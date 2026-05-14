@@ -6,7 +6,7 @@ Triển khai module Deal Pipeline theo pattern `controller → service → repo 
 
 ## Tasks
 
-- [X] 1. Tạo Zod schemas và DTOs cho deals module
+- [x] 1. Tạo Zod schemas và DTOs cho deals module
   - Tạo file `be/src/routes/deals/deals.model.ts` với đầy đủ schemas: `CreateDealBodySchema`, `UpdateDealStageBodySchema`, `UpdateDealBodySchema`, `GetDealResSchema`, `GetDealsPipelineResSchema`
   - Tạo file `be/src/routes/deals/deals.dto.ts` với các DTO classes dùng `createZodDto`
   - Import `DealStage` từ `generated/prisma-client`, không phải `@prisma/client`
@@ -18,7 +18,7 @@ Triển khai module Deal Pipeline theo pattern `controller → service → repo 
     - **Property 10: Forbidden fields bị reject bởi strict schema**
     - **Validates: Requirements 1.2, 1.3, 3.2, 4.5**
 
-- [X] 2. Tạo DealsRepository
+- [x] 2. Tạo DealsRepository
   - Tạo file `be/src/routes/deals/deals.repo.ts`
   - Implement `findAllByTenant(tenantId)` — query với `where: { tenantId, deletedAt: null }`, include contact/owner select
   - Implement `findOne(dealId, tenantId)` — full relations (contact, owner, tasks, activities take:20, aiSuggestions)
@@ -34,7 +34,7 @@ Triển khai module Deal Pipeline theo pattern `controller → service → repo 
     - **Property 5: Soft-deleted deals không xuất hiện trong findAllByTenant và findOne**
     - **Validates: Requirements 1.4, 2.2, 6.4, 7.2, 7.3**
 
-- [X] 3. Tạo DealsService
+- [x] 3. Tạo DealsService
   - Tạo file `be/src/routes/deals/deals.service.ts`
   - Implement `getPipeline(tenantId)` — gọi `findAllByTenant`, nhóm deals theo stage với object khởi tạo đủ 5 key = `[]`
   - Implement `getDealById(dealId, tenantId)` — gọi `findOne`, throw `NotFoundException` nếu null
@@ -58,7 +58,7 @@ Triển khai module Deal Pipeline theo pattern `controller → service → repo 
 - [ ] 4. Checkpoint — Đảm bảo tất cả tests pass
   - Đảm bảo tất cả tests pass, hỏi user nếu có thắc mắc.
 
-- [ ] 5. Tạo DealsController
+- [x] 5. Tạo DealsController
   - Tạo file `be/src/routes/deals/deals.controller.ts`
   - Khai báo `@Controller('deals')` và `@UseGuards(JwtAuthGuard)`
   - Implement `GET /deals/pipeline` — **phải đặt trước** `GET /deals/:id`
@@ -88,13 +88,77 @@ Triển khai module Deal Pipeline theo pattern `controller → service → repo 
     - **Property 11: GET /deals/:id trả về đủ relations, tasks sort createdAt asc, activities sort date desc tối đa 20, không có deletedAt**
     - **Validates: Requirements 5.1, 5.2, 5.4**
 
-- [ ] 6. Tạo DealsModule và wire vào AppModule
+- [x] 6. Tạo DealsModule và wire vào AppModule
   - Tạo file `be/src/routes/deals/deals.module.ts` với đầy đủ providers: `DealsController`, `DealsService`, `DealsRepository`, `PrismaService`
   - Import `DealsModule` vào `be/src/app.module.ts`
   - _Requirements: 7.1, 7.2_
 
-- [ ] 7. Checkpoint cuối — Đảm bảo tất cả tests pass
+- [x] 7. Checkpoint cuối — Đảm bảo tất cả tests pass
   - Đảm bảo tất cả tests pass, hỏi user nếu có thắc mắc.
+
+---
+
+## Frontend Tasks — Deal Pipeline (Zustand + dnd-kit)
+
+- [x] 8. Cài đặt dependencies và tạo types/service cho deals FE
+  - Cài `zustand` vào `fe/`: `npm install zustand`
+  - Tạo `fe/src/types/deal.type.ts` — mirror types từ backend: `DealStage` enum (uppercase), `DealCard`, `DealDetail`, `PipelineRes`
+  - Tạo `fe/src/lib/validations/deals.schema.ts` — Zod schemas cho `CreateDealBody`, `UpdateDealBody`
+  - Tạo `fe/src/services/deals.service.ts` — axios calls: `getPipeline()`, `getDealById()`, `createDeal()`, `updateDealStage()`, `updateDeal()`, `deleteDeal()`
+  - _Liên quan: Requirements 1.1, 2.1, 3.1, 4.1, 5.1, 6.1_
+
+- [x] 9. Tạo Zustand store cho pipeline
+  - Tạo `fe/src/store/pipelineStore.ts`
+  - State: `pipeline: Record<DealStage, DealCard[]>`, `isLoading`, `error`
+  - Actions: `setPipeline(data)`, `moveDeal(dealId, fromStage, toStage)` — optimistic update local trước, gọi API sau
+  - `moveDeal` phải update local state ngay lập tức (optimistic), rollback nếu API thất bại
+  - _Liên quan: Requirements 2.1, 2.3, 3.1_
+
+- [x] 10. Tạo React Query hooks cho deals
+  - Tạo `fe/src/hooks/useDeals.ts`
+  - `useGetPipeline()` — fetch `GET /deals/pipeline`, sync kết quả vào Zustand store qua `onSuccess`
+  - `useCreateDeal()` — mutation, invalidate pipeline cache sau khi tạo thành công
+  - `useUpdateDealStage()` — mutation với optimistic update qua Zustand store
+  - `useUpdateDeal()` — mutation, invalidate deal detail cache
+  - `useDeleteDeal()` — mutation, invalidate pipeline cache
+  - `useGetDealDetail(id)` — fetch `GET /deals/:id`
+  - _Liên quan: Requirements 1.1, 2.1, 3.1, 4.1, 5.1, 6.1_
+
+- [x] 11. Refactor types và STAGE_CONFIG để dùng uppercase DealStage
+  - Cập nhật `fe/src/app/(dashboard)/pipeline/_components/types.ts`
+  - Đổi `Stage` type từ lowercase sang `DealStage` enum uppercase: `PROSPECT | QUALIFIED | PROPOSAL | CLOSED_WON | CLOSED_LOST`
+  - Thêm `CLOSED_LOST` vào `STAGE_CONFIG` và `STAGES` array
+  - Cập nhật `INITIAL_DEALS` dùng uppercase stages (hoặc xóa mock data khi đã có API)
+  - _Liên quan: Requirements 2.1_
+
+- [X] 12. Implement dnd-kit drag-and-drop trong KanbanBoard + KanbanColumn
+  - Cập nhật `KanbanBoard.tsx`: wrap với `<DndContext>` từ `@dnd-kit/core`, handle `onDragEnd` → gọi `moveDeal` từ Zustand store
+  - Cập nhật `KanbanColumn.tsx`: dùng `useDroppable` từ `@dnd-kit/core` (đã import sẵn), bỏ comment code cũ, thêm visual feedback khi `isOver`
+  - Cập nhật `DealCard.tsx`: dùng `useDraggable` từ `@dnd-kit/core`, bỏ comment code cũ, thêm `opacity` khi đang drag
+  - Kết nối `KanbanBoard` với `useGetPipeline()` hook để load data thật từ API
+  - _Liên quan: Requirements 3.1_
+
+- [ ] 13. Tạo CreateDealDialog component
+  - Tạo `fe/src/app/(dashboard)/pipeline/_components/CreateDealDialog.tsx`
+  - Form dùng React Hook Form + Zod: fields `title` (required), `contactId` (select), `ownerId` (select), `value`, `closeDate`, `note`
+  - Dùng `useCreateDeal()` mutation để submit
+  - Kết nối nút "Thêm deal" trên header và nút "Thêm deal" trong empty column với dialog này
+  - _Liên quan: Requirements 1.1, 1.2, 1.3_
+
+- [ ] 14. Tạo trang Deal Detail (`/pipeline/[id]`)
+  - Tạo `fe/src/app/(dashboard)/pipeline/[id]/page.tsx`
+  - Dùng `useGetDealDetail(id)` để fetch data
+  - Hiển thị: thông tin deal (title, value, stage, closeDate, note), contact info, owner, danh sách tasks, activities (tối đa 20), AI suggestions
+  - Thêm nút edit deal (mở sheet/dialog) dùng `useUpdateDeal()`
+  - Thêm nút delete deal dùng `useDeleteDeal()`, redirect về `/pipeline` sau khi xóa
+  - _Liên quan: Requirements 4.1, 5.1, 6.1_
+
+- [ ] 15. Checkpoint FE — Kiểm tra toàn bộ luồng
+  - Verify: tạo deal → xuất hiện trong pipeline đúng cột PROSPECT
+  - Verify: kéo thả deal sang cột khác → stage cập nhật trên server
+  - Verify: mở deal detail → hiển thị đầy đủ relations
+  - Verify: xóa deal → biến mất khỏi pipeline
+  - Verify: empty state hiển thị đúng khi pipeline trống
 
 ## Ghi chú
 
@@ -103,3 +167,6 @@ Triển khai module Deal Pipeline theo pattern `controller → service → repo 
 - Property tests dùng thư viện **fast-check**, tối thiểu 100 iterations mỗi test
 - Mỗi property test phải có comment tag: `// Feature: deal-pipeline, Property {N}: {mô tả}`
 - Import Prisma client từ `generated/prisma-client`, không phải `@prisma/client`
+- FE dùng Zustand cho optimistic UI khi drag-and-drop, React Query cho server state
+- `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/react` đã có sẵn trong `fe/package.json`
+- Zustand chưa được cài — cần `npm install zustand` trong `fe/`

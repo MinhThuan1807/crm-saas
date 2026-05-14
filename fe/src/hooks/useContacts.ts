@@ -24,6 +24,27 @@ export const contactKeys = {
   detail: (id: string) => [...contactKeys.all, "detail", id] as const,
 }
 
+// export const contactQueries = {
+//   getContacts: (params: GetContactsQueryType) => ({
+//     queryKey: contactKeys.list(params),
+//     queryFn: ({ pageParam }) => contactsService.getAll({
+//       ...params,
+//       cursor: pageParam as string | undefined,
+//     }),
+//     staleTime: 30_000,
+//     initialPageParam: undefined as string | undefined,
+//     getNextPageParam: (lastPage) =>
+//       lastPage.pagination.hasNextPage
+//         ? lastPage.pagination.nextCursor ?? undefined
+//         : undefined,
+//   }),
+//   getContact: (id: string) => ({
+//     queryKey: contactKeys.detail(id),
+//     queryFn: () => contactsService.getById(id),
+//   }),
+
+// }
+
 // ─────────────────────────────────────────
 // GET ALL — dùng ở trang danh sách
 // ─────────────────────────────────────────
@@ -35,6 +56,7 @@ export const useGetContacts = (params: GetContactsQueryType) => {
         ...params,
         cursor: pageParam as string | undefined,
       }),
+    staleTime: 30_000,
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) =>
       lastPage.pagination.hasNextPage
