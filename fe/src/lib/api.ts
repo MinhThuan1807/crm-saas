@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.codelaicuocdoi.io.vn/";
+const baseUrl = "http://localhost:3001/";
 
 export const axiosInstance = axios.create({
   baseURL: baseUrl,

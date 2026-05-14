@@ -39,9 +39,8 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    //  "baseUrl": "./",
-    "moduleResolution": "node", // or "node"
-    "ignoreDeprecations": "6.0",
+    "baseUrl": "./",
+    "moduleResolution": "node",
     "paths": {
       "src/*": ["./src/*"]
     },
@@ -55,8 +54,6 @@
     "esModuleInterop": true
   },
   "ts-node": {
-    "require": [
-      "tsconfig-paths/register"
-    ]
+    "require": ["tsconfig-paths/register"]
   }
 }
