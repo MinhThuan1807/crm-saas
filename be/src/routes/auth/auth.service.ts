@@ -129,7 +129,7 @@ export class AuthService {
       secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-      path: '/auth', // 🔥 chỉ gửi khi gọi API auth (bảo mật hơn)
+      path: '/auth', //  chỉ gửi khi gọi API auth (bảo mật hơn)
     })
 
     return { message: 'Refreshed successfully' }

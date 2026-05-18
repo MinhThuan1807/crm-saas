@@ -11,8 +11,9 @@ import { AuthModule } from './routes/auth/auth.module'
 import { ContactsModule } from './routes/contacts/contacts.module';
 import { ActivitiesModule } from './routes/activities/activities.module';
 import { DealModule } from './routes/deal/deal.module';
+import { UsersModule } from './routes/users/users.module';
 @Module({
-  imports: [CommonModule, AuthModule, ContactsModule, ActivitiesModule, DealModule],
+  imports: [CommonModule, AuthModule, ContactsModule, ActivitiesModule, DealModule, UsersModule],
   controllers: [AppController],
   providers: [
     AppService,

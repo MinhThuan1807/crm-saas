@@ -10,8 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { auth } from "@/services/auth.service";
-import { toast } from "sonner";
 import { RegisterBodyType } from "@/lib/validations/auth.schema";
 import { useRouter} from "next/navigation";
 import { RegisterBodySchema } from '@/lib/validations/auth.schema';

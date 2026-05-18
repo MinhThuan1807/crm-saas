@@ -12,8 +12,14 @@ interface ContactDialogProps {
   contact?: Contact;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onCreated?: (contact: Contact) => void;
 }
-function ContactDialog({ contact, isOpen, onOpenChange }: ContactDialogProps) {
+function ContactDialog({
+  contact,
+  isOpen,
+  onOpenChange,
+  onCreated,
+}: ContactDialogProps) {
   const { mutateAsync: createContact, isPending: isCreating } =
     useCreateContact();
   const { mutateAsync: updateContact, isPending: isUpdating } =
@@ -30,7 +36,8 @@ function ContactDialog({ contact, isOpen, onOpenChange }: ContactDialogProps) {
       if (isEditing && contact?.id) {
         await updateContact({ id: contact.id, data });
       } else {
-        await createContact(data);
+        const createdContact = await createContact(data);
+        onCreated?.(createdContact);
       }
       onOpenChange(false);
     } catch (error) {

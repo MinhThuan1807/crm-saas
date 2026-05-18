@@ -22,7 +22,7 @@ import { AccessTokenPayload } from 'src/common/types/jwt.type'
 // Cookie options dùng chung để đảm bảo nhất quán
 const isProduction = envConfig.NODE_ENV === 'production'
 
-const COOKIE_OPTIONS = {
+export const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: isProduction,           // true trên production (bắt buộc với sameSite: none)
   sameSite: isProduction          // production: 'none' (cross-site), dev: 'lax' (local)

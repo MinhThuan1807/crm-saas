@@ -1,9 +1,15 @@
+"use client";
+
 import { Plus, Filter, LayoutGrid, List, ChevronDown } from "lucide-react";
+import { useState } from "react";
 import { KanbanBoard } from "@/app/(dashboard)/pipeline/_components/KanbanBoard";
+import { CreateDealSheet } from "@/app/(dashboard)/pipeline/_components/CreateDealSheet";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 export default function Pipeline() {
+  const [createOpen, setCreateOpen] = useState(false);
+
   return (
     <div className="flex h-full flex-col flex-1 min-w-0 overflow-hidden">
       {/* Top bar */}
@@ -63,7 +69,11 @@ export default function Pipeline() {
             <ChevronDown size={12} />
           </Button>
 
-          <Button size="sm" className="h-8 gap-1.5 text-xs">
+          <Button
+            size="sm"
+            className="h-8 gap-1.5 text-xs"
+            onClick={() => setCreateOpen(true)}
+          >
             <Plus size={13} />
             Thêm deal
           </Button>
@@ -76,6 +86,8 @@ export default function Pipeline() {
           <KanbanBoard />
         </div>
       </main>
+
+      <CreateDealSheet open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   );
 }

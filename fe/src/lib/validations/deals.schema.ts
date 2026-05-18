@@ -37,7 +37,7 @@ export const DealCardSchema = z.object({
     "CLOSED_WON",
     "CLOSED_LOST",
   ]),
-  closeDate: z.coerce.date().nullable(),
+  closeDate: z.coerce.date(),
   note: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
@@ -123,7 +123,7 @@ export const UpdateDealBodySchema = z
   .object({
     title: z.string().min(1).max(200).optional(),
     value: z.coerce.number().nonnegative().optional(),
-    closeDate: z.coerce.date().nullable().optional(),
+    closeDate: z.coerce.date().optional(),
     note: z.string().nullable().optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {

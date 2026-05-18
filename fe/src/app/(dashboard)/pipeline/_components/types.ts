@@ -1,6 +1,6 @@
 // Re-export từ deals.schema để dùng chung trong pipeline components
 export { DealStage } from "@/lib/validations/deals.schema";
-export type { DealCard as Deal } from "@/lib/validations/deals.schema";
+export type { DealDetail as Deal } from "@/lib/validations/deals.schema";
 import type { DealStage } from "@/lib/validations/deals.schema";
 
 // Alias để các component dùng Stage thay vì DealStage (backward compat)
@@ -49,3 +49,11 @@ export const STAGES: DealStage[] = [
   "CLOSED_WON",
   "CLOSED_LOST",
 ];
+
+export type Task = {
+  id: string;
+  title: string;
+  done: boolean;
+  dueDate: Date | null;
+  createdAt: Date;
+};
