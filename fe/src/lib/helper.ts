@@ -14,6 +14,7 @@ export function relativeTime(dateStr: string | Date): string {
   if (diff < 90) return "2 tháng trước";
   return `${Math.floor(diff / 30)} tháng trước`;
 }
+
 export function getInitials(name: string): string {
   // Tách tên thành các phần bằng khoảng trắng
   const parts = name.trim().split(/\s+/);

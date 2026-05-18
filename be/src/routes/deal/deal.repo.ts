@@ -32,7 +32,7 @@ export class DealRepository {
       where: { id: dealId, tenantId, deletedAt: null },
       include: {
         contact: true,
-        owner: { select: { id: true, name: true } },
+        owner: { select: { id: true, name: true, email: true } },
         tasks: { orderBy: { createdAt: 'asc' } },
         activities: { orderBy: { date: 'desc' }, take: 20 },
         aiSuggestions: { orderBy: { createdAt: 'desc' } },
