@@ -36,9 +36,12 @@ export const CreateDealBodySchema = DealBaseSchema.pick({
   title: true,
   value: true,
   // stage: true,
-  closeDate: true,
   note: true,
-}).strict()
+})
+  .extend({
+    closeDate: z.coerce.date().nullable().optional(),
+  })
+  .strict()
 
 export const CreateDealResSchema = DealBaseSchema.omit({ deletedAt: true })
 

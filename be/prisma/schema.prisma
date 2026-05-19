@@ -79,7 +79,7 @@ model Contact {
   tenantId  String
   name      String
   email     String?            // ? = optional
-  phone     String?
+  phone     String?            
   company   String?
   position  String?
   createdAt DateTime @default(now())
@@ -142,6 +142,7 @@ model Activity {
 
 model Task {
   id        String   @id @default(cuid())
+  tenantId  String
   dealId    String
   title     String
   done      Boolean  @default(false)
@@ -149,10 +150,15 @@ model Task {
   createdAt DateTime @default(now())
 
   deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, dealId])
 }
 
 model AiSuggestion {
   id        String           @id @default(cuid())
+  tenantId  String
+  jobId     String           // ID trả về từ hệ thống AI (OpenAI, etc.) để tracking
   dealId    String
   type      AiSuggestionType
   content   String           // JSON string hoặc plain text
@@ -160,6 +166,9 @@ model AiSuggestion {
   createdAt DateTime         @default(now())
 
   deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  @@index([tenantId])
+  @@index([tenantId, dealId])
+  @@index([tenantId, jobId])
 }
 
 model RefreshToken {

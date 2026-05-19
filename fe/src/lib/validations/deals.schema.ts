@@ -112,7 +112,7 @@ export const CreateDealBodySchema = z.object({
   contactId: z.string().min(1, "Vui lòng chọn liên hệ"),
   ownerId: z.string().min(1, "Vui lòng chọn người phụ trách"),
   value: z.coerce.number().nonnegative("Giá trị không được âm").default(0),
-  closeDate: z.coerce.date().optional(),
+  closeDate: z.coerce.date(),
   note: z.string().optional(),
 });
 
@@ -123,7 +123,7 @@ export const UpdateDealBodySchema = z
   .object({
     title: z.string().min(1).max(200).optional(),
     value: z.coerce.number().nonnegative().optional(),
-    closeDate: z.coerce.date().optional(),
+    closeDate: z.coerce.date().nullable().optional(),
     note: z.string().nullable().optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {

@@ -15,6 +15,15 @@ export function relativeTime(dateStr: string | Date): string {
   return `${Math.floor(diff / 30)} tháng trước`;
 }
 
+export function formatDate(dateStr: string | Date): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  });
+}
+
 export function getInitials(name: string): string {
   // Tách tên thành các phần bằng khoảng trắng
   const parts = name.trim().split(/\s+/);

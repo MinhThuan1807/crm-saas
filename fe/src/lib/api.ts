@@ -20,7 +20,12 @@ const refreshClient = axios.create({
   withCredentials: true,
 });
 
-let refreshPromise: Promise<unknown> | null = null;
+const refreshPromise: Promise<unknown> | null = null;
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: any) => void;
+  reject: (reason?: any) => void;
+}> = [];
 
 axiosInstance.interceptors.response.use(
   (response) => response,
@@ -31,22 +36,48 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (originalRequest.url?.includes("/auth/refresh-token") || originalRequest._retry) {
+    if (
+      originalRequest.url?.includes("auth/refresh-token") ||
+      originalRequest._retry
+    ) {
+      isRefreshing = false;
       window.location.href = "/login";
       return Promise.reject(error);
     }
 
     originalRequest._retry = true;
 
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      }).then(() => {
+        return axiosInstance(originalRequest);
+      });
+    }
+
+    isRefreshing = true;
+
     try {
-      refreshPromise ??= refreshClient.post("/auth/refresh-token", {});
-      await refreshPromise;
+      await refreshClient.post("auth/refresh-token", {});
+      processQueue(null);
       return axiosInstance(originalRequest);
     } catch (refreshError) {
+      processQueue(refreshError);
       window.location.href = "/login";
       return Promise.reject(refreshError);
     } finally {
-      refreshPromise = null;
+      isRefreshing = false;
     }
-  }
+  },
 );
+
+const processQueue = (error: any, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};

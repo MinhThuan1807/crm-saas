@@ -153,6 +153,7 @@ export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typ
 
 export const TaskScalarFieldEnum = {
   id: 'id',
+  tenantId: 'tenantId',
   dealId: 'dealId',
   title: 'title',
   done: 'done',
@@ -165,6 +166,8 @@ export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof Task
 
 export const AiSuggestionScalarFieldEnum = {
   id: 'id',
+  tenantId: 'tenantId',
+  jobId: 'jobId',
   dealId: 'dealId',
   type: 'type',
   content: 'content',

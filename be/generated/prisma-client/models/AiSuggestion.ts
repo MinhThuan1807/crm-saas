@@ -26,6 +26,8 @@ export type AggregateAiSuggestion = {
 
 export type AiSuggestionMinAggregateOutputType = {
   id: string | null
+  tenantId: string | null
+  jobId: string | null
   dealId: string | null
   type: $Enums.AiSuggestionType | null
   content: string | null
@@ -35,6 +37,8 @@ export type AiSuggestionMinAggregateOutputType = {
 
 export type AiSuggestionMaxAggregateOutputType = {
   id: string | null
+  tenantId: string | null
+  jobId: string | null
   dealId: string | null
   type: $Enums.AiSuggestionType | null
   content: string | null
@@ -44,6 +48,8 @@ export type AiSuggestionMaxAggregateOutputType = {
 
 export type AiSuggestionCountAggregateOutputType = {
   id: number
+  tenantId: number
+  jobId: number
   dealId: number
   type: number
   content: number
@@ -55,6 +61,8 @@ export type AiSuggestionCountAggregateOutputType = {
 
 export type AiSuggestionMinAggregateInputType = {
   id?: true
+  tenantId?: true
+  jobId?: true
   dealId?: true
   type?: true
   content?: true
@@ -64,6 +72,8 @@ export type AiSuggestionMinAggregateInputType = {
 
 export type AiSuggestionMaxAggregateInputType = {
   id?: true
+  tenantId?: true
+  jobId?: true
   dealId?: true
   type?: true
   content?: true
@@ -73,6 +83,8 @@ export type AiSuggestionMaxAggregateInputType = {
 
 export type AiSuggestionCountAggregateInputType = {
   id?: true
+  tenantId?: true
+  jobId?: true
   dealId?: true
   type?: true
   content?: true
@@ -155,6 +167,8 @@ export type AiSuggestionGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 
 export type AiSuggestionGroupByOutputType = {
   id: string
+  tenantId: string
+  jobId: string
   dealId: string
   type: $Enums.AiSuggestionType
   content: string
@@ -185,6 +199,8 @@ export type AiSuggestionWhereInput = {
   OR?: Prisma.AiSuggestionWhereInput[]
   NOT?: Prisma.AiSuggestionWhereInput | Prisma.AiSuggestionWhereInput[]
   id?: Prisma.StringFilter<"AiSuggestion"> | string
+  tenantId?: Prisma.StringFilter<"AiSuggestion"> | string
+  jobId?: Prisma.StringFilter<"AiSuggestion"> | string
   dealId?: Prisma.StringFilter<"AiSuggestion"> | string
   type?: Prisma.EnumAiSuggestionTypeFilter<"AiSuggestion"> | $Enums.AiSuggestionType
   content?: Prisma.StringFilter<"AiSuggestion"> | string
@@ -195,6 +211,8 @@ export type AiSuggestionWhereInput = {
 
 export type AiSuggestionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
+  jobId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -208,6 +226,8 @@ export type AiSuggestionWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.AiSuggestionWhereInput | Prisma.AiSuggestionWhereInput[]
   OR?: Prisma.AiSuggestionWhereInput[]
   NOT?: Prisma.AiSuggestionWhereInput | Prisma.AiSuggestionWhereInput[]
+  tenantId?: Prisma.StringFilter<"AiSuggestion"> | string
+  jobId?: Prisma.StringFilter<"AiSuggestion"> | string
   dealId?: Prisma.StringFilter<"AiSuggestion"> | string
   type?: Prisma.EnumAiSuggestionTypeFilter<"AiSuggestion"> | $Enums.AiSuggestionType
   content?: Prisma.StringFilter<"AiSuggestion"> | string
@@ -218,6 +238,8 @@ export type AiSuggestionWhereUniqueInput = Prisma.AtLeast<{
 
 export type AiSuggestionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
+  jobId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -233,6 +255,8 @@ export type AiSuggestionScalarWhereWithAggregatesInput = {
   OR?: Prisma.AiSuggestionScalarWhereWithAggregatesInput[]
   NOT?: Prisma.AiSuggestionScalarWhereWithAggregatesInput | Prisma.AiSuggestionScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"AiSuggestion"> | string
+  tenantId?: Prisma.StringWithAggregatesFilter<"AiSuggestion"> | string
+  jobId?: Prisma.StringWithAggregatesFilter<"AiSuggestion"> | string
   dealId?: Prisma.StringWithAggregatesFilter<"AiSuggestion"> | string
   type?: Prisma.EnumAiSuggestionTypeWithAggregatesFilter<"AiSuggestion"> | $Enums.AiSuggestionType
   content?: Prisma.StringWithAggregatesFilter<"AiSuggestion"> | string
@@ -242,6 +266,8 @@ export type AiSuggestionScalarWhereWithAggregatesInput = {
 
 export type AiSuggestionCreateInput = {
   id?: string
+  tenantId: string
+  jobId: string
   type: $Enums.AiSuggestionType
   content: string
   sourceNote?: string | null
@@ -251,6 +277,8 @@ export type AiSuggestionCreateInput = {
 
 export type AiSuggestionUncheckedCreateInput = {
   id?: string
+  tenantId: string
+  jobId: string
   dealId: string
   type: $Enums.AiSuggestionType
   content: string
@@ -260,6 +288,8 @@ export type AiSuggestionUncheckedCreateInput = {
 
 export type AiSuggestionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumAiSuggestionTypeFieldUpdateOperationsInput | $Enums.AiSuggestionType
   content?: Prisma.StringFieldUpdateOperationsInput | string
   sourceNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -269,6 +299,8 @@ export type AiSuggestionUpdateInput = {
 
 export type AiSuggestionUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
   dealId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumAiSuggestionTypeFieldUpdateOperationsInput | $Enums.AiSuggestionType
   content?: Prisma.StringFieldUpdateOperationsInput | string
@@ -278,6 +310,8 @@ export type AiSuggestionUncheckedUpdateInput = {
 
 export type AiSuggestionCreateManyInput = {
   id?: string
+  tenantId: string
+  jobId: string
   dealId: string
   type: $Enums.AiSuggestionType
   content: string
@@ -287,6 +321,8 @@ export type AiSuggestionCreateManyInput = {
 
 export type AiSuggestionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumAiSuggestionTypeFieldUpdateOperationsInput | $Enums.AiSuggestionType
   content?: Prisma.StringFieldUpdateOperationsInput | string
   sourceNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -295,6 +331,8 @@ export type AiSuggestionUpdateManyMutationInput = {
 
 export type AiSuggestionUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
   dealId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumAiSuggestionTypeFieldUpdateOperationsInput | $Enums.AiSuggestionType
   content?: Prisma.StringFieldUpdateOperationsInput | string
@@ -314,6 +352,8 @@ export type AiSuggestionOrderByRelationAggregateInput = {
 
 export type AiSuggestionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
+  jobId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -323,6 +363,8 @@ export type AiSuggestionCountOrderByAggregateInput = {
 
 export type AiSuggestionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
+  jobId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -332,6 +374,8 @@ export type AiSuggestionMaxOrderByAggregateInput = {
 
 export type AiSuggestionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
+  jobId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   content?: Prisma.SortOrder
@@ -387,6 +431,8 @@ export type EnumAiSuggestionTypeFieldUpdateOperationsInput = {
 
 export type AiSuggestionCreateWithoutDealInput = {
   id?: string
+  tenantId: string
+  jobId: string
   type: $Enums.AiSuggestionType
   content: string
   sourceNote?: string | null
@@ -395,6 +441,8 @@ export type AiSuggestionCreateWithoutDealInput = {
 
 export type AiSuggestionUncheckedCreateWithoutDealInput = {
   id?: string
+  tenantId: string
+  jobId: string
   type: $Enums.AiSuggestionType
   content: string
   sourceNote?: string | null
@@ -432,6 +480,8 @@ export type AiSuggestionScalarWhereInput = {
   OR?: Prisma.AiSuggestionScalarWhereInput[]
   NOT?: Prisma.AiSuggestionScalarWhereInput | Prisma.AiSuggestionScalarWhereInput[]
   id?: Prisma.StringFilter<"AiSuggestion"> | string
+  tenantId?: Prisma.StringFilter<"AiSuggestion"> | string
+  jobId?: Prisma.StringFilter<"AiSuggestion"> | string
   dealId?: Prisma.StringFilter<"AiSuggestion"> | string
   type?: Prisma.EnumAiSuggestionTypeFilter<"AiSuggestion"> | $Enums.AiSuggestionType
   content?: Prisma.StringFilter<"AiSuggestion"> | string
@@ -441,6 +491,8 @@ export type AiSuggestionScalarWhereInput = {
 
 export type AiSuggestionCreateManyDealInput = {
   id?: string
+  tenantId: string
+  jobId: string
   type: $Enums.AiSuggestionType
   content: string
   sourceNote?: string | null
@@ -449,6 +501,8 @@ export type AiSuggestionCreateManyDealInput = {
 
 export type AiSuggestionUpdateWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumAiSuggestionTypeFieldUpdateOperationsInput | $Enums.AiSuggestionType
   content?: Prisma.StringFieldUpdateOperationsInput | string
   sourceNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -457,6 +511,8 @@ export type AiSuggestionUpdateWithoutDealInput = {
 
 export type AiSuggestionUncheckedUpdateWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumAiSuggestionTypeFieldUpdateOperationsInput | $Enums.AiSuggestionType
   content?: Prisma.StringFieldUpdateOperationsInput | string
   sourceNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -465,6 +521,8 @@ export type AiSuggestionUncheckedUpdateWithoutDealInput = {
 
 export type AiSuggestionUncheckedUpdateManyWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  jobId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumAiSuggestionTypeFieldUpdateOperationsInput | $Enums.AiSuggestionType
   content?: Prisma.StringFieldUpdateOperationsInput | string
   sourceNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -475,6 +533,8 @@ export type AiSuggestionUncheckedUpdateManyWithoutDealInput = {
 
 export type AiSuggestionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  tenantId?: boolean
+  jobId?: boolean
   dealId?: boolean
   type?: boolean
   content?: boolean
@@ -485,6 +545,8 @@ export type AiSuggestionSelect<ExtArgs extends runtime.Types.Extensions.Internal
 
 export type AiSuggestionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  tenantId?: boolean
+  jobId?: boolean
   dealId?: boolean
   type?: boolean
   content?: boolean
@@ -495,6 +557,8 @@ export type AiSuggestionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
 
 export type AiSuggestionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  tenantId?: boolean
+  jobId?: boolean
   dealId?: boolean
   type?: boolean
   content?: boolean
@@ -505,6 +569,8 @@ export type AiSuggestionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
 
 export type AiSuggestionSelectScalar = {
   id?: boolean
+  tenantId?: boolean
+  jobId?: boolean
   dealId?: boolean
   type?: boolean
   content?: boolean
@@ -512,7 +578,7 @@ export type AiSuggestionSelectScalar = {
   createdAt?: boolean
 }
 
-export type AiSuggestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "dealId" | "type" | "content" | "sourceNote" | "createdAt", ExtArgs["result"]["aiSuggestion"]>
+export type AiSuggestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "jobId" | "dealId" | "type" | "content" | "sourceNote" | "createdAt", ExtArgs["result"]["aiSuggestion"]>
 export type AiSuggestionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   deal?: boolean | Prisma.DealDefaultArgs<ExtArgs>
 }
@@ -530,6 +596,8 @@ export type $AiSuggestionPayload<ExtArgs extends runtime.Types.Extensions.Intern
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    tenantId: string
+    jobId: string
     dealId: string
     type: $Enums.AiSuggestionType
     content: string
@@ -960,6 +1028,8 @@ export interface Prisma__AiSuggestionClient<T, Null = never, ExtArgs extends run
  */
 export interface AiSuggestionFieldRefs {
   readonly id: Prisma.FieldRef<"AiSuggestion", 'String'>
+  readonly tenantId: Prisma.FieldRef<"AiSuggestion", 'String'>
+  readonly jobId: Prisma.FieldRef<"AiSuggestion", 'String'>
   readonly dealId: Prisma.FieldRef<"AiSuggestion", 'String'>
   readonly type: Prisma.FieldRef<"AiSuggestion", 'AiSuggestionType'>
   readonly content: Prisma.FieldRef<"AiSuggestion", 'String'>
