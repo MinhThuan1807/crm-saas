@@ -49,6 +49,7 @@ export class DealRepository {
         value: data.value ?? 0,
         stage: DealStageConst.PROSPECT,
         contactId: data.contactId,
+        closeDate: data.closeDate ?? null,
         note: data.note ?? null,
       },
     })

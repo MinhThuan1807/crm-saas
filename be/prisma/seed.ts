@@ -387,18 +387,21 @@ async function main() {
     data: [
       // deal1 — QUALIFIED
       {
+        tenantId: tenant.id,
         dealId: deal1.id,
         title: 'Gửi proposal chính thức',
         done: false,
         dueDate: new Date('2025-04-10'),
       },
       {
+        tenantId: tenant.id,
         dealId: deal1.id,
         title: 'Setup demo environment',
         done: true,
         dueDate: new Date('2025-04-05'),
       },
       {
+        tenantId: tenant.id,
         dealId: deal1.id,
         title: 'Confirm yêu cầu tích hợp với team kỹ thuật',
         done: false,
@@ -406,12 +409,14 @@ async function main() {
       },
       // deal2 — PROPOSAL
       {
+        tenantId: tenant.id,
         dealId: deal2.id,
         title: 'Viết tài liệu kỹ thuật API',
         done: false,
         dueDate: new Date('2025-04-12'),
       },
       {
+        tenantId: tenant.id,
         dealId: deal2.id,
         title: 'Follow up sau 3 ngày',
         done: false,
@@ -419,12 +424,14 @@ async function main() {
       },
       // deal3 — CLOSED_WON
       {
+        tenantId: tenant.id,
         dealId: deal3.id,
         title: 'Bàn giao tài liệu hợp đồng',
         done: true,
         dueDate: new Date('2025-04-02'),
       },
       {
+        tenantId: tenant.id,
         dealId: deal3.id,
         title: 'Kick-off meeting với team triển khai',
         done: true,
@@ -432,6 +439,7 @@ async function main() {
       },
       // deal0a — PROSPECT
       {
+        tenantId: tenant.id,
         dealId: deal0a.id,
         title: 'Gửi brochure sản phẩm',
         done: false,
@@ -447,6 +455,8 @@ async function main() {
   await prisma.aiSuggestion.createMany({
     data: [
       {
+        tenantId: tenant.id,
+        jobId: 'job-seed-001',
         dealId: deal1.id,
         type: AiSuggestionType.EMAIL_DRAFT,
         content:
@@ -454,12 +464,16 @@ async function main() {
         sourceNote: 'Demo sản phẩm tại văn phòng khách hàng',
       },
       {
+        tenantId: tenant.id,
+        jobId: 'job-seed-002',
         dealId: deal1.id,
         type: AiSuggestionType.TASK_LIST,
         content: JSON.stringify(['Gửi email follow-up sau demo', 'Chuẩn bị báo giá chính thức', 'Lên lịch họp lần 2']),
         sourceNote: 'Demo sản phẩm tại văn phòng khách hàng',
       },
       {
+        tenantId: tenant.id,
+        jobId: 'job-seed-003',
         dealId: deal2.id,
         type: AiSuggestionType.SUMMARY,
         content:
@@ -467,6 +481,8 @@ async function main() {
         sourceNote: 'Follow up sau khi gửi proposal',
       },
       {
+        tenantId: tenant.id,
+        jobId: 'job-seed-004',
         dealId: deal0a.id,
         type: AiSuggestionType.TASK_LIST,
         content: JSON.stringify([

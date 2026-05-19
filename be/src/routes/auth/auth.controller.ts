@@ -17,18 +17,10 @@ import { Roles } from 'src/common/decorators/roles.decorator'
 import { ROLE } from 'src/common/constants/role.constanst'
 import { MessageDto } from 'src/common/dto/message.dto'
 import envConfig from 'src/common/config'
+import { COOKIE_OPTIONS } from './auth.constants'
 import { AccessTokenPayload } from 'src/common/types/jwt.type'
 
-// Cookie options dùng chung để đảm bảo nhất quán
-const isProduction = envConfig.NODE_ENV === 'production'
-
-export const COOKIE_OPTIONS = {
-  httpOnly: true,
-  secure: isProduction,           // true trên production (bắt buộc với sameSite: none)
-  sameSite: isProduction          // production: 'none' (cross-site), dev: 'lax' (local)
-    ? ('none' as const)
-    : ('lax' as const),
-}
+// COOKIE_OPTIONS moved to auth.constants to avoid circular imports
 
 @Controller('auth')
 export class AuthController {
@@ -74,6 +66,7 @@ export class AuthController {
   @ZodSerializerDto(MessageDto)
   async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies.refreshToken
+     console.log('=== REFRESH TOKEN FROM COOKIE ===', refreshToken)
     return this.authService.refreshToken(refreshToken, res)
   }
 

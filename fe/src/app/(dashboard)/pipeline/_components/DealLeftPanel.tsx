@@ -22,7 +22,7 @@ import { DealStage } from "./types";
 import { cn } from "@/lib/utils";
 import { Deal } from "./types";
 import { Task } from "./types";
-import {  formatCurrency, getInitials } from "@/lib/helper";
+import {  formatCurrency, formatDate, getInitials } from "@/lib/helper";
 
 // ── Mock data ───────────────────────────────────────────────────────────────
 // const DEAL = {
@@ -42,56 +42,20 @@ import {  formatCurrency, getInitials } from "@/lib/helper";
 //   },
 // };
 
-const CONTACT = {
-  id: "c1",
-  name: "Phạm Đức Quang",
-  title: "Giám đốc IT",
-  company: "Ngân hàng JKL",
-  email: "quang.pham@jklbank.vn",
-  phone: "0912 456 789",
-  initials: "PQ",
-  avatarBg: "#D4E8F5",
-  avatarColor: "#1A5C7A",
-};
+// const CONTACT = {
+//   id: "c1",
+//   name: "Phạm Đức Quang",
+//   title: "Giám đốc IT",
+//   company: "Ngân hàng JKL",
+//   email: "quang.pham@jklbank.vn",
+//   phone: "0912 456 789",
+//   initials: "PQ",
+//   avatarBg: "#D4E8F5",
+//   avatarColor: "#1A5C7A",
+// };
 
 type Priority = "high" | "medium" | "low";
 type DueStatus = "overdue" | "today" | "upcoming" | "done";
-
-
-// const INITIAL_TASKS: Task[] = [
-//   {
-//     id: "t1",
-//     title: "Soạn và gửi hợp đồng + SOW chi tiết",
-//     due: "22/03",
-//     done: false,
-//     priority: "high",
-//     dueStatus: "overdue",
-//   },
-//   {
-//     id: "t2",
-//     title: "Lên lịch kickoff meeting với đội kỹ thuật JKL",
-//     due: "24/03",
-//     done: false,
-//     priority: "high",
-//     dueStatus: "today",
-//   },
-//   {
-//     id: "t3",
-//     title: "Chuẩn bị quyền truy cập staging environment",
-//     due: "25/03",
-//     done: false,
-//     priority: "medium",
-//     dueStatus: "upcoming",
-//   },
-//   {
-//     id: "t4",
-//     title: "Review checklist tuân thủ PCI-DSS",
-//     due: "28/03",
-//     done: true,
-//     priority: "low",
-//     dueStatus: "done",
-//   },
-// ];
 
 const PIPELINE_STAGES: { key: DealStage; label: string }[] = [
   { key: "PROSPECT",   label: "Prospect" },
@@ -196,7 +160,7 @@ export function DealLeftPanel({ deal }: DealLeftPanelProps) {
               Ngày chốt dự kiến
             </p>
             <p className="text-foreground" style={{ fontSize: 14, fontWeight: 600, lineHeight: 1.35 }}>
-              {new Date(deal.closeDate).toLocaleDateString()}
+              {formatDate(deal.closeDate)}
             </p>
           </div>
 
@@ -307,7 +271,7 @@ export function DealLeftPanel({ deal }: DealLeftPanelProps) {
             Liên hệ chính
           </p>
           <Link
-            href={`/contacts/${CONTACT.id}`}
+            href={`/contacts/${deal.contact.id}`}
             className="flex items-center gap-0.5 text-primary hover:underline"
             style={{ fontSize: 11 }}
           >
@@ -322,22 +286,22 @@ export function DealLeftPanel({ deal }: DealLeftPanelProps) {
             <AvatarFallback
               className="border-0"
               style={{
-                background: CONTACT.avatarBg,
-                color: CONTACT.avatarColor,
+                background: "#D4E8F5",
+                color: "#1A5C7A",
                 fontSize: 14,
                 fontWeight: 600,
               }}
             >
-              {CONTACT.initials}
+              {getInitials(deal.contact.name)}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
             <p className="text-foreground" style={{ fontSize: 14, fontWeight: 600, marginBottom: 2 }}>
-              {CONTACT.name}
+              {deal.contact.name}
             </p>
             <div className="flex items-center gap-1.5 text-muted-foreground" style={{ fontSize: 12 }}>
               <Building2 size={11} strokeWidth={1.7} />
-              {CONTACT.title} · {CONTACT.company}
+              {deal.contact.name} · {deal.contact.company}
             </div>
           </div>
         </div>
@@ -345,7 +309,7 @@ export function DealLeftPanel({ deal }: DealLeftPanelProps) {
         {/* Email + phone */}
         <div className="space-y-1.5">
           <a
-            href={`mailto:${CONTACT.email}`}
+            href={`mailto:${deal.contact.email}`}
             className="flex items-center gap-2.5 group"
             style={{ textDecoration: "none" }}
           >
@@ -356,11 +320,11 @@ export function DealLeftPanel({ deal }: DealLeftPanelProps) {
               className="text-muted-foreground group-hover:text-primary transition-colors"
               style={{ fontSize: 12 }}
             >
-              {CONTACT.email}
+              {deal.contact.email}
             </span>
           </a>
           <a
-            href={`tel:${CONTACT.phone}`}
+            href={`tel:${deal.contact.phone}`}
             className="flex items-center gap-2.5 group"
             style={{ textDecoration: "none" }}
           >
@@ -371,7 +335,7 @@ export function DealLeftPanel({ deal }: DealLeftPanelProps) {
               className="text-muted-foreground group-hover:text-primary transition-colors"
               style={{ fontSize: 12 }}
             >
-              {CONTACT.phone}
+              {deal.contact.phone}
             </span>
           </a>
         </div>

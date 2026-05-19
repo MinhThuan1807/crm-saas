@@ -5,11 +5,11 @@ import { LoginBodyType, RegisterBodyType } from './auth.model'
 import slugify from 'slugify'
 import { ROLE } from 'src/common/constants/role.constanst'
 import { SharedUserRepository } from 'src/common/repositories/shared-user.repo'
-import { AccessTokenPayloadCreate, RefreshTokenPayload, RefreshTokenPayloadCreate } from 'src/common/types/jwt.type'
+import { AccessTokenPayloadCreate } from 'src/common/types/jwt.type'
 import { TokenService } from 'src/common/services/token.service'
 import { AuthRepository } from './auth.repo'
-import {  Response as ExpressResponse } from 'express'
-import envConfig from 'src/common/config'
+import { Response as ExpressResponse } from 'express'
+import { COOKIE_OPTIONS } from './auth.constants'
 
 @Injectable()
 export class AuthService {
@@ -58,12 +58,10 @@ export class AuthService {
 
     const isPasswordValid = await this.hashingService.compare(body.password, user.password)
     if (!isPasswordValid) {
-      throw new UnprocessableEntityException(
-        {
-          message: 'Sai mật khẩu. Vui lòng thử lại.',
-          path: 'password',
-        },
-      )
+      throw new UnprocessableEntityException({
+        message: 'Sai mật khẩu. Vui lòng thử lại.',
+        path: 'password',
+      })
     }
 
     const tokens = await this.generateTokens({ userId: user.id, role: user.role, tenantId: user.tenantId })
@@ -71,7 +69,7 @@ export class AuthService {
   }
 
   async logout(refreshToken: string) {
-    await this.authRepository.deleteRefreshToken(refreshToken);
+    await this.authRepository.deleteRefreshToken(refreshToken)
     return { message: 'Đăng xuất thành công' }
   }
 
@@ -98,9 +96,12 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string, res: ExpressResponse) {
+    console.log("refresh-Token calling")
     const { userId } = await this.tokenService.verifyRefreshToken(refreshToken)
+    console.log('=== verify OK, userId:', userId)
 
     const storedToken = await this.authRepository.findRefreshTokenIncludeUser(refreshToken)
+    console.log("=== stored token from DB:", storedToken)
 
     if (!storedToken) {
       throw new UnauthorizedException('Invalid refresh token')
@@ -114,22 +115,14 @@ export class AuthService {
       tenantId: storedToken.user.tenantId,
     })
 
-    const isProduction = envConfig.NODE_ENV === 'production'
-
     res.cookie('accessToken', tokens.accessToken, {
-      httpOnly: true,
-      secure: isProduction,          // true khi deploy HTTPS
-      sameSite: isProduction ? 'none' : 'lax', 
-      maxAge: 15 * 60 * 1000,        // 15 phút
-      path: '/',                     // toàn bộ domain
+      ...COOKIE_OPTIONS,
+      maxAge: 15 * 60 * 1000, // 15 phút
     })
 
     res.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? 'none' : 'lax',
+      ...COOKIE_OPTIONS,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-      path: '/auth', //  chỉ gửi khi gọi API auth (bảo mật hơn)
     })
 
     return { message: 'Refreshed successfully' }
