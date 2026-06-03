@@ -8,7 +8,7 @@
   - Validate env bằng Zod, đặt mặc định `OPENAI_MODEL=gpt-4o-mini`, fail fast khi thiếu biến bắt buộc
   - _Requirements: 2.3, 2.4, 2.7, 2.8, 7.1, 7.2, 7.3_
 
-- [ ] 2. Tích hợp Redis và BullMQ cho AI analysis
+- [X] 2. Tích hợp Redis và BullMQ cho AI analysis
   - Cấu hình `BullModule` kết nối Redis qua `REDIS_HOST` và `REDIS_PORT`
   - Tạo queue riêng cho AI meeting note analysis
   - Định nghĩa payload job gồm `jobId`, `dealId`, `tenantId`, `userId`, `meetingNote`
@@ -16,7 +16,7 @@
   - Xử lý lỗi Redis khi enqueue để API trả HTTP 503 thay vì làm crash server
   - _Requirements: 1.1, 1.6, 2.5, 6.3, 6.4, 7.4_
 
-- [ ] 3. Xây dựng endpoint submit meeting note
+- [X] 3. Xây dựng endpoint submit meeting note
   - Thêm `POST /deals/:id/analyze` yêu cầu JWT hợp lệ
   - Validate `meetingNote` là string dài từ 10 đến 10000 ký tự
   - Trả HTTP 422 với thông báo rõ ràng khi note rỗng, quá ngắn hoặc quá dài
@@ -24,7 +24,7 @@
   - Enqueue BullMQ job và trả HTTP 202 trong vòng 500ms kèm `jobId`
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
 
-- [ ] 4. Thêm rate limiting theo user cho endpoint analyze
+- [X] 4. Thêm rate limiting theo user cho endpoint analyze
   - Tạo service/guard rate limit dùng Redis counter theo `userId`
   - Giới hạn 10 request phân tích AI trong 60 giây
   - Trả HTTP 429 khi vượt giới hạn với đúng thông báo yêu cầu
@@ -32,7 +32,7 @@
   - Đảm bảo key rate limit không dựa theo IP và hoạt động khi backend scale nhiều instance
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 5. Tạo OpenAI analysis processor
+- [X] 5. Tạo OpenAI analysis processor
   - Tạo BullMQ processor nhận job từ queue AI analysis
   - Gọi OpenAI API với model từ config, mặc định `gpt-4o-mini`
   - Chuẩn hóa prompt để yêu cầu JSON dạng `{ tasks, emailDraft, summary }`
@@ -42,7 +42,7 @@
   - Log lỗi OpenAI ở mức `error` kèm status code, message và `dealId`
   - _Requirements: 2.1, 2.2, 2.5, 2.6, 6.1, 6.2, 6.5_
 
-- [ ] 6. Lưu kết quả AI và tạo task một cách atomic
+- [X] 6. Lưu kết quả AI và tạo task một cách atomic
   - Trong một DB transaction, lưu 3 bản ghi `AiSuggestion` cho `TASK_LIST`, `EMAIL_DRAFT`, `SUMMARY`
   - Lưu `sourceNote` gốc vào các bản ghi hoặc cấu trúc audit liên quan
   - Tạo các bản ghi `Task` từ mảng `tasks`, gắn đúng `dealId` và `tenantId`
@@ -68,31 +68,6 @@
   - Map lỗi quota/auth OpenAI sang thông báo: `Dịch vụ AI tạm thời không khả dụng. Vui lòng liên hệ admin.`
   - Lưu hoặc truyền `jobId` và error reason để SSE controller có thể gửi lỗi đúng request
   - _Requirements: 3.2, 3.3, 6.1, 6.2_
-
-- [ ] 9. Xây dựng AI panel trên Deal detail page
-  - Thêm component `AI_Panel` vào trang chi tiết Deal
-  - Hiển thị textarea nhập `meetingNote` với giới hạn 10 đến 10000 ký tự
-  - Thêm button `Phân tích bằng AI`
-  - Validate input ở frontend trước khi gọi API
-  - Gọi `POST /deals/:id/analyze`, nhận `jobId`, rồi mở `EventSource` tới `/deals/:id/ai-stream`
-  - Disable button và ngăn submit trùng trong khi đang chờ kết quả
-  - _Requirements: 4.1, 4.2, 4.8_
-
-- [ ] 10. Hiển thị trạng thái realtime và kết quả AI trên frontend
-  - Hiển thị loading animation và skeleton cho khu vực task/email khi đang chờ SSE
-  - Khi nhận `ai-complete`, render danh sách tasks gồm title và dueDate
-  - Render email draft và summary trong các section riêng biệt, không reload trang
-  - Khi nhận `ai-error`, hiển thị thông báo lỗi thân thiện và bật lại button
-  - Đóng `EventSource` ngay sau `ai-complete`, `ai-error` hoặc connection error
-  - Xử lý lỗi kết nối SSE bằng thông báo lỗi và re-enable button
-  - _Requirements: 4.2, 4.3, 4.4, 4.5, 4.6_
-
-- [ ] 11. Thêm thao tác copy email draft
-  - Thêm button `Copy` cho email draft
-  - Copy nội dung email draft vào clipboard
-  - Hiển thị feedback tạm thời `Đã copy!` trong 2 giây sau khi copy thành công
-  - Xử lý lỗi clipboard bằng thông báo phù hợp nếu trình duyệt từ chối quyền
-  - _Requirements: 4.7_
 
 - [ ] 12. Viết test backend cho API, queue và SSE
   - Test `POST /deals/:id/analyze` trả 202 và `jobId` khi hợp lệ

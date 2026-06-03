@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@nestjs/bull": "^11.0.4",
+    "@nestjs/bullmq": "^11.0.4",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.2",
@@ -36,6 +37,7 @@
     "@prisma/client": "^7.5.0",
     "bcrypt": "^6.0.0",
     "bull": "^4.16.5",
+    "bullmq": "^5.76.10",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.3.1",
     "ioredis": "^5.10.1",

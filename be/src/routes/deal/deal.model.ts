@@ -8,9 +8,9 @@ export const DealStageConst = {
   PROPOSAL: 'PROPOSAL',
   CLOSED_WON: 'CLOSED_WON',
   CLOSED_LOST: 'CLOSED_LOST',
-} as const;
+} as const
 
-export type DealStageType = typeof DealStageConst[keyof typeof DealStageConst];
+export type DealStageType = (typeof DealStageConst)[keyof typeof DealStageConst]
 
 export const DealBaseSchema = z.object({
   id: z.string(),
@@ -19,7 +19,13 @@ export const DealBaseSchema = z.object({
   ownerId: z.string(),
   title: z.string().min(1).max(200),
   value: z.coerce.number().nonnegative().default(0),
-  stage: z.enum([DealStageConst.PROSPECT, DealStageConst.QUALIFIED, DealStageConst.PROPOSAL, DealStageConst.CLOSED_WON, DealStageConst.CLOSED_LOST]),
+  stage: z.enum([
+    DealStageConst.PROSPECT,
+    DealStageConst.QUALIFIED,
+    DealStageConst.PROPOSAL,
+    DealStageConst.CLOSED_WON,
+    DealStageConst.CLOSED_LOST,
+  ]),
   closeDate: z.date().nullable(),
   note: z.string().nullable(),
   createdAt: z.date(),
@@ -62,7 +68,7 @@ export const UpdateDealBodySchema = z
   .strict()
   .refine((data) => Object.keys(data).length > 0, { message: 'Ít nhất phải có một trường được cập nhật' })
 
-export const UpdateDealResSchema = CreateDealResSchema  
+export const UpdateDealResSchema = CreateDealResSchema
 
 export type UpdateDealBodyType = z.infer<typeof UpdateDealBodySchema>
 export type UpdateDealResType = z.infer<typeof UpdateDealResSchema>
@@ -70,9 +76,17 @@ export type UpdateDealResType = z.infer<typeof UpdateDealResSchema>
 // ─────────────────────────────────────────
 // UPDATE STAGE — PATCH /deals/:id/stage
 // ─────────────────────────────────────────
-export const UpdateDealStageBodySchema = z.object({
-  stage: z.enum([DealStageConst.PROSPECT, DealStageConst.QUALIFIED, DealStageConst.PROPOSAL, DealStageConst.CLOSED_WON, DealStageConst.CLOSED_LOST]),
-}).strict()
+export const UpdateDealStageBodySchema = z
+  .object({
+    stage: z.enum([
+      DealStageConst.PROSPECT,
+      DealStageConst.QUALIFIED,
+      DealStageConst.PROPOSAL,
+      DealStageConst.CLOSED_WON,
+      DealStageConst.CLOSED_LOST,
+    ]),
+  })
+  .strict()
 
 export type UpdateDealStageBodyType = z.infer<typeof UpdateDealStageBodySchema>
 export type UpdateDealStageResType = UpdateDealResType
@@ -80,45 +94,47 @@ export type UpdateDealStageResType = UpdateDealResType
 // ─────────────────────────────────────────
 // GET ONE — GET /deals/:id
 // ─────────────────────────────────────────
-export const GetDealResSchema = DealBaseSchema
-  .omit({ deletedAt: true })
-  .extend({
-    contact: z.object({
-      id: z.string(),
-      name: z.string(),
-      email: z.string().nullable(),
-      phone: z.string().nullable(),
-      company: z.string().nullable(),
-      position: z.string().nullable(),
-    }),
-    owner: z.object({
-      id: z.string(),
-      name: z.string(),
-      email: z.string(),
-    }),
-    tasks: z.array(z.object({
+export const GetDealResSchema = DealBaseSchema.omit({ deletedAt: true }).extend({
+  contact: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string().nullable(),
+    phone: z.string().nullable(),
+    company: z.string().nullable(),
+    position: z.string().nullable(),
+  }),
+  owner: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string(),
+  }),
+  tasks: z.array(
+    z.object({
       id: z.string(),
       title: z.string(),
       done: z.boolean(),
       dueDate: z.coerce.date().nullable(),
       createdAt: z.coerce.date(),
-    })),
-    activities: z.array(z.object({
+    }),
+  ),
+  activities: z.array(
+    z.object({
       id: z.string(),
       type: z.string(),
       title: z.string().nullable(),
       note: z.string().nullable(),
       date: z.coerce.date(),
-    })),
-    aiSuggestions: z.array(
-      z.object({
-        id: z.string(),
-        type: z.string(),
-        content: z.string(),
-        createdAt: z.coerce.date(),
-      }),
-    ),
-  })
+    }),
+  ),
+  aiSuggestions: z.array(
+    z.object({
+      id: z.string(),
+      type: z.string(),
+      content: z.string(),
+      createdAt: z.coerce.date(),
+    }),
+  ),
+})
 
 export type GetDealResType = z.infer<typeof GetDealResSchema>
 
@@ -143,7 +159,24 @@ export const GetDealsPipelineResSchema = z.object({
   PROPOSAL: z.array(DealCardSchema),
   CLOSED_WON: z.array(DealCardSchema),
   CLOSED_LOST: z.array(DealCardSchema),
-});
+})
 
-export type GetDealsPipelineResType = z.infer<typeof GetDealsPipelineResSchema>;
+export type GetDealsPipelineResType = z.infer<typeof GetDealsPipelineResSchema>
 
+// ─────────────────────────────────────────
+// ANALYZE — POST /deals/:id/analyze
+// ─────────────────────────────────────────
+export const AnalyzeDealBodySchema = z
+  .object({
+    meetingNote: z.string().min(10).max(10000),
+  })
+  .strict()
+
+export const AnalyzeDealResSchema = z
+  .object({
+    jobId: z.string(),
+  })
+  .strict()
+
+export type AnalyzeDealBodyType = z.infer<typeof AnalyzeDealBodySchema>
+export type AnalyzeDealResType = z.infer<typeof AnalyzeDealResSchema>
