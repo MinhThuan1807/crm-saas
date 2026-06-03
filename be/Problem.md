@@ -78,3 +78,11 @@ Body          Input từ client                       @Body() trong controller
 Query         Query params                          @Query() trong controller
 Res           Output trả về client                  @ZodSerializerDto()
 Type          TypeScript type                       Tham số trong service/repo
+
+=======================================================
+Lưu ý khi scale (production)
+
+Hiện tại ai.sse.ts giữ subscribers in-memory — hoạt động tốt cho single instance.
+Nếu deploy nhiều instance, cần add Redis pub/sub:
+mỗi instance subscribe Redis channel {tenantId}:{dealId} và broadcast tới local subscribers khi nhận message.
+processor publish message vào Redis channel thay vì gọi publishAiEvent trực tiếp.

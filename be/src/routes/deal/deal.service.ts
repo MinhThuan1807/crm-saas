@@ -8,12 +8,18 @@ import {
   GetDealsPipelineResSchema,
   GetDealsPipelineResType,
   DealCardSchema,
+  AnalyzeDealBodyType,
+  AnalyzeDealResType,
 } from './deal.model'
 import { DealRepository } from './deal.repo'
+import { AiService } from '../ai/ai.service'
 
 @Injectable()
 export class DealService {
-  constructor(private readonly dealRepo: DealRepository) {}
+  constructor(
+    private readonly dealRepo: DealRepository,
+    private readonly aiService: AiService,
+  ) {}
 
   create(tenantId: string, data: CreateDealBodyType) {
     // const stage = DealStageConst.PROSPECT
@@ -30,7 +36,7 @@ export class DealService {
       [DealStageConst.CLOSED_WON]: [],
       [DealStageConst.CLOSED_LOST]: [],
     }
-    deals.forEach(deal => {
+    deals.forEach((deal) => {
       const parsed = DealCardSchema.parse(deal)
       stageMap[deal.stage].push(parsed)
     })
@@ -72,5 +78,30 @@ export class DealService {
     }
     await this.dealRepo.softDelete(dealId, tenantId)
     return { message: 'Xóa deal thành công' }
+  }
+
+  async analyze(
+    dealId: string,
+    tenantId: string,
+    userId: string,
+    body: AnalyzeDealBodyType,
+  ): Promise<AnalyzeDealResType> {
+    const deal = await this.dealRepo.findOne(dealId, tenantId)
+    if (!deal) {
+      throw new NotFoundException('Không tìm thấy deal')
+    }
+
+    if (!body || typeof body.meetingNote !== 'string') {
+      throw new UnprocessableEntityException('Thiếu trường meetingNote')
+    }
+
+    const jobId = await this.aiService.enqueueAnalysis({
+      dealId,
+      tenantId,
+      userId,
+      meetingNote: body.meetingNote,
+    })
+
+    return { jobId }
   }
 }

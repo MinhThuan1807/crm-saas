@@ -23,10 +23,11 @@ const ConfigSchema = z.object({
   PORT: z.string(),
 
   OPENAI_API_KEY: z.string().min(1),
-  OPENAI_MODEL: z.string().default('gpt-4o'),
+  OPENAI_MODEL: z.string().default('gpt-4o-mini'),
   REDIS_HOST: z.string().min(1),
   REDIS_PORT: z.coerce.number().int().positive(),
   REDIS_PASSWORD: z.string().optional(),
+  REDIS_TLS: z.string().optional(),
 })
 
 // const configServer = plainToInstance(ConfigSchema, process.env);
