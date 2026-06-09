@@ -9,27 +9,32 @@ import {
 } from "@/lib/validations/contacts.scheme";
 
 export const contactsService = {
-  getAll: async (params?: GetContactsQueryType): Promise<GetContactsResType> => {
-    const response = await axiosInstance.get("/contacts", { params });
-    return response.data; 
+  getAll: async (
+    params?: GetContactsQueryType,
+  ): Promise<GetContactsResType> => {
+    const response = await axiosInstance.get("contacts", { params });
+    return response.data;
   },
 
   getById: async (id: string): Promise<GetContactResType> => {
-    const response = await axiosInstance.get(`/contacts/${id}`);
+    const response = await axiosInstance.get(`contacts/${id}`);
     return response.data;
   },
 
   create: async (data: CreateContactBodyType): Promise<GetContactResType> => {
-    const response = await axiosInstance.post("/contacts", data);
+    const response = await axiosInstance.post("contacts", data);
     return response.data;
   },
 
-    update: async (id: string, data: UpdateContactBodyType): Promise<UpdateContactResType> => {
-    const response = await axiosInstance.patch(`/contacts/${id}`, data); // patch không phải put
+  update: async (
+    id: string,
+    data: UpdateContactBodyType,
+  ): Promise<UpdateContactResType> => {
+    const response = await axiosInstance.patch(`contacts/${id}`, data);
     return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
-    await axiosInstance.delete(`/contacts/${id}`);
+    await axiosInstance.delete(`contacts/${id}`);
   },
-}
+};
