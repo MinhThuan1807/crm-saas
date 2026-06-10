@@ -1,94 +1,45 @@
+"use client";
 import { useState } from "react";
 import { Phone, Mail, Users, FileText, Clock } from "lucide-react";
-
 import {
-  ACTIVITIES_TYPES,
-  Activity,
+  ActivityType,
+  ActivityItem
 } from "@/lib/validations/activities.scheme";
-import LogActivvityForm from "./LogActivityForm";
+import LogActivityForm from "./LogActivityForm";
 import { relativeTime } from "@/lib/helper";
-import { useCreateActivity } from "@/hooks/useActivities";
-import { CreateActivityBodyType } from "@/lib/validations/activities.scheme";
 
-export type ActivityTab =
-  | typeof ACTIVITIES_TYPES.CALL
-  | typeof ACTIVITIES_TYPES.EMAIL
-  | typeof ACTIVITIES_TYPES.MEETING
-  | typeof ACTIVITIES_TYPES.NOTE;
+export type ActivityTab = ActivityType;
 
-interface TimelineItem {
-  id: string;
-  type:
-    | typeof ACTIVITIES_TYPES.CALL
-    | typeof ACTIVITIES_TYPES.EMAIL
-    | typeof ACTIVITIES_TYPES.MEETING
-    | typeof ACTIVITIES_TYPES.NOTE;
-  timeLabel: string;
-  title: string;
-  body: string;
-  date?: string;
-  aiSuggestion?: string;
-}
 interface ActivityTimelineProps {
-  contactId: string;
-  activities: Activity[];
+  activities: ActivityItem[];
+  onSubmitActivity: (data: any, reset: () => void) => void;
+  isPendingSubmit?: boolean;
+  entityType?: "contact" | "deal";
 }
-const TIMELINE: TimelineItem[] = [
-  {
-    id: "t1",
-    type: ACTIVITIES_TYPES.MEETING,
-    timeLabel: "Hôm nay 14:30",
-    title: "Cuộc họp trực tiếp",
-    body: "Đã gặp CEO tại văn phòng Tập đoàn DEF. Thảo luận về proposal hệ thống quản lý toàn diện. Khách hàng quan tâm đến module HR và tích hợp ERP. Yêu cầu demo kỹ thuật vào tuần sau.",
-    aiSuggestion: "AI đã tạo 3 tasks từ note này",
-  },
-  {
-    id: "t2",
-    type: ACTIVITIES_TYPES.EMAIL,
-    timeLabel: "Hôm qua 09:15",
-    title: "Email theo dõi proposal",
-    body: "Đã gửi email tóm tắt proposal với báo giá chi tiết và timeline triển khai. Đính kèm case study của 2 khách hàng tương tự trong ngành.",
-  },
-  {
-    id: "t3",
-    type: ACTIVITIES_TYPES.CALL,
-    timeLabel: "5 ngày trước",
-    title: "Cuộc gọi tư vấn kỹ thuật",
-    body: "Trao đổi với đội IT về yêu cầu kỹ thuật và tích hợp với hệ thống hiện tại. Xác nhận nhu cầu API với phần mềm kế toán của bên thứ ba.",
-    date: "24 phút",
-  },
-  {
-    id: "t4",
-    type: ACTIVITIES_TYPES.NOTE,
-    timeLabel: "1 tuần trước",
-    title: "Ghi chú nội bộ",
-    body: "Khách hàng đang xem xét 2 vendor khác. Budget đã được phê duyệt Q1. Quyết định mua hàng dự kiến cuối tháng. Cần theo dõi chặt chẽ.",
-  },
-];
 
 const TYPE_CONFIG: Record<
-  TimelineItem["type"],
+  ActivityType,
   { iconBg: string; iconColor: string; icon: typeof Phone; label: string }
 > = {
-  [ACTIVITIES_TYPES.MEETING]: {
+  [ActivityType.MEETING]: {
     iconBg: "#FEF3E2",
     iconColor: "#854F0B",
     icon: Users,
     label: "Cuộc họp",
   },
-  [ACTIVITIES_TYPES.EMAIL]: {
+  [ActivityType.EMAIL]: {
     iconBg: "#EEEDFE",
     iconColor: "#534AB7",
     icon: Mail,
     label: "Email",
   },
-  [ACTIVITIES_TYPES.CALL]: {
+  [ActivityType.CALL]: {
     iconBg: "#E8F5E0",
     iconColor: "#3B6D11",
     icon: Phone,
     label: "Cuộc gọi",
   },
-  [ACTIVITIES_TYPES.NOTE]: {
+  [ActivityType.NOTE]: {
     iconBg: "#F1EFE8",
     iconColor: "#9B9B96",
     icon: FileText,
@@ -97,25 +48,23 @@ const TYPE_CONFIG: Record<
 };
 
 export default function ActivityTimeline({
-  contactId,
   activities,
+  onSubmitActivity,
+  isPendingSubmit,
+  entityType = "contact",
 }: ActivityTimelineProps) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const createActivity = useCreateActivity(contactId);
 
   const toggleExpand = (id: string) =>
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
 
-  const handleSubmit = (data: CreateActivityBodyType, reset: () => void) => {
-    createActivity.mutate(data);
-  };
-
   return (
     <div className="flex-1 flex flex-col overflow-y-auto bg-[#F8F8F7]">
       {/* ── Log activity form ── */}
-      <LogActivvityForm
-        onSubmit={handleSubmit}
-        isPending={createActivity.isPending}
+      <LogActivityForm
+        onSubmit={onSubmitActivity}
+        isPending={isPendingSubmit}
+        entityType={entityType}
       />
 
       {/* Timeline label */}
@@ -131,7 +80,7 @@ export default function ActivityTimeline({
         {activities.map((item, index) => {
           const config = TYPE_CONFIG[item.type];
           const Icon = config.icon;
-          const isLast = index === TIMELINE.length - 1;
+          const isLast = index === activities.length - 1;
           const isExpanded = expanded[item.id];
           const bodyPreview =
             item.note.length > 100 && !isExpanded
@@ -220,32 +169,6 @@ export default function ActivityTimeline({
                     {isExpanded ? "Rút gọn" : "Xem thêm"}
                   </button>
                 )}
-
-                {/* AI suggestion */}
-                {/* {item.aiSuggestion && (
-                  <div className="mt-2.5 px-3 py-2 rounded-lg bg-[#F5F3FF] border border-[#C4BFF5] flex items-center gap-2">
-                    <div className="size-[22px] rounded-md bg-secondary flex items-center justify-center shrink-0">
-                      <Sparkles size={12} color="#534AB7" />
-                    </div>
-                    <div className="flex-1">
-                      <p
-                        className="text-primary"
-                        style={{ fontSize: 11, fontWeight: 500, marginBottom: 1 }}
-                      >
-                        {item.aiSuggestion}
-                      </p>
-                      <p style={{ fontSize: 10, color: "#7B74C9" }}>
-                        Tạo cuộc hẹn demo · Gửi tài liệu kỹ thuật · Cập nhật deal stage
-                      </p>
-                    </div>
-                    <button
-                      className="bg-background border border-[#C4BFF5] rounded-md text-primary cursor-pointer whitespace-nowrap px-2.5 py-1"
-                      style={{ fontSize: 11, fontWeight: 500 }}
-                    >
-                      Xem tasks
-                    </button>
-                  </div>
-                )} */}
               </div>
             </div>
           );

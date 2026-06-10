@@ -6,6 +6,16 @@ import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import {
   useActivitiesInfinite,
@@ -108,7 +118,13 @@ export default function Activities() {
   );
   const [formContext] = useState<ActivityFormContext>({ type: "global" });
 
-  // ── Data fetching — infinite scroll (req 9.1, 9.6) ───────────────────────
+  // ── Delete confirmation state ──────────────────────────────────────────────
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [activityToDelete, setActivityToDelete] = useState<ActivityItem | null>(
+    null,
+  );
+
+  // ── Data fetching — infinite scroll  ───────────────────────
   const infiniteParams = useMemo(
     () => (activeFilter !== "all" ? { type: activeFilter } : undefined),
     [activeFilter],
@@ -125,13 +141,13 @@ export default function Activities() {
     [data],
   );
 
-  // ── Group theo ngày cho timeline (req 9.3) ────────────────────────────────
+  // ── Group theo ngày cho timeline ────────────────────────────────
   const groups = useMemo(
     () => (showEmpty ? [] : groupActivitiesByDate(allActivities)),
     [allActivities, showEmpty],
   );
 
-  // ── isEmpty check (req 9.5) ───────────────────────────────────────────────
+  // ── isEmpty check  ───────────────────────────────────────────────
   const isEmpty = !isLoading && allActivities.length === 0;
 
   // ── Handlers ─────────────────────────────────────────────────────────────
@@ -146,25 +162,18 @@ export default function Activities() {
   }
 
   function handleDelete(activity: ActivityItem) {
-    if (
-      confirm(
-        `Xóa hoạt động "${activity.title ?? activity.note.slice(0, 40)}"?`,
-      )
-    ) {
-      deleteActivity.mutate(activity.id);
-    }
+    setActivityToDelete(activity);
+    setDeleteConfirmOpen(true);
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-      {/* Header — "Thêm hoạt động" button mở ActivityForm (req 9.7) */}
       <ActivitiesHeader
         dateRangeLabel="Tất cả"
         onNewActivity={handleOpenCreate}
       />
 
-      {/* Filters — type filter (req 9.2) */}
       <ActivitiesFilters
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
@@ -177,9 +186,7 @@ export default function Activities() {
           className="flex gap-6 p-6 items-start mx-auto"
           style={{ maxWidth: 1400 }}
         >
-          {/* ── Timeline (65%) ── */}
           <div className="min-w-0" style={{ flex: "65 1 0%" }}>
-            {/* Skeleton loading (req 9.4) */}
             {isLoading ? (
               <TimelineSkeleton />
             ) : (
@@ -187,11 +194,10 @@ export default function Activities() {
                 <ActivitiesTimeline
                   groups={groups}
                   showEmpty={isEmpty || showEmpty}
-                  // onEdit={handleEdit}
-                  // onDelete={handleDelete}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
                 />
 
-                {/* Load more button (req 9.6) */}
                 {hasNextPage && !showEmpty && (
                   <div className="flex justify-center mt-6">
                     <Button
@@ -213,7 +219,6 @@ export default function Activities() {
             )}
           </div>
 
-          {/* ── SummaryPanel (35%) — luôn nhận unfiltered data (req 10.4) ── */}
           <div
             className="min-w-0"
             style={{ flex: "35 1 0%", minWidth: 260, maxWidth: 320 }}
@@ -225,13 +230,60 @@ export default function Activities() {
         </div>
       </div>
 
-      {/* ActivityForm Dialog (req 9.7) */}
       <ActivityForm
         open={formOpen}
         onOpenChange={setFormOpen}
         activity={formActivity}
         context={formContext}
       />
+
+      <AlertDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xóa hoạt động</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn xóa hoạt động "
+              {activityToDelete?.title ||
+                (activityToDelete?.note
+                  ? activityToDelete.note.slice(0, 40) +
+                    (activityToDelete.note.length > 40 ? "..." : "")
+                  : "")}
+              "? Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteActivity.isPending}>
+              Hủy
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={deleteActivity.isPending}
+              onClick={(e) => {
+                e.preventDefault();
+                if (activityToDelete) {
+                  deleteActivity.mutate(activityToDelete.id, {
+                    onSuccess: () => {
+                      setDeleteConfirmOpen(false);
+                    },
+                  });
+                }
+              }}
+            >
+              {deleteActivity.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang xóa...
+                </>
+              ) : (
+                "Xóa"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

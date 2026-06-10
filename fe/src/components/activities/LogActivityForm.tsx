@@ -1,10 +1,9 @@
-'use client"';
+"use client";
 import {
-  ACTIVITIES_TYPES,
-  CreateActivityBodySchema,
-  CreateActivityBodyType,
+  ActivityType,
+  CreateActivityForContactBodySchema,
+  CreateActivityForContactBodyType,
 } from "@/lib/validations/activities.scheme";
-import { ActivityTab } from "./ActivityTimeline";
 import {
   Phone,
   Mail,
@@ -23,42 +22,33 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { relativeTime } from "@/lib/helper";
 
+export type ActivityTab = ActivityType;
+
 const TABS: { key: ActivityTab; label: string; icon: typeof Phone }[] = [
-  { key: ACTIVITIES_TYPES.CALL, label: "Cuộc gọi", icon: Phone },
-  { key: ACTIVITIES_TYPES.EMAIL, label: "Email", icon: Mail },
-  { key: ACTIVITIES_TYPES.MEETING, label: "Gặp mặt", icon: Users },
-  { key: ACTIVITIES_TYPES.NOTE, label: "Ghi chú", icon: FileText },
+  { key: ActivityType.CALL, label: "Cuộc gọi", icon: Phone },
+  { key: ActivityType.EMAIL, label: "Email", icon: Mail },
+  { key: ActivityType.MEETING, label: "Gặp mặt", icon: Users },
+  { key: ActivityType.NOTE, label: "Ghi chú", icon: FileText },
 ];
 
-const PLACEHOLDER: Record<ActivityTab, string> = {
-  [ACTIVITIES_TYPES.CALL]:
-    "Ghi chú cuộc gọi... nội dung trao đổi, kết quả, bước tiếp theo...",
-  [ACTIVITIES_TYPES.EMAIL]:
-    "Tóm tắt email... chủ đề, nội dung chính, phản hồi của khách...",
-  [ACTIVITIES_TYPES.MEETING]:
-    "Ghi chú cuộc họp... agenda, thảo luận, quyết định, action items...",
-  [ACTIVITIES_TYPES.NOTE]:
-    "Ghi chú nội bộ... thông tin quan trọng về liên hệ này...",
-};
-
-
 interface LogActivityFormProps {
-  onSubmit: (data: CreateActivityBodyType, reset: () => void) => void;
+  onSubmit: (data: CreateActivityForContactBodyType, reset: () => void) => void;
   isPending?: boolean;
+  entityType?: "contact" | "deal";
 }
 
-function LogActivvityForm({ onSubmit, isPending }: LogActivityFormProps) {
+function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogActivityFormProps) {
   const [activeTab, setActiveTab] = useState<ActivityTab>(
-    ACTIVITIES_TYPES.CALL,
+    ActivityType.CALL,
   );
 
-  const form = useForm<CreateActivityBodyType>({
-    resolver: zodResolver(CreateActivityBodySchema),
+  const form = useForm({
+    resolver: zodResolver(CreateActivityForContactBodySchema),
     defaultValues: {
-      title: null,
+      title: null as string | null,
       note: "",
       date: new Date(),
-      type: ACTIVITIES_TYPES.CALL,
+      type: ActivityType.CALL as ActivityType,
     },
   });
 
@@ -69,21 +59,25 @@ function LogActivvityForm({ onSubmit, isPending }: LogActivityFormProps) {
     form.setValue("type", tab);
   };
 
-  const handleSubmit = (data: CreateActivityBodyType) => {
+  const handleSubmit = (data: any) => {
     const reset = () =>
       form.reset({ title: null, note: "", date: new Date(), type: activeTab });
-    onSubmit(data, reset);
+    onSubmit(data as CreateActivityForContactBodyType, reset);
   };
 
-  // useEffect(() => {
-  //  form.reset({
-  //     title: null,
-  //     note: "",
-  //     date: new Date(),
-  //     type: activeTab,
-  //   });
-  //  }, []);
- 
+  const PLACEHOLDER: Record<ActivityTab, string> = {
+    [ActivityType.CALL]:
+      "Ghi chú cuộc gọi... nội dung trao đổi, kết quả, bước tiếp theo...",
+    [ActivityType.EMAIL]:
+      "Tóm tắt email... chủ đề, nội dung chính, phản hồi của khách...",
+    [ActivityType.MEETING]:
+      "Ghi chú cuộc họp... agenda, thảo luận, quyết định, action items...",
+    [ActivityType.NOTE]:
+      entityType === "deal"
+        ? "Ghi chú nội bộ... thông tin quan trọng về deal này..."
+        : "Ghi chú nội bộ... thông tin quan trọng về liên hệ này...",
+  };
+
   return (
     <div className="mx-6 mt-5 mb-0 bg-background rounded-xl border border-border overflow-hidden shrink-0">
       <form onSubmit={form.handleSubmit(handleSubmit)}>
@@ -114,14 +108,14 @@ function LogActivvityForm({ onSubmit, isPending }: LogActivityFormProps) {
         </div>
 
         {/* Title input */}
-          <Input
-            {...form.register("title")}
-            placeholder="Tiêu đề hoạt động (tùy chọn)"
-            className="text-sm px-2 m-2 outline-1 outline-black w-lg"
-          />
+        <Input
+          {...form.register("title")}
+          placeholder="Tiêu đề hoạt động (tùy chọn)"
+          className="text-sm px-2 m-2 outline-1 outline-black w-lg"
+        />
     
         {/* Textarea */}
-        <div className="px-3.5 pt-3 pb-2 m-2 outline-2  outline-amber-50 rounded-2xl">
+        <div className="px-3.5 pt-3 pb-2 m-2 outline-2 outline-amber-50 rounded-2xl">
           <Textarea
             {...form.register("note")}
             placeholder={PLACEHOLDER[activeTab]}
@@ -133,7 +127,6 @@ function LogActivvityForm({ onSubmit, isPending }: LogActivityFormProps) {
 
         {/* Form footer */}
         <div className="flex items-center justify-between px-3.5 py-2 border-t border-border">
-          
           <button
             type="button"
             className="flex items-center gap-1 px-2.5 py-1 text-[11px] rounded-md border border-border bg-background text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
@@ -158,4 +151,4 @@ function LogActivvityForm({ onSubmit, isPending }: LogActivityFormProps) {
   );
 }
 
-export default LogActivvityForm;
+export default LogActivityForm;

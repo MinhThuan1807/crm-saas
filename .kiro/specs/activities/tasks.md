@@ -219,8 +219,8 @@ Mở rộng module Activities từ stub hiện tại (chỉ có create/get for c
     - Tag: `// Feature: activities, Property 12: Top users ranking deterministic`
     - **Validates: Requirements 10.2, 10.3**
 
-- [ ] 11. Cập nhật Activities Page (`page.tsx`) để dùng real API data
-  - [ ] 11.1 Rewrite `page.tsx` — thay `ACTIVITY_GROUPS` mock bằng `useActivitiesInfinite`
+- [x] 11. Cập nhật Activities Page (`page.tsx`) để dùng real API data
+  - [x] 11.1 Rewrite `page.tsx` — thay `ACTIVITY_GROUPS` mock bằng `useActivitiesInfinite`
     - Import `useActivitiesInfinite` từ `@/hooks/useActivities`
     - Thêm state `activeFilter` → truyền vào hook như `type` param
     - Implement `groupActivitiesByDate(activities)` để group theo calendar day
@@ -232,8 +232,8 @@ Mở rộng module Activities từ stub hiện tại (chỉ có create/get for c
     - Thêm "New Activity" button → mở `ActivityForm` với `context: { type: 'global' }`
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7_
 
-- [ ] 12. Tích hợp Activities vào Contact Detail Page
-  - [ ] 12.1 Update `fe/src/app/(dashboard)/contacts/[id]/page.tsx` để tích hợp activities
+- [x] 12. Tích hợp Activities vào Contact Detail Page
+  - [x] 12.1 Update `fe/src/app/(dashboard)/contacts/[id]/page.tsx` để tích hợp activities
     - Import `useContactActivities`, `useCreateContactActivity`, `useUpdateActivity`, `useDeleteActivity`
     - Fetch activities với `useContactActivities(contactId)`
     - Render `ActivitiesTimeline` với data từ hook

@@ -14,7 +14,7 @@ import type { ActivityItem, ActivityType } from "./types";
 // ─────────────────────────────────────────
 
 interface SummaryPanelProps {
-  /** Toàn bộ unfiltered activities — không thay đổi khi type filter thay đổi (req 10.4) */
+  /** Toàn bộ unfiltered activities — không thay đổi khi type filter thay đổi */
   activities: ActivityItem[];
   isLoading: boolean;
 }
@@ -219,7 +219,7 @@ export function SummaryPanel({ activities, isLoading }: SummaryPanelProps) {
           {isLoading ? (
             <UserSkeletonRows />
           ) : topUsers.length === 0 ? (
-            // Placeholder khi không có data (req 10.2)
+            // Placeholder khi không có data
             [1, 2, 3].map((rank) => (
               <div key={rank} className="flex items-center gap-2.5">
                 <span
