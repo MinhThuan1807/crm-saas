@@ -135,7 +135,7 @@ export const ActivityFormSchema = z.object({
   type: ActivityTypeEnum,
   title: z.string().nullable().optional(),
   note: z.string().min(1, "Nội dung không được để trống"),
-  date: z.coerce.date().optional(),
+  date: z.date().optional(),
 });
 
 export type ActivityFormValues = z.infer<typeof ActivityFormSchema>;

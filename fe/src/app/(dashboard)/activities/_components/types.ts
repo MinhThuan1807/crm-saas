@@ -56,4 +56,4 @@ export const TYPE_META: Record<
 };
 
 // TOP_STAFF đã được xóa — tính toán dynamic trong SummaryPanel
-// từ toàn bộ unfiltered activities data (requirement 10.2, 10.3)
+// từ toàn bộ unfiltered activities data 

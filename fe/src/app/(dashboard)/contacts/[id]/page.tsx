@@ -2,12 +2,12 @@
 import { ArrowLeft, Plus, MoreHorizontal, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { ContactInfoPanel } from "../_components/ContactInfoPanel";
-import ActivityTimeline from "../_components/ActivityTimeline";
+import ActivityTimeline from "@/components/activities/ActivityTimeline";
 import { ContactDetailSkeleton } from "../_components/ContactDetailSkeleton";
 import { Button } from "@/components/ui/button";
 import { useGetContact } from "@/hooks/useContacts";
 import { useParams } from "next/navigation";
-import { useGetActivitiesByContact } from "@/hooks/useActivities";
+import { useContactActivities, useCreateContactActivity } from "@/hooks/useActivities";
 
 export default function ContactDetailPage() {
   // Get contact ID from URL params
@@ -15,7 +15,8 @@ export default function ContactDetailPage() {
   const id = params.id as string;
 
   const getContactDetail = useGetContact(id);
-  const activites = useGetActivitiesByContact(id);
+  const activites = useContactActivities(id);
+  const createActivity = useCreateContactActivity(id);
 
   if (getContactDetail.isLoading) {
     return <ContactDetailSkeleton />;
@@ -23,6 +24,14 @@ export default function ContactDetailPage() {
 
   const contact = getContactDetail.data;
   const activities = activites?.data || [];
+
+  const handleSubmitActivity = (data: any, reset: () => void) => {
+    createActivity.mutate(data, {
+      onSuccess: () => {
+        reset();
+      },
+    });
+  };
 
   if (!contact) {
     return <div>Contact not found</div>;
@@ -100,7 +109,12 @@ export default function ContactDetailPage() {
       {/* Split content area */}
       <div className="flex flex-1 overflow-hidden">
         <ContactInfoPanel contact={contact} />
-        <ActivityTimeline contactId={id} activities={activities} />
+        <ActivityTimeline
+          activities={activities}
+          onSubmitActivity={handleSubmitActivity}
+          isPendingSubmit={createActivity.isPending}
+          entityType="contact"
+        />
       </div>
     </div>
   );

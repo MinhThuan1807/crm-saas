@@ -35,6 +35,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDeleteDeal, useGetDealDetail } from "@/hooks/useDeals";
+import { useDealActivities } from "@/hooks/useActivities";
 import { EditDealSheet } from "../_components/EditDealSheet";
 
 export default function DealDetail() {
@@ -45,6 +46,8 @@ export default function DealDetail() {
   
   const deal = useGetDealDetail(id).data;
   const deleteDeal = useDeleteDeal();
+  const activitiesQuery = useDealActivities(id);
+  const activities = activitiesQuery?.data || [];
 
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -167,7 +170,7 @@ export default function DealDetail() {
       {/* ── Split content ────────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
         <DealLeftPanel deal={deal} />
-        <DealRightPanel />
+        <DealRightPanel dealId={id} activities={activities} />
       </div>
 
       {/* Edit sheet */}

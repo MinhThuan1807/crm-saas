@@ -175,10 +175,10 @@ export function ActivityForm({
           return;
         }
       }
-      // Thành công → đóng form (req 12.3)
+      // Thành công → đóng form 
       onOpenChange(false);
     } catch {
-      // Thất bại → giữ nguyên form, toast đã được xử lý trong hook (req 12.3)
+      // Thất bại → giữ nguyên form, toast đã được xử lý trong hook 
       // Không gọi onOpenChange(false)
     }
   }
@@ -276,7 +276,7 @@ export function ActivityForm({
               )}
             />
 
-            {/* Date — optional datetime picker (req 12.1, default = now) */}
+            {/* Date — optional datetime picker */}
             <FormField
               control={form.control}
               name="date"

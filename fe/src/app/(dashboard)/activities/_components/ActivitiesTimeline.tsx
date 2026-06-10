@@ -2,7 +2,7 @@
 
 import { ChevronRight } from "lucide-react";
 
-import { ActivityGroup } from "./types";
+import { ActivityGroup, ActivityItem } from "./types";
 import { ActivityCard } from "./ActivityCard";
 import { DateDivider } from "./DateDivider";
 import { EmptyState } from "./EmptyState";
@@ -10,9 +10,13 @@ import { EmptyState } from "./EmptyState";
 export function ActivitiesTimeline({
   groups,
   showEmpty,
+  onEdit,
+  onDelete,
 }: {
   groups: ActivityGroup[];
   showEmpty: boolean;
+  onEdit?: (activity: ActivityItem) => void;
+  onDelete?: (activity: ActivityItem) => void;
 }) {
   return showEmpty || groups.length === 0 ? (
     <div
@@ -28,7 +32,12 @@ export function ActivitiesTimeline({
           <DateDivider label={group.dateLabel} />
           <div className="space-y-3">
             {group.items.map((activity) => (
-              <ActivityCard key={activity.id} activity={activity} />
+              <ActivityCard
+                key={activity.id}
+                activity={activity}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
             ))}
           </div>
         </div>
