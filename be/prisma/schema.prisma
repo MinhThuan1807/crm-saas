@@ -49,10 +49,11 @@ model Tenant {
   plan      String   @default("free")
   createdAt DateTime @default(now())
 
-  users     User[]
-  contacts  Contact[]
-  deals     Deal[]
-  activities Activity[]
+  users       User[]
+  contacts    Contact[]
+  deals       Deal[]
+  activities  Activity[]
+  invitations Invitation[]
 }
 
 model User {
@@ -182,4 +183,28 @@ model RefreshToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+model Invitation {
+  id        String           @id @default(cuid())
+  tenantId  String
+  email     String
+  role      Role             @default(SALES_REP)
+  token     String           @unique
+  status    InvitationStatus @default(PENDING)
+  expiresAt DateTime
+  createdAt DateTime         @default(now())
+
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@index([token])
 }

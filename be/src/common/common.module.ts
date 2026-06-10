@@ -5,9 +5,10 @@ import { HashingService } from './services/hashing.service';
 import { SharedUserRepository } from './repositories/shared-user.repo';
 import { JwtModule } from '@nestjs/jwt';
 import { RedisService } from './services/redis.service';
+import { MailService } from './services/mail.service';
 
 // const sharedProviders = PrismaService;
-const sharedProviders = [PrismaService, TokenService, HashingService , SharedUserRepository, RedisService];
+const sharedProviders = [PrismaService, TokenService, HashingService , SharedUserRepository, RedisService, MailService];
 
 @Module({
    imports: [

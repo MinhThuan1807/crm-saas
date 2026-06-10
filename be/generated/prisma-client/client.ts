@@ -79,3 +79,8 @@ export type AiSuggestion = Prisma.AiSuggestionModel
  * 
  */
 export type RefreshToken = Prisma.RefreshTokenModel
+/**
+ * Model Invitation
+ * 
+ */
+export type Invitation = Prisma.InvitationModel

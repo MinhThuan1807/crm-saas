@@ -46,3 +46,13 @@ export const AiSuggestionType = {
 } as const
 
 export type AiSuggestionType = (typeof AiSuggestionType)[keyof typeof AiSuggestionType]
+
+
+export const InvitationStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  EXPIRED: 'EXPIRED',
+  REVOKED: 'REVOKED'
+} as const
+
+export type InvitationStatus = (typeof InvitationStatus)[keyof typeof InvitationStatus]
