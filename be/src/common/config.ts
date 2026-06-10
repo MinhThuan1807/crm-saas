@@ -28,6 +28,8 @@ const ConfigSchema = z.object({
   REDIS_PORT: z.coerce.number().int().positive(),
   REDIS_PASSWORD: z.string().optional(),
   REDIS_TLS: z.string().optional(),
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM_EMAIL: z.string().optional(),
 })
 
 // const configServer = plainToInstance(ConfigSchema, process.env);

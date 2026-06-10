@@ -8,4 +8,14 @@ export const usersService = {
 
     return Array.isArray(parsed) ? parsed : parsed.data;
   },
+
+  update: async (id: string, data: { name?: string; role?: string }) => {
+    const res = await axiosInstance.patch(`users/${id}`, data);
+    return res.data;
+  },
+
+  delete: async (id: string) => {
+    const res = await axiosInstance.delete(`users/${id}`);
+    return res.data;
+  },
 };
