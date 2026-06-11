@@ -60,7 +60,8 @@ export type CreateDealResType = z.infer<typeof CreateDealResSchema>
 
 export const UpdateDealBodySchema = z
   .object({
-    title: z.string().min(1).max(200),
+    title: z.string().min(1).max(200).optional(),
+    ownerId: z.string().optional(),
     value: z.coerce.number().nonnegative().optional(),
     closeDate: z.coerce.date().nullable().optional(),
     note: z.string().nullable().optional(),

@@ -65,13 +65,12 @@ export function normalizeStageName(raw: string): DealStage {
 // ── The reusable badge ──────────────────────────────────────────────────────
 interface StageBadgeProps {
   /** Accepts a DealStage key ("prospect") or a loose display string ("Closed Won") */
-  stage: DealStage | string;
+  stage: DealStage;
   className?: string;
 }
 
 export function StageBadge({ stage, className }: StageBadgeProps) {
-  const key = normalizeStageName(stage as string);
-  const meta = STAGE_COLORS[key];
+  const meta = STAGE_COLORS[stage];
 
   return (
     <span

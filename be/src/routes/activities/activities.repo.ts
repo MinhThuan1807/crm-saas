@@ -7,6 +7,7 @@ import {
   GetActivitiesQueryType,
   ActivityBaseType,
 } from './activities.model'
+import { ROLE } from 'src/common/constants/role.constanst'
 
 // ActivityWithRelations matches ActivityBaseType (with nested user, contact, deal)
 export type ActivityWithRelations = ActivityBaseType
@@ -71,9 +72,12 @@ export class ActivitiesRepository {
   async findAll(
     tenantId: string,
     query: GetActivitiesQueryType,
+    userContext?: { userId: string; role: string },
   ): Promise<{ data: ActivityWithRelations[]; total: number }> {
+    const isSalesRep = userContext?.role === ROLE.SALES_REP
     const where = {
       tenantId,
+      ...(isSalesRep && { userId: userContext.userId }),
       ...(query.type && { type: query.type }),
       ...(query.contactId && { contactId: query.contactId }),
       ...(query.dealId && { dealId: query.dealId }),

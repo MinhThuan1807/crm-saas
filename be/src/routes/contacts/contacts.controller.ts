@@ -12,20 +12,19 @@ export class ContactsController {
   constructor(private readonly contactService: ContactsService) {}
 
   @Get()
-  // @Roles(ROLE.ADMIN)
   @ZodSerializerDto(GetContactsResDto)
   getContacts(@CurrentUser() user: AccessTokenPayload, @Query() query: GetContactsQueryDto) {
     return this.contactService.getAllContacts(user.tenantId, {
       cursor: query.cursor,
       limit: query.limit,
       search: query.search
-    });
+    }, { userId: user.userId, role: user.role });
   }
 
   @Get(':id')
   @ZodSerializerDto(GetContactResDto)
   getContactById(@CurrentUser() user: AccessTokenPayload, @Param('id') contactId: string) {
-    return this.contactService.getContactById(contactId, user.tenantId);
+    return this.contactService.getContactById(contactId, user.tenantId, { userId: user.userId, role: user.role });
   }
 
   @Post()
@@ -34,34 +33,32 @@ export class ContactsController {
     @CurrentUser() user: AccessTokenPayload,
     @Body() body: CreateContactBodyDto,
   ) {
-    return this.contactService.createContact(user.tenantId, body)
+    return this.contactService.createContact(user.tenantId, user.userId, body)
   }
 
   @Patch(':id')
-  // @ZodSerializerDto(GetContactResDto)
   updateContact(
     @CurrentUser() user: AccessTokenPayload,
     @Param('id') contactId: string,
     @Body() body: UpdateContactBodyDto,
   ) {
-    return this.contactService.update(contactId, user.tenantId, body)
+    return this.contactService.update(contactId, user.tenantId, body, { userId: user.userId, role: user.role })
   }
 
   @Delete(':id')
-  // @ZodSerializerDto(GetContactResDto)
   deleteContact(
     @CurrentUser() user: AccessTokenPayload,
     @Param('id') contactId: string,
   ) {
-    return this.contactService.delete(contactId, user.tenantId)
+    return this.contactService.delete(contactId, user.tenantId, { userId: user.userId, role: user.role })
   }
 
   @Patch(':id/restore')
-  // @ZodSerializerDto(GetContactResDto)
   restoreContact(
     @CurrentUser() user: AccessTokenPayload,
     @Param('id') contactId: string,
   ) {
-    return this.contactService.restore(contactId, user.tenantId)
+    return this.contactService.restore(contactId, user.tenantId, { userId: user.userId, role: user.role })
   }
 }
+

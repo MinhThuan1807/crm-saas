@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common'
 import { PrismaClientKnownRequestError } from '../../../generated/prisma-client/internal/prismaNamespace'
 import { ActivitiesRepository } from './activities.repo'
 import {
@@ -11,6 +11,7 @@ import {
 import { ActivityWithRelations } from './activities.repo'
 import { ContactsRepository } from '../contacts/contacts.repo'
 import { DealRepository } from '../deal/deal.repo'
+import { ROLE } from 'src/common/constants/role.constanst'
 
 @Injectable()
 export class ActivitiesService {
@@ -26,38 +27,47 @@ export class ActivitiesService {
     contactId: string,
     userId: string,
     body: CreateActivityForContactBodyType,
+    userContext?: { userId: string; role: string },
   ): Promise<ActivityWithRelations> {
-    const contact = await this.contactsRepo.findOne(contactId, tenantId)
+    const contact = await this.contactsRepo.findOne(contactId, tenantId, userContext)
     if (!contact) throw new NotFoundException('Liên hệ không tồn tại')
 
     return this.activitiesRepo.create(tenantId, userId, body, { contactId })
   }
 
   // Tạo activity gắn với deal — validate deal thuộc tenant trước
-  // Nếu body có contactId, cũng validate contact thuộc tenant
+  // Nếu body có contactId, cũng validate contact thuộc tenant.
+  // Đồng thời, nếu không có contactId, tự động gán contactId từ Deal (Cascading Timeline)
   async createForDeal(
     tenantId: string,
     dealId: string,
     userId: string,
     body: CreateActivityForDealBodyType,
+    userContext?: { userId: string; role: string },
   ): Promise<ActivityWithRelations> {
-    const deal = await this.dealRepo.findOne(dealId, tenantId)
+    const deal = await this.dealRepo.findOne(dealId, tenantId, userContext)
     if (!deal) throw new NotFoundException('Deal không tồn tại')
 
     if (body.contactId) {
-      const contact = await this.contactsRepo.findOne(body.contactId, tenantId)
+      const contact = await this.contactsRepo.findOne(body.contactId, tenantId, userContext)
       if (!contact) throw new NotFoundException('Liên hệ không tồn tại')
     }
 
+    const targetContactId = body.contactId || deal.contactId
+
     return this.activitiesRepo.create(tenantId, userId, body, {
       dealId,
-      contactId: body.contactId,
+      contactId: targetContactId,
     })
   }
 
   // Lấy activities theo contact — validate contact trước
-  async getByContact(tenantId: string, contactId: string): Promise<{ data: ActivityWithRelations[] }> {
-    const contact = await this.contactsRepo.findOne(contactId, tenantId)
+  async getByContact(
+    tenantId: string,
+    contactId: string,
+    userContext?: { userId: string; role: string },
+  ): Promise<{ data: ActivityWithRelations[] }> {
+    const contact = await this.contactsRepo.findOne(contactId, tenantId, userContext)
     if (!contact) throw new NotFoundException('Liên hệ không tồn tại')
 
     const data = await this.activitiesRepo.findAllByContact(tenantId, contactId)
@@ -66,8 +76,12 @@ export class ActivitiesService {
 
   // Lấy activities theo deal — validate deal trước
   // Throw NotFoundException khi deal không tồn tại (không trả về { data: [] })
-  async getByDeal(tenantId: string, dealId: string): Promise<{ data: ActivityWithRelations[] }> {
-    const deal = await this.dealRepo.findOne(dealId, tenantId)
+  async getByDeal(
+    tenantId: string,
+    dealId: string,
+    userContext?: { userId: string; role: string },
+  ): Promise<{ data: ActivityWithRelations[] }> {
+    const deal = await this.dealRepo.findOne(dealId, tenantId, userContext)
     if (!deal) throw new NotFoundException('Deal không tồn tại')
 
     const data = await this.activitiesRepo.findAllByDeal(tenantId, dealId)
@@ -75,8 +89,12 @@ export class ActivitiesService {
   }
 
   // Lấy tất cả activities của tenant, phân trang và lọc
-  async getAll(tenantId: string, query: GetActivitiesQueryType): Promise<GetActivitiesPaginatedResType> {
-    const { data, total } = await this.activitiesRepo.findAll(tenantId, query)
+  async getAll(
+    tenantId: string,
+    query: GetActivitiesQueryType,
+    userContext?: { userId: string; role: string },
+  ): Promise<GetActivitiesPaginatedResType> {
+    const { data, total } = await this.activitiesRepo.findAll(tenantId, query, userContext)
     return {
       data,
       total,
@@ -85,20 +103,38 @@ export class ActivitiesService {
     }
   }
 
-  // Partial update — chỉ update fields được cung cấp
+  // Partial update — chỉ update fields được cung cấp (Audit-safe Lock)
   async updateActivity(
     activityId: string,
     tenantId: string,
     body: UpdateActivityBodyType,
+    userContext?: { userId: string; role: string },
   ): Promise<ActivityWithRelations> {
     const existing = await this.activitiesRepo.findOne(activityId, tenantId)
     if (!existing) throw new NotFoundException('Hoạt động không tồn tại')
 
+    // Lock: Chỉ người tạo ra activity hoặc Admin/Manager mới được sửa
+    if (userContext?.role === ROLE.SALES_REP && existing.userId !== userContext.userId) {
+      throw new ForbiddenException('Bạn không có quyền sửa hoạt động này')
+    }
+
     return this.activitiesRepo.update(activityId, tenantId, body)
   }
 
-  // Hard delete — Activity không có deletedAt
-  async deleteActivity(activityId: string, tenantId: string): Promise<{ message: string }> {
+  // Hard delete — Activity không có deletedAt (Audit-safe Lock)
+  async deleteActivity(
+    activityId: string,
+    tenantId: string,
+    userContext?: { userId: string; role: string },
+  ): Promise<{ message: string }> {
+    const existing = await this.activitiesRepo.findOne(activityId, tenantId)
+    if (!existing) throw new NotFoundException('Hoạt động không tồn tại')
+
+    // Lock: Chỉ người tạo ra activity hoặc Admin/Manager mới được xóa
+    if (userContext?.role === ROLE.SALES_REP && existing.userId !== userContext.userId) {
+      throw new ForbiddenException('Bạn không có quyền xóa hoạt động này')
+    }
+
     try {
       await this.activitiesRepo.hardDelete(activityId, tenantId)
       return { message: 'Xóa hoạt động thành công' }
@@ -110,3 +146,4 @@ export class ActivitiesService {
     }
   }
 }
+

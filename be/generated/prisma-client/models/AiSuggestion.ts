@@ -179,7 +179,7 @@ export type AiSuggestionGroupByOutputType = {
   _max: AiSuggestionMaxAggregateOutputType | null
 }
 
-type GetAiSuggestionGroupByPayload<T extends AiSuggestionGroupByArgs> = Prisma.PrismaPromise<
+export type GetAiSuggestionGroupByPayload<T extends AiSuggestionGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<AiSuggestionGroupByOutputType, T['by']> &
       {

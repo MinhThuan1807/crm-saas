@@ -3,6 +3,7 @@ import { NotFoundException } from '@nestjs/common'
 import { DealService } from './deal.service'
 import { DealRepository } from './deal.repo'
 import { DealStageConst } from './deal.model'
+import { ContactsRepository } from '../contacts/contacts.repo'
 
 // ─── Mock data ───────────────────────────────────────────────────────────────
 
@@ -43,6 +44,10 @@ const mockDealRepo = {
   softDelete: jest.fn(),
 }
 
+const mockContactsRepo = {
+  findOne: jest.fn(),
+}
+
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe('DealService', () => {
@@ -50,7 +55,11 @@ describe('DealService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [DealService, { provide: DealRepository, useValue: mockDealRepo }],
+      providers: [
+        DealService,
+        { provide: DealRepository, useValue: mockDealRepo },
+        { provide: ContactsRepository, useValue: mockContactsRepo },
+      ],
     }).compile()
 
     service = module.get<DealService>(DealService)

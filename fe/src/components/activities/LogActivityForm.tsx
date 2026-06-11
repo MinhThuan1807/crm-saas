@@ -45,7 +45,7 @@ function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogAct
   const form = useForm({
     resolver: zodResolver(CreateActivityForContactBodySchema),
     defaultValues: {
-      title: null as string | null,
+      title: "",
       note: "",
       date: new Date(),
       type: ActivityType.CALL as ActivityType,
@@ -56,13 +56,23 @@ function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogAct
 
   const handleTabChange = (tab: ActivityTab) => {
     setActiveTab(tab);
-    form.setValue("type", tab);
+    form.reset({
+      title: "",
+      note: "",
+      date: new Date(),
+      type: tab,
+    });
   };
 
   const handleSubmit = (data: any) => {
     const reset = () =>
-      form.reset({ title: null, note: "", date: new Date(), type: activeTab });
-    onSubmit(data as CreateActivityForContactBodyType, reset);
+      form.reset({ title: "", note: "", date: new Date(), type: activeTab });
+    
+    const payload = {
+      ...data,
+      title: data.title?.trim() ? data.title.trim() : null,
+    };
+    onSubmit(payload, reset);
   };
 
   const PLACEHOLDER: Record<ActivityTab, string> = {
@@ -108,19 +118,24 @@ function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogAct
         </div>
 
         {/* Title input */}
-        <Input
-          {...form.register("title")}
-          placeholder="Tiêu đề hoạt động (tùy chọn)"
-          className="text-sm px-2 m-2 outline-1 outline-black w-lg"
-        />
+        <div className="px-4 pt-3">
+          <Input
+            {...form.register("title")}
+            value={form.watch("title") || ""}
+            placeholder="Tiêu đề hoạt động (tùy chọn)"
+            className="bg-[#F8F8F7] border-[#E8E7E2] text-sm"
+            style={{ fontSize: 13 }}
+          />
+        </div>
     
         {/* Textarea */}
-        <div className="px-3.5 pt-3 pb-2 m-2 outline-2 outline-amber-50 rounded-2xl">
+        <div className="px-4 py-2">
           <Textarea
             {...form.register("note")}
+            value={form.watch("note") || ""}
             placeholder={PLACEHOLDER[activeTab]}
             rows={3}
-            className="border-0 shadow-none resize-none p-0 bg-transparent text-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="bg-[#F8F8F7] border-[#E8E7E2] text-sm resize-none"
             style={{ fontSize: 13, lineHeight: 1.6 }}
           />
         </div>

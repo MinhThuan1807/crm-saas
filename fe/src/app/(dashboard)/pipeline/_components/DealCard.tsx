@@ -2,14 +2,18 @@
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Deal } from "./types";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   deal: Deal;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
 function getInitials(name: string): string {
@@ -29,7 +33,7 @@ function formatValue(value: number): string {
   return `${millions % 1 === 0 ? millions : millions.toFixed(1)}tr`;
 }
 
-export function DealCard({ deal }: Props) {
+export function DealCard({ deal, onEdit, onDelete }: Props) {
   const {
     attributes,
     listeners,
@@ -82,24 +86,71 @@ export function DealCard({ deal }: Props) {
           </svg>
         </div>
       )}
-
-      <Link
-        href={`/pipeline/${deal.id}`}
-        onClick={(e) => e.stopPropagation()}
-        className={cn(
-          "block mb-0.5 transition-colors",
-          hovered ? "text-primary" : "text-foreground",
-        )}
-        style={{
-          fontSize: 13,
-          fontWeight: 500,
-          lineHeight: 1.4,
-          paddingRight: isWon ? 20 : 0,
-          textDecoration: "none",
-        }}
-      >
-        {deal.title}
-      </Link>
+      <div className="flex items-start justify-between gap-2">
+        <Link
+          href={`/pipeline/${deal.id}`}
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          className={cn(
+            "block mb-0.5 transition-colors flex-1 min-w-0",
+            hovered ? "text-primary" : "text-foreground",
+          )}
+          style={{
+            fontSize: 13,
+            fontWeight: 500,
+            lineHeight: 1.4,
+            paddingRight: isWon ? 20 : 0,
+            textDecoration: "none",
+          }}
+        >
+          {deal.title}
+        </Link>
+        <div
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
+          className={cn(
+            "shrink-0 transition-opacity",
+            hovered ? "opacity-100" : "opacity-0",
+          )}
+        >
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-6 border-0 text-muted-foreground hover:text-foreground hover:bg-muted"
+              >
+                <MoreHorizontal size={14} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem
+                style={{ fontSize: 13 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(); 
+                }}
+              >
+                <Pencil size={12} className="mr-2" />
+                Chỉnh sửa deal
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                style={{ fontSize: 13 }}
+                className="text-destructive focus:text-destructive"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+              >
+                <Trash2 size={12} className="mr-2" />
+                Xóa deal
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
 
       <p
         className="text-muted-foreground"

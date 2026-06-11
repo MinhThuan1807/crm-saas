@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/common/services/prisma.service'
 import { CreateContactBodyType, GetContactsQueryType } from './contacts.model'
+import { ROLE } from 'src/common/constants/role.constanst'
 
 @Injectable()
 export class ContactsRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  create(tenantId: string, data: CreateContactBodyType) {
+  create(tenantId: string, ownerId: string, data: CreateContactBodyType) {
     return this.prismaService.contact.create({
       data: {
         tenantId,
+        ownerId,
         name: data.name,
         email: data.email ?? null,
         phone: data.phone ?? null,
@@ -19,11 +21,13 @@ export class ContactsRepository {
     })
   }
 
-  findAll(tenantId: string, query: GetContactsQueryType) {
+  findAll(tenantId: string, query: GetContactsQueryType, userContext?: { userId: string; role: string }) {
+    const isSalesRep = userContext?.role === ROLE.SALES_REP
     return this.prismaService.contact.findMany({
       where: {
         tenantId,
         deletedAt: null,
+        ...(isSalesRep && { ownerId: userContext.userId }),
         OR: query.search
           ? [
               { name: { contains: query.search, mode: 'insensitive' } },
@@ -42,9 +46,15 @@ export class ContactsRepository {
     })
   }
 
-  findOne(contactId: string, tenantId: string) {
+  findOne(contactId: string, tenantId: string, userContext?: { userId: string; role: string }) {
+    const isSalesRep = userContext?.role === ROLE.SALES_REP
     return this.prismaService.contact.findFirst({
-      where: { id: contactId, tenantId, deletedAt: null },
+      where: { 
+        id: contactId, 
+        tenantId, 
+        deletedAt: null,
+        ...(isSalesRep && { ownerId: userContext.userId }),
+      },
       include: {
         deals: { where: { deletedAt: null } },
         activities: { orderBy: { date: 'desc' }, take: 10 },
@@ -67,9 +77,15 @@ export class ContactsRepository {
     })
   }
 
-  findDeleted(contactId: string, tenantId: string) {
+  findDeleted(contactId: string, tenantId: string, userContext?: { userId: string; role: string }) {
+    const isSalesRep = userContext?.role === ROLE.SALES_REP
     return this.prismaService.contact.findFirst({
-      where: { id: contactId, tenantId, deletedAt: { not: null } },
+      where: { 
+        id: contactId, 
+        tenantId, 
+        deletedAt: { not: null },
+        ...(isSalesRep && { ownerId: userContext.userId }),
+      },
     })
   }
   restore(contactId: string, tenantId: string) {
@@ -79,3 +95,4 @@ export class ContactsRepository {
     })
   }
 }
+
