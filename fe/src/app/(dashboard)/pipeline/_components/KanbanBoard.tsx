@@ -19,8 +19,19 @@ import { KanbanColumn } from "./KanbanColumn";
 import { DealCard } from "./DealCard";
 import { Button } from "@/components/ui/button";
 import { useDealPipelineStore } from "@/stores/dealCards-store";
-import { useGetPipeline, useUpdateDealStage } from "@/hooks/useDeals";
+import { useGetPipeline, useUpdateDealStage, useDeleteDeal } from "@/hooks/useDeals";
 import type { Deal } from "./types";
+import { EditDealSheet } from "./EditDealSheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // ── Empty-pipeline illustration ─────────────────────────────────────────────
 function EmptyPipelineIllustration() {
@@ -141,6 +152,17 @@ export function KanbanBoard() {
   // Track stage gốc lúc bắt đầu kéo — active.data.current không tự update
   const dragOriginStage = useRef<Stage | null>(null);
   const lastOverStage = useRef<Stage | null>(null);
+
+  const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
+  const [deletingDeal, setDeletingDeal] = useState<Deal | null>(null);
+  const deleteDealMutation = useDeleteDeal();
+
+  const handleDelete = () => {
+    if (deletingDeal) {
+      deleteDealMutation.mutate({ id: deletingDeal.id, stage: deletingDeal.stage });
+      setDeletingDeal(null);
+    }
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -319,7 +341,13 @@ export function KanbanBoard() {
         ) : (
           <div className="flex gap-4 h-full items-start">
             {STAGES.map((stage) => (
-              <KanbanColumn key={stage} stage={stage} deals={pipeline[stage]} />
+              <KanbanColumn
+                key={stage}
+                stage={stage}
+                deals={pipeline[stage]}
+                onEdit={setEditingDeal}
+                onDelete={setDeletingDeal}
+              />
             ))}
           </div>
         )}
@@ -327,8 +355,47 @@ export function KanbanBoard() {
 
       {/* DragOverlay: render clone của card đang kéo */}
       <DragOverlay>
-        {activeDeal ? <DealCard deal={activeDeal} /> : null}
+        {activeDeal ? (
+          <DealCard
+            deal={activeDeal}
+            onDelete={() => {}}
+            onEdit={() => {}}
+          />
+        ) : null}
       </DragOverlay>
+
+      {editingDeal && (
+        <EditDealSheet
+          deal={editingDeal}
+          open={!!editingDeal}
+          onOpenChange={(open) => {
+            if (!open) setEditingDeal(null);
+          }}
+        />
+      )}
+
+      <AlertDialog open={!!deletingDeal} onOpenChange={(open) => {
+        if (!open) setDeletingDeal(null);
+      }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle style={{ fontSize: 15 }}>Xóa deal này?</AlertDialogTitle>
+            <AlertDialogDescription style={{ fontSize: 13 }}>
+              Deal <strong>{deletingDeal?.title ?? "này"}</strong> sẽ bị xóa vĩnh viễn và không thể khôi phục.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel style={{ fontSize: 13 }}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              style={{ fontSize: 13 }}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
+              Xóa deal
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DndContext>
   );
 }

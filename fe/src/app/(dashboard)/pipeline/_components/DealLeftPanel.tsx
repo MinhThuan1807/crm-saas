@@ -20,39 +20,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { StageBadge } from "@/components/ui/StageBadge";
 import { DealStage } from "./types";
 import { cn } from "@/lib/utils";
-import { Deal } from "./types";
+import { DealDetail } from "./types";
 import { Task } from "./types";
 import {  formatCurrency, formatDate, getInitials } from "@/lib/helper";
-
-// ── Mock data ───────────────────────────────────────────────────────────────
-// const DEAL = {
-//   title: "Security Audit Platform",
-//   stage: "PROPOSAL" as DealStage,
-//   value: "480tr",
-//   valueFull: "480,000,000 VND",
-//   closeDate: "31/03/2026",
-//   probability: 70,
-//   source: "Inbound",
-//   owner: {
-//     initials: "DT",
-//     name: "Đặng Tuấn",
-//     role: "Sales Manager",
-//     bg: "#D4F5E0",
-//     color: "#1A7A3C",
-//   },
-// };
-
-// const CONTACT = {
-//   id: "c1",
-//   name: "Phạm Đức Quang",
-//   title: "Giám đốc IT",
-//   company: "Ngân hàng JKL",
-//   email: "quang.pham@jklbank.vn",
-//   phone: "0912 456 789",
-//   initials: "PQ",
-//   avatarBg: "#D4E8F5",
-//   avatarColor: "#1A5C7A",
-// };
 
 type Priority = "high" | "medium" | "low";
 type DueStatus = "overdue" | "today" | "upcoming" | "done";
@@ -72,11 +42,12 @@ const PRIORITY_DOT: Record<Priority, string> = {
 };
 
 type DealLeftPanelProps = {
-  deal: Deal;
+  deal: DealDetail;
+  onEdit: () => void;
 };
 
 // ── Component ───────────────────────────────────────────────────────────────
-export function DealLeftPanel({ deal }: DealLeftPanelProps) {
+export function DealLeftPanel({ deal, onEdit }: DealLeftPanelProps) {
   const [tasks, setTasks]         = useState<Task[]>(deal?.tasks);
   const [addingTask, setAddingTask] = useState(false);
   const [newTitle, setNewTitle]   = useState("");
@@ -126,6 +97,7 @@ export function DealLeftPanel({ deal }: DealLeftPanelProps) {
             size="sm"
             className="h-6 gap-1 px-2 text-muted-foreground hover:text-foreground -mr-1"
             style={{ fontSize: 12 }}
+            onClick={onEdit}
           >
             <Edit2 size={11} />
             Chỉnh sửa

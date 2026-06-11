@@ -6,11 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -34,6 +34,10 @@ import { useGetContacts } from "@/hooks/useContacts";
 import { useCreateDeal } from "@/hooks/useDeals";
 import { useGetUsers } from "@/hooks/useUsers";
 import { Contact } from "@/lib/validations/contacts.scheme";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 
 const createDealFormSchema = z.object({
   title: z
@@ -131,7 +135,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
       contactId: values.contactId,
       ownerId: values.ownerId,
       value: values.value,
-      closeDate: values.closeDate ? new Date(values.closeDate) : undefined,
+      closeDate: values.closeDate ? new Date(values.closeDate) : new Date(),
       note: values.note?.trim() ? values.note.trim() : undefined,
     });
 
@@ -143,13 +147,13 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
   const usersLoading = usersQuery.isLoading;
 
   return (
-    <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent className="w-[400px] sm:w-[480px] overflow-y-auto p-4">
-        <SheetHeader className="pb-4 border-b mb-5">
-          <SheetTitle style={{ fontSize: 15, fontWeight: 600 }}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="max-w-[480px] overflow-y-auto p-5">
+        <DialogHeader className="pb-4 border-b mb-4">
+          <DialogTitle style={{ fontSize: 15, fontWeight: 600 }}>
             Thêm deal
-          </SheetTitle>
-        </SheetHeader>
+          </DialogTitle>
+        </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -166,7 +170,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                       placeholder="Tên deal"
                       {...field}
                       style={{ fontSize: 13 }}
-                      className="shadow-inner bg-gray-50"
+                      className="bg-[#F8F8F7] border-[#E8E7E2]"
                     />
                   </FormControl>
                   <FormMessage style={{ fontSize: 11 }} />
@@ -188,7 +192,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                     disabled={contactsLoading || isPending}
                   >
                     <FormControl>
-                      <SelectTrigger size="sm" style={{ fontSize: 13 }} className="shadown-inner bg-gray-50 ">
+                      <SelectTrigger size="sm" style={{ fontSize: 13 }} className="bg-[#F8F8F7] border-[#E8E7E2]">
                         <SelectValue
                           placeholder={
                             contactsLoading ? "Đang tải..." : "Chọn liên hệ"
@@ -211,9 +215,9 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                   </Select>
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="shadow-inner bg-gray-50 h-7 px-0 text-xs text-primary hover:bg-transparent"
+                    className="h-7 px-2 text-xs text-primary bg-[#F8F8F7] hover:bg-gray-100 border border-[#E8E7E2] mt-1.5"
                     disabled={isPending}
                     onClick={() => setContactDialogOpen(true)}
                   >
@@ -292,13 +296,40 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                 control={form.control}
                 name="closeDate"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ fontSize: 12 }}>
+                  <FormItem className="flex flex-col gap-1.5">
+                    <FormLabel style={{ fontSize: 12, lineHeight: 1 }}>
                       Ngày đóng dự kiến
                     </FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} style={{ fontSize: 13 }} />
-                    </FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className="w-full h-8 pl-3 text-left font-normal text-xs bg-[#F8F8F7] border border-[#E8E7E2] text-foreground hover:bg-gray-100"
+                          >
+                            {field.value ? (
+                              format(new Date(field.value), "dd/MM/yyyy")
+                            ) : (
+                              <span className="text-muted-foreground">Chọn ngày</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 bg-white" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => {
+                            field.onChange(date ? date.toISOString().split("T")[0] : "");
+                          }}
+                          disabled={(date) =>
+                            date < new Date("1900-01-01")
+                          }
+                          
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage style={{ fontSize: 11 }} />
                   </FormItem>
                 )}
@@ -317,7 +348,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                       rows={4}
                       {...field}
                       style={{ fontSize: 13, resize: "none" }}
-                    className="shadow-inner bg-gray-50"
+                      className="bg-[#F8F8F7] border-[#E8E7E2]"
                     />
                   </FormControl>
                   <FormMessage style={{ fontSize: 11 }} />
@@ -347,13 +378,14 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
             </div>
           </form>
         </Form>
-      </SheetContent>
+      </DialogContent>
 
       <ContactDialog
         isOpen={contactDialogOpen}
         onOpenChange={setContactDialogOpen}
         onCreated={handleContactCreated}
       />
-    </Sheet>
+    </Dialog>
   );
 }
+  

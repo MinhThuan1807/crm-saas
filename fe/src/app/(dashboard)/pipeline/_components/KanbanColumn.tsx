@@ -13,15 +13,18 @@ import { cn } from "@/lib/utils";
 interface Props {
   stage: Stage;
   deals: Deal[];
+  onEdit: (deal: Deal) => void;
+  onDelete: (deal: Deal) => void;
 }
 
 function formatTotal(total: number): string {
   if (total === 0) return "—";
-  if (total >= 1000) return `${(total / 1000).toFixed(1).replace(".0", "")} tỷ`;
-  return `${total % 1 === 0 ? total : total.toFixed(1)}tr`;
+  const millions = total / 1_000_000;
+  if (millions >= 1000) return `${(millions / 1000).toFixed(1).replace(".0", "")} tỷ`;
+  return `${millions % 1 === 0 ? millions : millions.toFixed(1)}tr`;
 }
 
-export function KanbanColumn({ stage, deals }: Props) {
+export function KanbanColumn({ stage, deals, onEdit, onDelete }: Props) {
   const config = STAGE_CONFIG[stage];
 
   // Column là droppable target — id = stage string
@@ -34,7 +37,7 @@ export function KanbanColumn({ stage, deals }: Props) {
   const dealIds = deals.map((d) => d.id);
 
   return (
-    <div className="flex flex-col flex-1 min-w-[220px] group/col">
+    <div className="flex flex-col flex-1 min-w-[220px] group/col h-full overflow-hidden">
       {/* ── Column header ─────────────────────────────────────────────── */}
       <div className="pb-3 pl-0.5">
         <div className="flex items-center gap-2">
@@ -59,17 +62,6 @@ export function KanbanColumn({ stage, deals }: Props) {
           >
             {deals.length}
           </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              "ml-auto size-6 text-muted-foreground hover:text-primary hover:bg-primary/8 transition-all duration-150",
-              "opacity-0 group-hover/col:opacity-100",
-            )}
-            title={`Thêm deal vào ${config.label}`}
-          >
-            <Plus size={13} />
-          </Button>
         </div>
         <p
           className="pl-4 mt-0.5 text-muted-foreground tabular-nums"
@@ -119,7 +111,14 @@ export function KanbanColumn({ stage, deals }: Props) {
               </Button>
             </div>
           ) : (
-            deals.map((deal) => <DealCard key={deal.id} deal={deal} />)
+            deals.map((deal) => (
+              <DealCard
+                key={deal.id}
+                deal={deal}
+                onEdit={() => onEdit(deal)}
+                onDelete={() => onDelete(deal)}
+              />
+            ))
           )}
         </SortableContext>
       </div>

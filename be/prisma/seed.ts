@@ -73,6 +73,7 @@ async function main() {
     create: {
       id: 'contact-seed-001',
       tenantId: tenant.id,
+      ownerId: salesRep.id,
       name: 'Phạm Văn Khách',
       email: 'khach@gmail.com',
       phone: '0901234567',
@@ -87,6 +88,7 @@ async function main() {
     create: {
       id: 'contact-seed-002',
       tenantId: tenant.id,
+      ownerId: salesRep.id,
       name: 'Hoàng Thị Liên',
       email: 'lien@startup.vn',
       phone: '0912345678',
@@ -101,6 +103,7 @@ async function main() {
     create: {
       id: 'contact-seed-003',
       tenantId: tenant.id,
+      ownerId: manager.id,
       name: 'Đặng Minh Tuấn',
       email: 'tuan@enterprise.com',
       phone: '0987654321',
@@ -115,6 +118,7 @@ async function main() {
     create: {
       id: 'contact-seed-004',
       tenantId: tenant.id,
+      ownerId: salesRep.id,
       name: 'Nguyễn Thị Hoa',
       email: 'hoa@fintech.vn',
       phone: '0933445566',
@@ -129,6 +133,7 @@ async function main() {
     create: {
       id: 'contact-seed-005',
       tenantId: tenant.id,
+      ownerId: manager.id,
       name: 'Bùi Quốc Hùng',
       email: 'hung@logistics.com',
       phone: '0977889900',
@@ -143,6 +148,7 @@ async function main() {
     create: {
       id: 'contact-seed-006',
       tenantId: tenant.id,
+      ownerId: salesRep.id,
       name: 'Trịnh Văn Nam',
       email: 'nam@retailchain.vn',
       phone: '0911223344',

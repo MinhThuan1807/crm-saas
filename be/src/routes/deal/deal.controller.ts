@@ -42,19 +42,19 @@ export class DealController {
   @Post()
   @ZodSerializerDto(CreateDealResDto)
   create(@Body() body: CreateDealBodyType, @CurrentUser() user: AccessTokenPayload) {
-    return this.dealService.create(user.tenantId, { ...body })
+    return this.dealService.create(user.tenantId, { ...body }, { userId: user.userId, role: user.role })
   }
 
   @Get('pipeline')
   @ZodSerializerDto(GetDealsPipelineResDto)
   getPipeline(@CurrentUser() user: AccessTokenPayload) {
-    return this.dealService.getPipleline(user.tenantId)
+    return this.dealService.getPipleline(user.tenantId, { userId: user.userId, role: user.role })
   }
 
   @Get(':id')
   @ZodSerializerDto(GetDealResDto)
   getDealById(@Param('id') dealId: string, @CurrentUser() user: AccessTokenPayload) {
-    return this.dealService.getDealById(dealId, user.tenantId)
+    return this.dealService.getDealById(dealId, user.tenantId, { userId: user.userId, role: user.role })
   }
 
   @Patch(':id/stage')
@@ -64,19 +64,19 @@ export class DealController {
     @CurrentUser() user: AccessTokenPayload,
     @Body() body: { stage: DealStageType },
   ) {
-    return this.dealService.updateDealStage(dealId, user.tenantId, body.stage)
+    return this.dealService.updateDealStage(dealId, user.tenantId, body.stage, { userId: user.userId, role: user.role })
   }
 
   @Patch(':id')
   @ZodSerializerDto(UpdateDealResDto)
   update(@Param('id') dealId: string, @CurrentUser() user: AccessTokenPayload, @Body() body: UpdateDealBodyType) {
-    return this.dealService.update(dealId, user.tenantId, body)
+    return this.dealService.update(dealId, user.tenantId, body, { userId: user.userId, role: user.role })
   }
 
   @Delete(':id')
   @ZodSerializerDto(MessageDto)
   delete(@Param('id') dealId: string, @CurrentUser() user: AccessTokenPayload) {
-    return this.dealService.delete(dealId, user.tenantId)
+    return this.dealService.delete(dealId, user.tenantId, { userId: user.userId, role: user.role })
   }
 
   @UseGuards(AiRateLimitGuard)
@@ -88,7 +88,7 @@ export class DealController {
     @CurrentUser() user: AccessTokenPayload,
   ) {
     try {
-      return await this.dealService.analyze(dealId, user.tenantId, user.userId, body)
+      return await this.dealService.analyze(dealId, user.tenantId, user.userId, body, { userId: user.userId, role: user.role })
     } catch (err) {
       if (err instanceof HttpException) throw err
       // log original error for debugging before returning generic 503
@@ -101,7 +101,7 @@ export class DealController {
   @Get(':id/ai-stream')
   async aiStream(@Param('id') dealId: string, @CurrentUser() user: AccessTokenPayload, @Res() res: Response) {
     // verify deal exists and belongs to tenant
-    await this.dealService.getDealById(dealId, user.tenantId)
+    await this.dealService.getDealById(dealId, user.tenantId, { userId: user.userId, role: user.role })
 
     // subscribe and keep connection open
     subscribeToAiStream(user.tenantId, dealId, res)

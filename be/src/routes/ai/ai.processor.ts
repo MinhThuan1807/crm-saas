@@ -195,5 +195,5 @@ new Worker(
       throw new Error(`DB transaction failed: ${String((err as Error).message || err)}`)
     }
   },
-  { connection, concurrency: 2 },
+  { connection: connection as any, concurrency: 2 },
 )

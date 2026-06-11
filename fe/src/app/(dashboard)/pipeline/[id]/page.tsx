@@ -169,7 +169,7 @@ export default function DealDetail() {
 
       {/* ── Split content ────────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
-        <DealLeftPanel deal={deal} />
+        <DealLeftPanel deal={deal} onEdit={() => setEditOpen(true)}/>
         <DealRightPanel dealId={id} activities={activities} />
       </div>
 

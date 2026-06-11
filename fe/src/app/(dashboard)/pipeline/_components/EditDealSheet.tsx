@@ -4,11 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormField,
@@ -27,14 +27,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Deal, STAGE_CONFIG, STAGES } from "./types";
+import { Deal, DealDetail, STAGE_CONFIG, STAGES } from "./types";
 import { useUpdateDeal } from "@/hooks/useDeals";
+import { useGetUsers } from "@/hooks/useUsers";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 
 const formSchema = z.object({
   title:     z.string().min(1, "Tên deal không được để trống"),
   stage:     z.enum(STAGES, "Vui lòng chọn giai đoạn"),
   contactId: z.string(),
-  ownerId:   z.string(),
+  ownerId:   z.string().min(1, "Vui lòng chọn người phụ trách"),
   value:     z.number().nonnegative("Giá trị không được âm"),
   closeDate: z.string(),
   note:      z.string(),
@@ -43,13 +48,16 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface Props {
-  deal: Deal;
+  deal: Deal | DealDetail;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export function EditDealSheet({ deal, open, onOpenChange }: Props) {
   const updateDeal = useUpdateDeal(deal.id);
+  const usersQuery = useGetUsers();
+  const users = usersQuery.data ?? [];
+  const usersLoading = usersQuery.isLoading;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -58,34 +66,33 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
       stage:     "PROSPECT",
       contactId: "",
       ownerId:   "",
-      value:     deal?.value ?? 0,
-      closeDate: deal?.closeDate ? new Date(deal.closeDate).toISOString().split("T")[0] : "",
-      note:      deal?.note ?? "",
+      value:     0,
+      closeDate: "",
+      note:      "",
     },
   });
 
   // Populate form when deal changes / sheet opens
-  // useEffect(() => {
-  //   if (deal && open) {
-  //     form.reset({
-  //       title:     deal.title,
-  //       stage:     deal.stage,
-  //       contactId: "",
-  //       ownerId:   ownerIdFromDeal(deal),
-  //       value:     deal.value === "—" ? 0 : deal.value,
-  //       closeDate: "",
-  //       note:      "",
-  //     });
-  //   }
-  // }, [deal, open]);
+  useEffect(() => {
+    if (deal && open) {
+      form.reset({
+        title:     deal.title,
+        stage:     deal.stage,
+        contactId: deal.contactId || "",
+        ownerId:   deal.ownerId || "",
+        value:     Number(deal.value) || 0,
+        closeDate: deal.closeDate ? new Date(deal.closeDate).toISOString().split("T")[0] : "",
+        note:      deal.note || "",
+      });
+    }
+  }, [deal, open, form]);
 
   const onSubmit = (values: FormValues) => {
     if (!deal) return;
-
-    // const contact = MOCK_CONTACTS.find((c) => c.id === values.contactId);
-
+    
     updateDeal.mutate({
       title:   values.title,
+      ownerId: values.ownerId,
       value:   values.value,
       closeDate: values.closeDate ? new Date(values.closeDate) : undefined,
       note:    values.note,
@@ -97,11 +104,11 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
 
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[400px] sm:w-[480px] overflow-y-auto">
-        <SheetHeader className="pb-4 border-b mb-5">
-          <SheetTitle style={{ fontSize: 15, fontWeight: 600 }}>Chỉnh sửa deal</SheetTitle>
-        </SheetHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[480px] overflow-y-auto p-5">
+        <DialogHeader className="pb-4 border-b mb-4">
+          <DialogTitle style={{ fontSize: 15, fontWeight: 600 }}>Chỉnh sửa deal</DialogTitle>
+        </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -116,7 +123,7 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
                     Tên deal <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Tên deal" {...field} style={{ fontSize: 13 }} />
+                    <Input placeholder="Tên deal" {...field} style={{ fontSize: 13 }} className="bg-[#F8F8F7] border-[#E8E7E2]" />
                   </FormControl>
                   <FormMessage style={{ fontSize: 11 }} />
                 </FormItem>
@@ -133,7 +140,7 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
                     <FormLabel style={{ fontSize: 12 }}>Giai đoạn</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
-                        <SelectTrigger size="sm" style={{ fontSize: 13 }}>
+                        <SelectTrigger size="sm" style={{ fontSize: 13 }} className="bg-[#F8F8F7] border-[#E8E7E2]">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
@@ -163,6 +170,7 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
                         {...field}
                         onChange={(e) => field.onChange(e.target.valueAsNumber)}
                         style={{ fontSize: 13 }}
+                        className="bg-[#F8F8F7] border-[#E8E7E2]"
                       />
                     </FormControl>
                     <FormMessage style={{ fontSize: 11 }} />
@@ -171,48 +179,22 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
               />
             </div>
 
-            {/* Contact */}
-            {/* <FormField
-              control={form.control}
-              name="contactId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel style={{ fontSize: 12 }}>Liên hệ</FormLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger size="sm" style={{ fontSize: 13 }}>
-                        <SelectValue placeholder={deal.company || "Chọn liên hệ"} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {MOCK_CONTACTS.map((c) => (
-                        <SelectItem key={c.id} value={c.id} style={{ fontSize: 13 }}>
-                          {c.name} — {c.company}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage style={{ fontSize: 11 }} />
-                </FormItem>
-              )}
-            /> */}
-
             {/* Owner + Close Date */}
             <div className="grid grid-cols-2 gap-3">
-              {/* <FormField
+              <FormField
                 control={form.control}
                 name="ownerId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel style={{ fontSize: 12 }}>Người phụ trách</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <FormLabel style={{ fontSize: 12 }}>Người phụ trách <span className="text-destructive">*</span></FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange} disabled={usersLoading}>
                       <FormControl>
-                        <SelectTrigger size="sm" style={{ fontSize: 13 }}>
-                          <SelectValue placeholder="Chọn nhân viên" />
+                        <SelectTrigger size="sm" style={{ fontSize: 13 }} className="bg-[#F8F8F7] border-[#E8E7E2]">
+                          <SelectValue placeholder={usersLoading ? "Đang tải..." : "Chọn nhân viên"} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {MOCK_OWNERS.map((o) => (
+                        {users.map((o) => (
                           <SelectItem key={o.id} value={o.id} style={{ fontSize: 13 }}>
                             {o.name}
                           </SelectItem>
@@ -222,17 +204,43 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
                     <FormMessage style={{ fontSize: 11 }} />
                   </FormItem>
                 )}
-              /> */}
+              />
 
               <FormField
                 control={form.control}
                 name="closeDate"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel style={{ fontSize: 12 }}>Ngày đóng dự kiến</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} style={{ fontSize: 13 }} />
-                    </FormControl>
+                  <FormItem className="flex flex-col gap-1.5">
+                    <FormLabel style={{ fontSize: 12, lineHeight: 1 }}>Ngày đóng dự kiến</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className="w-full h-8 pl-3 text-left font-normal text-xs bg-[#F8F8F7] border border-[#E8E7E2] text-foreground hover:bg-gray-100"
+                          >
+                            {field.value ? (
+                              format(new Date(field.value), "dd/MM/yyyy")
+                            ) : (
+                              <span className="text-muted-foreground">Chọn ngày</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 bg-white" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={(date) => {
+                            field.onChange(date ? date.toISOString().split("T")[0] : "");
+                          }}
+                          disabled={(date) =>
+                            date < new Date("1900-01-01")
+                          }
+                        />
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage style={{ fontSize: 11 }} />
                   </FormItem>
                 )}
@@ -252,6 +260,7 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
                       rows={4}
                       {...field}
                       style={{ fontSize: 13, resize: "none" }}
+                      className="bg-[#F8F8F7] border-[#E8E7E2]"
                     />
                   </FormControl>
                   <FormMessage style={{ fontSize: 11 }} />
@@ -275,7 +284,7 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
             </div>
           </form>
         </Form>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }

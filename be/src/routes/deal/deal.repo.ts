@@ -1,14 +1,20 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/common/services/prisma.service'
 import { CreateDealBodyType, DealStageConst, DealStageType, UpdateDealBodyType } from './deal.model'
+import { ROLE } from 'src/common/constants/role.constanst'
 
 @Injectable()
 export class DealRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  findAllByTenant(tenantId: string) {
+  findAllByTenant(tenantId: string, userContext?: { userId: string; role: string }) {
+    const isSalesRep = userContext?.role === ROLE.SALES_REP
     return this.prismaService.deal.findMany({
-      where: { tenantId, deletedAt: null },
+      where: { 
+        tenantId, 
+        deletedAt: null,
+        ...(isSalesRep && { ownerId: userContext.userId })
+      },
       include: {
         contact: { select: { id: true, name: true } },
         owner: { select: { id: true, name: true } },
@@ -17,9 +23,14 @@ export class DealRepository {
     })
   }
 
-  findDealsByStage(stage: DealStageType) {
+  findDealsByStage(stage: DealStageType, userContext?: { userId: string; role: string }) {
+    const isSalesRep = userContext?.role === ROLE.SALES_REP
     return this.prismaService.deal.findMany({
-      where: { stage: stage, deletedAt: null },
+      where: { 
+        stage: stage, 
+        deletedAt: null,
+        ...(isSalesRep && { ownerId: userContext.userId })
+      },
       include: {
         contact: { select: { id: true, name: true } },
         owner: { select: { id: true, name: true } },
@@ -27,9 +38,15 @@ export class DealRepository {
     })
   }
 
-  findOne(dealId: string, tenantId: string) {
+  findOne(dealId: string, tenantId: string, userContext?: { userId: string; role: string }) {
+    const isSalesRep = userContext?.role === ROLE.SALES_REP
     return this.prismaService.deal.findFirst({
-      where: { id: dealId, tenantId, deletedAt: null },
+      where: { 
+        id: dealId, 
+        tenantId, 
+        deletedAt: null,
+        ...(isSalesRep && { ownerId: userContext.userId })
+      },
       include: {
         contact: true,
         owner: { select: { id: true, name: true, email: true } },
@@ -76,3 +93,4 @@ export class DealRepository {
     })
   }
 }
+

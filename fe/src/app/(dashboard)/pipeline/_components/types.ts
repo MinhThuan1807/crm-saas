@@ -1,10 +1,12 @@
 // Re-export từ deals.schema để dùng chung trong pipeline components
 export { DealStage } from "@/lib/validations/deals.schema";
-export type { DealDetail as Deal } from "@/lib/validations/deals.schema";
-import type { DealStage } from "@/lib/validations/deals.schema";
+import type { DealCard, DealDetail, DealStage } from "@/lib/validations/deals.schema";
 
 // Alias để các component dùng Stage thay vì DealStage (backward compat)
 export type Stage = DealStage;
+
+export type Deal = DealCard;
+export type { DealDetail };
 
 export const STAGE_CONFIG: Record<
   DealStage,
