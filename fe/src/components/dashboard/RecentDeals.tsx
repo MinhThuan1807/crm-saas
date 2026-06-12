@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { RecentDealType } from "@/lib/validations/dashboard.schema";
 
 interface Deal {
   id: string;
@@ -31,7 +32,7 @@ interface Deal {
   daysAgo: number;
 }
 
-const deals: Deal[] = [
+const MOCK_DEALS: Deal[] = [
   {
     id: "d1",
     title: "Security Audit Platform",
@@ -89,13 +90,20 @@ const deals: Deal[] = [
   },
 ];
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 function timeLabel(daysAgo: number) {
   if (daysAgo === 0) return "Hôm nay";
   if (daysAgo === 1) return "Hôm qua";
   return `${daysAgo} ngày trước`;
 }
 
-export function RecentDeals() {
+interface RecentDealsProps {
+  deals?: RecentDealType[];
+  isLoading?: boolean;
+}
+
+export function RecentDeals({ deals = MOCK_DEALS, isLoading = false }: RecentDealsProps) {
   return (
     <Card className="shadow-none border-border/70 gap-0 py-0">
       <CardHeader className="border-b px-5 py-4">
@@ -142,69 +150,100 @@ export function RecentDeals() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {deals.map((deal) => (
-              <TableRow
-                key={deal.id}
-                className="cursor-pointer border-b border-b-muted/60 hover:bg-muted/30"
-              >
-                {/* Deal + company */}
-                <TableCell className="px-5 py-3">
-                  <div className="min-w-0">
-                    <p
-                      className="text-foreground truncate max-w-[200px]"
-                      style={{ fontSize: 13, fontWeight: 500 }}
-                    >
-                      {deal.title}
-                    </p>
-                    <p className="text-muted-foreground truncate max-w-[200px]" style={{ fontSize: 11, marginTop: 1 }}>
-                      {deal.company}
-                    </p>
-                  </div>
-                </TableCell>
-
-                {/* Stage badge */}
-                <TableCell className="px-2 py-3">
-                  <span
-                    className="inline-block rounded-full px-2 py-0.5 whitespace-nowrap"
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 500,
-                      color: deal.stageColor,
-                      background: deal.stageBg,
-                    }}
-                  >
-                    {deal.stage}
-                  </span>
-                </TableCell>
-
-                {/* Value */}
-                <TableCell className="px-2 py-3 text-foreground tabular-nums" style={{ fontSize: 13, fontWeight: 600 }}>
-                  {deal.value}
-                </TableCell>
-
-                {/* Owner */}
-                <TableCell className="px-2 py-3">
-                  <Avatar className="size-6">
-                    <AvatarFallback
-                      className="border-0"
-                      style={{
-                        background: deal.owner.bg,
-                        color: deal.owner.color,
-                        fontSize: 10,
-                        fontWeight: 600,
-                      }}
-                    >
-                      {deal.owner.initials}
-                    </AvatarFallback>
-                  </Avatar>
-                </TableCell>
-
-                {/* Time */}
-                <TableCell className="px-5 py-3 text-muted-foreground text-right" style={{ fontSize: 11 }}>
-                  {timeLabel(deal.daysAgo)}
+            {isLoading ? (
+              [1, 2, 3, 4, 5].map((i) => (
+                <TableRow key={i} className="border-b border-b-muted/60 hover:bg-transparent">
+                  <TableCell className="px-5 py-3">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-32 rounded" />
+                      <Skeleton className="h-3.5 w-20 rounded" />
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-2 py-3">
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                  </TableCell>
+                  <TableCell className="px-2 py-3">
+                    <Skeleton className="h-4 w-10 rounded" />
+                  </TableCell>
+                  <TableCell className="px-2 py-3">
+                    <Skeleton className="size-6 rounded-full" />
+                  </TableCell>
+                  <TableCell className="px-5 py-3 text-right">
+                    <Skeleton className="h-3.5 w-14 rounded ml-auto" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : deals.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="py-10 text-center text-muted-foreground" style={{ fontSize: 13 }}>
+                  Chưa có deal nào được tạo trong kỳ này
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              deals.map((deal) => (
+                <TableRow
+                  key={deal.id}
+                  className="cursor-pointer border-b border-b-muted/60 hover:bg-muted/30"
+                >
+                  {/* Deal + company */}
+                  <TableCell className="px-5 py-3">
+                    <div className="min-w-0">
+                      <p
+                        className="text-foreground truncate max-w-[200px]"
+                        style={{ fontSize: 13, fontWeight: 500 }}
+                      >
+                        {deal.title}
+                      </p>
+                      <p className="text-muted-foreground truncate max-w-[200px]" style={{ fontSize: 11, marginTop: 1 }}>
+                        {deal.company}
+                      </p>
+                    </div>
+                  </TableCell>
+
+                  {/* Stage badge */}
+                  <TableCell className="px-2 py-3">
+                    <span
+                      className="inline-block rounded-full px-2 py-0.5 whitespace-nowrap"
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 500,
+                        color: deal.stageColor,
+                        background: deal.stageBg,
+                      }}
+                    >
+                      {deal.stage}
+                    </span>
+                  </TableCell>
+
+                  {/* Value */}
+                  <TableCell className="px-2 py-3 text-foreground tabular-nums" style={{ fontSize: 13, fontWeight: 600 }}>
+                    {deal.value}
+                  </TableCell>
+
+                  {/* Owner */}
+                  <TableCell className="px-2 py-3">
+                    <Avatar className="size-6">
+                      <AvatarFallback
+                        className="border-0"
+                        style={{
+                          background: deal.owner.bg,
+                          color: deal.owner.color,
+                          fontSize: 10,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {deal.owner.initials}
+                      </AvatarFallback>
+                    </Avatar>
+                  </TableCell>
+
+                  {/* Time */}
+                  <TableCell className="px-5 py-3 text-muted-foreground text-right" style={{ fontSize: 11 }}>
+                    {timeLabel(deal.daysAgo)}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </CardContent>

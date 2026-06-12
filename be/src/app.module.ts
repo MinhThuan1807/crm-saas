@@ -13,8 +13,9 @@ import { ActivitiesModule } from './routes/activities/activities.module';
 import { DealModule } from './routes/deal/deal.module';
 import { UsersModule } from './routes/users/users.module';
 import { InvitationsModule } from './routes/invitations/invitations.module';
+import { DashboardModule } from './routes/dashboard/dashboard.module';
 @Module({
-  imports: [CommonModule, AuthModule, ContactsModule, ActivitiesModule, DealModule, UsersModule, InvitationsModule],
+  imports: [CommonModule, AuthModule, ContactsModule, ActivitiesModule, DealModule, UsersModule, InvitationsModule, DashboardModule],
   controllers: [AppController],
   providers: [
     AppService,

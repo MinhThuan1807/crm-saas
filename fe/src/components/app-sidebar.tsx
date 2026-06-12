@@ -23,7 +23,18 @@ import {
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
-import { useLogout } from "@/hooks/useAuth";
+import { useLogout, useMe } from "@/hooks/useAuth";
+
+function getInitials(name?: string): string {
+  if (!name) return "";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    const first = parts[0][0];
+    const last = parts[parts.length - 1][0];
+    return (first + last).toUpperCase();
+  }
+  return parts[0] ? parts[0][0].toUpperCase() : '';
+}
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
@@ -36,6 +47,7 @@ const navItems = [
 
 export function AppSidebar() {
   const { mutate: logout } = useLogout();
+  const { data: me } = useMe();
   const pathName = usePathname();
 
   const handleLogout = () => {
@@ -126,7 +138,7 @@ export function AppSidebar() {
                   fontWeight: 600,
                 }}
               >
-                NM
+                {getInitials(me?.name) || "NM"}
               </AvatarFallback>
             </Avatar>
   
@@ -135,10 +147,10 @@ export function AppSidebar() {
                 className="text-foreground truncate"
                 style={{ fontSize: 12, fontWeight: 500 }}
               >
-                Nguyễn Minh
+                {me?.name || "Nguyễn Minh"}
               </p>
               <p className="text-muted-foreground" style={{ fontSize: 11 }}>
-                Manager
+                {me?.role ? (me.role.charAt(0) + me.role.slice(1).toLowerCase().replace('_', ' ')) : "Manager"}
               </p>
             </div>
   
