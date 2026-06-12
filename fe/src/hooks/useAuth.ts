@@ -2,7 +2,7 @@
 import { LoginBodyType, RegisterBodyType } from "@/lib/validations/auth.schema";
 import { authService } from "@/services/auth.service";
 import { ApiError } from "@/types/error.type";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -62,5 +62,13 @@ export const useRegister = () => {
       const message = error?.response?.data?.message || "Đăng ký thất bại";
       toast.error(message);
     },
+  });
+};
+
+export const useMe = () => {
+  return useQuery({
+    queryKey: ["auth", "me"],
+    queryFn: authService.me,
+    staleTime: 5 * 60 * 1000, // 5 mins
   });
 };
