@@ -3,7 +3,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
 import { ChartCard } from "./ChartCard";
-import { revenueByMonth, fmtTr } from "./reportsData";
+import { fmtTr } from "./reportsData";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -26,7 +26,19 @@ const LEGEND = [
   { color: "#FBBF24", label: "Target",   dash: true,  bar: false },
 ];
 
-export function RevenueMonthChart() {
+interface RevenueMonthChartProps {
+  data?: {
+    month: string;
+    actual: number;
+    target: number;
+  }[];
+}
+
+export function RevenueMonthChart({ data = [] }: RevenueMonthChartProps) {
+  // Dynamically calculate y-axis domain max based on data
+  const maxVal = Math.max(...data.map(d => Math.max(d.actual, d.target)), 100);
+  const yDomainMax = Math.ceil(maxVal * 1.2);
+
   return (
     <ChartCard
       title="Doanh thu theo tháng"
@@ -49,10 +61,10 @@ export function RevenueMonthChart() {
       }
     >
       <ResponsiveContainer width="100%" height={220}>
-        <ComposedChart data={revenueByMonth} margin={{ top: 5, right: 16, left: 0, bottom: 5 }}>
+        <ComposedChart data={data} margin={{ top: 5, right: 16, left: 0, bottom: 5 }}>
           <CartesianGrid key="rm-grid"  strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
           <XAxis         key="rm-xaxis" dataKey="month" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
-          <YAxis         key="rm-yaxis" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={fmtTr} width={44} domain={[0, 200000]} />
+          <YAxis         key="rm-yaxis" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={fmtTr} width={44} domain={[0, yDomainMax]} />
           <Tooltip       key="rm-tt"    content={<CustomTooltip />} />
           <Bar  key="rm-bar"  dataKey="actual" name="Thực tế" fill="#534AB7" radius={[4, 4, 0, 0]} maxBarSize={36} />
           <Line key="rm-line" type="monotone" dataKey="target" name="Target" stroke="#FBBF24" strokeWidth={2} strokeDasharray="5 3" dot={false} />

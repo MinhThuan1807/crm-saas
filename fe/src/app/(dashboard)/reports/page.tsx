@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Download, FileText, Calendar, ChevronDown, TrendingUp, TrendingDown,
   BarChart2, PieChart, Activity, Users,
@@ -9,12 +10,11 @@ import {
 import { RevenueMonthChart } from "./_components/RevenueMonthChart";
 import { ForecastAreaChart }  from "./_components/ForecastAreaChart";
 import { WinLossChart }       from "./_components/WinLossChart";
-import { IndustryDonut }      from "./_components/IndustryDonut";
 import { TopDealsTable }      from "./_components/TopDealsTable";
 import { TeamPerformanceTab } from "./_components/TeamPerformanceTab";
 import { PipelineAnalysisTab } from "./_components/PipelineAnalysisTab";
 import { ActivityReportTab } from "./_components/ActivityReportTab";
-import { dealsBySourceData, fmtTr } from "./_components/reportsData";
+import { reportsService } from "@/services/reports.service";
 
 // ── Tabs ─────────────────────────────────────────────────────────────────────
 type Tab = "overview" | "team" | "pipeline" | "activity";
@@ -37,7 +37,7 @@ interface KpiProps {
 
 function KpiCard({ label, value, delta, up, subtext }: KpiProps) {
   return (
-    <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-2.5">
+    <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-2.5 shadow-sm">
       <p className="text-[#6B6B67]" style={{ fontSize: 11 }}>{label}</p>
       <p className="text-[#1A1A18]" style={{ fontSize: 22, fontWeight: 700, lineHeight: 1 }}>
         {value}
@@ -57,95 +57,23 @@ function KpiCard({ label, value, delta, up, subtext }: KpiProps) {
   );
 }
 
-// ── Deals by Source (custom horizontal bars) ─────────────────────────────────
-function DealsBySourceCard() {
-  const maxDeals = Math.max(...dealsBySourceData.map((d) => d.deals));
-  const maxValue = Math.max(...dealsBySourceData.map((d) => d.value));
-
-  return (
-    <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4">
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <h3 className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 600 }}>Deals theo nguồn</h3>
-          <p className="text-[#6B6B67] mt-0.5" style={{ fontSize: 11 }}>Phân phối theo kênh</p>
-        </div>
-        <div className="flex gap-2">
-          <div className="flex items-center gap-1">
-            <div className="size-2 rounded-full" style={{ background: "#534AB7" }} />
-            <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>Deals</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="size-2 rounded-full" style={{ background: "#AFA9EC" }} />
-            <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>Doanh thu</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        {dealsBySourceData.map((d) => (
-          <div key={d.source}>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>{d.source}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-[#1A1A18] tabular-nums" style={{ fontSize: 11, fontWeight: 600 }}>
-                  {d.deals} deals
-                </span>
-                <span className="text-[#6B6B67] tabular-nums" style={{ fontSize: 10 }}>
-                  {fmtTr(d.value)}
-                </span>
-              </div>
-            </div>
-            {/* Deal count bar */}
-            <div className="h-2 bg-[#F1EFE8] rounded-full overflow-hidden mb-1">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${(d.deals / maxDeals) * 100}%`, background: "#534AB7" }}
-              />
-            </div>
-            {/* Value bar */}
-            <div className="h-1.5 bg-[#F1EFE8] rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${(d.value / maxValue) * 100}%`, background: "#AFA9EC" }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Empty tab placeholder ─────────────────────────────────────────────────────
-function EmptyTab({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="flex-1 flex flex-col items-center justify-center" style={{ minHeight: 480 }}>
-      <div
-        className="size-14 rounded-full flex items-center justify-center mb-4"
-        style={{ background: "#EEEDFE" }}
-      >
-        <BarChart2 size={24} style={{ color: "#534AB7" }} />
-      </div>
-      <p className="text-[#1A1A18] mb-1.5" style={{ fontSize: 15, fontWeight: 600 }}>{title}</p>
-      <p className="text-[#6B6B67]" style={{ fontSize: 13 }}>{description}</p>
-      <div className="mt-6 flex flex-col gap-3 w-full max-w-xs opacity-30 pointer-events-none select-none">
-        {[80, 60, 75, 50].map((w, i) => (
-          <div key={i} className="flex items-center gap-3">
-            <div className="h-2 rounded-full bg-[#534AB7]" style={{ width: `${w}%` }} />
-            <div className="size-4 rounded bg-[#E8E7E2]" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
+  
+  // Date ranges default to entire 2026 to capture all seeded records
+  const [startDate, setStartDate] = useState("2026-01-01");
+  const [endDate, setEndDate] = useState("2026-12-31");
+
+  // Fetch overview analytics
+  const { data: overviewData, isLoading: isOverviewLoading } = useQuery({
+    queryKey: ["reports", "overview", startDate, endDate],
+    queryFn: () => reportsService.getOverview({ startDate, endDate }),
+    enabled: activeTab === "overview",
+  });
 
   return (
-    <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+    <div className="flex flex-col flex-1 min-w-0 overflow-hidden bg-[#F8F8F7]">
 
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
       <header
@@ -168,18 +96,8 @@ export default function ReportsPage() {
             style={{ fontSize: 12, color: "#1A1A18" }}
           >
             <Calendar size={13} className="text-[#6B6B67]" />
-            <span>01/01/2026 – 31/05/2026</span>
+            <span>01/01/2026 – 31/12/2026</span>
             <ChevronDown size={12} className="text-[#6B6B67]" />
-          </button>
-
-          {/* Owner filter */}
-          <button
-            className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#E8E7E2] bg-white hover:bg-[#F8F8F7] transition-colors cursor-pointer"
-            style={{ fontSize: 12, color: "#6B6B67" }}
-          >
-            <Users size={13} />
-            <span>Lọc theo owner</span>
-            <ChevronDown size={12} />
           </button>
 
           {/* Export CSV */}
@@ -233,67 +151,109 @@ export default function ReportsPage() {
       </div>
 
       {/* ── Body ─────────────────────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto bg-[#F8F8F7]" style={{ padding: 24 }}>
+      <div className="flex-1 overflow-y-auto" style={{ padding: 24 }}>
 
         {activeTab === "overview" && (
-          <div className="flex flex-col gap-5">
-
-            {/* Row 1: KPI cards */}
-            <div className="grid grid-cols-5 gap-4">
-              <KpiCard
-                label="Tổng doanh thu"
-                value="820tr"
-                delta="+15% YoY"
-                up={true}
-              />
-              <KpiCard
-                label="Tổng deals đóng"
-                value="47"
-                delta="+8"
-                up={true}
-                subtext="so với kỳ trước"
-              />
-              <KpiCard
-                label="Win rate TB"
-                value="34.2%"
-                delta="+2.1%"
-                up={true}
-              />
-              <KpiCard
-                label="Avg deal size"
-                value="17.4tr"
-                delta="+5%"
-                up={true}
-              />
-              <KpiCard
-                label="Avg days to close"
-                value="22 ngày"
-                delta="-3 ngày"
-                up={true}
-              />
+          isOverviewLoading ? (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <span className="text-[#6B6B67] text-sm">Đang tải dữ liệu báo cáo...</span>
             </div>
+          ) : (
+            overviewData && (
+              <div className="flex flex-col gap-5">
 
-            {/* Row 2: Revenue chart + Forecast chart */}
-            <div className="grid grid-cols-2 gap-4">
-              <RevenueMonthChart />
-              <ForecastAreaChart />
-            </div>
+                {/* Row 1: KPI cards */}
+                <div className="grid grid-cols-5 gap-4">
+                  <KpiCard
+                    label="Tổng doanh thu"
+                    value={overviewData.kpis.totalRevenue.value}
+                    delta={overviewData.kpis.totalRevenue.delta}
+                    up={overviewData.kpis.totalRevenue.up}
+                  />
+                  <KpiCard
+                    label="Tổng deals đóng"
+                    value={overviewData.kpis.closedDeals.value}
+                    delta={overviewData.kpis.closedDeals.delta}
+                    up={overviewData.kpis.closedDeals.up}
+                    subtext={overviewData.kpis.closedDeals.subtext}
+                  />
+                  <KpiCard
+                    label="Win rate TB"
+                    value={overviewData.kpis.winRate.value}
+                    delta={overviewData.kpis.winRate.delta}
+                    up={overviewData.kpis.winRate.up}
+                  />
+                  <KpiCard
+                    label="Avg deal size"
+                    value={overviewData.kpis.avgDealSize.value}
+                    delta={overviewData.kpis.avgDealSize.delta}
+                    up={overviewData.kpis.avgDealSize.up}
+                  />
+                  <KpiCard
+                    label="Avg days to close"
+                    value={overviewData.kpis.avgDaysToClose.value}
+                    delta={overviewData.kpis.avgDaysToClose.delta}
+                    up={overviewData.kpis.avgDaysToClose.up}
+                  />
+                </div>
 
-            {/* Row 3: Deals by source + Win/Loss + Industry donut */}
-            <div className="grid grid-cols-3 gap-4">
-              <DealsBySourceCard />
-              <WinLossChart />
-              <IndustryDonut />
-            </div>
+                {/* Row 2: Revenue chart + Forecast chart */}
+                <div className="grid grid-cols-2 gap-4">
+                  <RevenueMonthChart data={overviewData.revenueByMonth} />
+                  <ForecastAreaChart data={overviewData.forecastData} />
+                </div>
 
-            {/* Row 4: Top deals table */}
-            <TopDealsTable />
+                {/* Row 3: Win/Loss Chart only */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="col-span-2">
+                    <WinLossChart />
+                  </div>
+                  <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-5 flex flex-col justify-between">
+                    <div>
+                      <h4 className="text-[#1A1A18] font-bold text-xs" style={{ fontSize: 13 }}>Tỷ lệ chốt Sales</h4>
+                      <p className="text-[#6B6B67] mt-1.5" style={{ fontSize: 11 }}>
+                        Thống kê tỷ lệ thắng (Win) và thua (Loss) của các Deal đã đóng trong kỳ.
+                      </p>
+                    </div>
+                    
+                    {/* Hiển thị chỉ số KPI Win Rate thực tế để lấp khoảng trống ở giữa */}
+                    <div className="flex flex-col items-center justify-center py-6">
+                      <span className="text-[#534AB7] text-4xl font-bold tracking-tight">
+                        {overviewData.kpis.winRate.value}
+                      </span>
+                      <span className="text-[#6B6B67] mt-1" style={{ fontSize: 11 }}>
+                        Tỷ lệ thắng trung bình kỳ này
+                      </span>
+                      <div className="flex items-center gap-1 mt-2">
+                        <span 
+                          className="px-1.5 py-0.5 rounded text-[10px] font-semibold"
+                          style={{
+                            background: overviewData.kpis.winRate.up ? "#DCFCE7" : "#FEE2E2",
+                            color: overviewData.kpis.winRate.up ? "#166534" : "#991B1B"
+                          }}
+                        >
+                          {overviewData.kpis.winRate.delta}
+                        </span>
+                        <span className="text-[#6B6B67] text-[10px]">so với kỳ trước</span>
+                      </div>
+                    </div>
 
-          </div>
+                    <div className="text-[#1A1A18] font-semibold text-xs border-t border-[#E8E7E2] pt-4" style={{ fontSize: 11 }}>
+                      Tỷ lệ thắng là tỷ trọng phần trăm số lượng Deal chốt thành công trên tổng số Deal đã kết thúc.
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 4: Top deals table */}
+                <TopDealsTable deals={overviewData.topDeals} />
+
+              </div>
+            )
+          )
         )}
 
         {activeTab === "team" && (
-          <TeamPerformanceTab />
+          <TeamPerformanceTab startDate={startDate} endDate={endDate} />
         )}
 
         {activeTab === "pipeline" && (
@@ -301,7 +261,7 @@ export default function ReportsPage() {
         )}
 
         {activeTab === "activity" && (
-          <ActivityReportTab />
+          <ActivityReportTab startDate={startDate} endDate={endDate} />
         )}
 
       </div>

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { topDeals } from "./reportsData";
 
 type Filter = "all" | "won" | "lost";
 
@@ -11,14 +10,47 @@ const FILTER_LABELS: Record<Filter, string> = {
   lost: "Closed Lost",
 };
 
-export function TopDealsTable() {
+export interface TopDeal {
+  id: string;
+  name: string;
+  company: string;
+  owner: string;
+  ownerInitials: string;
+  ownerBg: string;
+  ownerColor: string;
+  value: string;
+  closedAt: string;
+  stage: string;
+}
+
+interface TopDealsTableProps {
+  deals?: TopDeal[];
+}
+
+export function TopDealsTable({ deals = [] }: TopDealsTableProps) {
   const [filter, setFilter] = useState<Filter>("all");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
   const filtered = filter === "all"
-    ? topDeals
-    : topDeals.filter((d) =>
+    ? deals
+    : deals.filter((d) =>
         filter === "won" ? d.stage === "CLOSED_WON" : d.stage === "CLOSED_LOST"
       );
+
+  const handleFilterChange = (newFilter: Filter) => {
+    setFilter(newFilter);
+    setCurrentPage(1);
+  }
+
+  const totalItems = filtered.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedDeals = filtered.slice(startIndex, endIndex);
+
+  
 
   return (
     <div className="bg-white rounded-[10px] border border-[#E8E7E2]">
@@ -59,7 +91,7 @@ export function TopDealsTable() {
         <table className="w-full" style={{ borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid #E8E7E2" }}>
-              {["Deal", "Công ty", "Owner", "Giá trị", "Ngày chốt", "Nguồn", "Giai đoạn"].map((col) => (
+              {["Deal", "Công ty", "Owner", "Giá trị", "Ngày chốt", "Giai đoạn"].map((col) => (
                 <th
                   key={col}
                   className="text-left text-[#6B6B67] px-5 py-3"
@@ -71,84 +103,77 @@ export function TopDealsTable() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((deal, i) => (
-              <tr
-                key={deal.id}
-                className="hover:bg-[#F8F8F7] transition-colors"
-                style={{ borderBottom: i < filtered.length - 1 ? "1px solid #E8E7E2" : "none" }}
-              >
-                {/* Deal name */}
-                <td className="px-5 py-3">
-                  <span className="text-[#1A1A18]" style={{ fontSize: 12, fontWeight: 500 }}>
-                    {deal.name}
-                  </span>
-                </td>
-
-                {/* Company */}
-                <td className="px-5 py-3">
-                  <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>{deal.company}</span>
-                </td>
-
-                {/* Owner */}
-                <td className="px-5 py-3">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="size-6 shrink-0">
-                      <AvatarFallback
-                        style={{ background: deal.ownerBg, color: deal.ownerC, fontSize: 8, fontWeight: 700 }}
-                        className="border-0"
-                      >
-                        {deal.ownerI}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-[#1A1A18] whitespace-nowrap" style={{ fontSize: 12 }}>
-                      {deal.owner}
-                    </span>
-                  </div>
-                </td>
-
-                {/* Value */}
-                <td className="px-5 py-3">
-                  <span className="text-[#1A1A18] tabular-nums" style={{ fontSize: 12, fontWeight: 600 }}>
-                    {deal.value}
-                  </span>
-                </td>
-
-                {/* Close date */}
-                <td className="px-5 py-3">
-                  <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>{deal.closedAt}</span>
-                </td>
-
-                {/* Source */}
-                <td className="px-5 py-3">
-                  <span
-                    className="px-2 py-0.5 rounded-full"
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 500,
-                      background: "#F1EFE8",
-                      color: "#6B6B67",
-                    }}
-                  >
-                    {deal.source}
-                  </span>
-                </td>
-
-                {/* Stage */}
-                <td className="px-5 py-3">
-                  <span
-                    className="px-2 py-0.5 rounded-full whitespace-nowrap"
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 600,
-                      background: deal.stage === "CLOSED_WON" ? "#DCFCE7" : "#FEE2E2",
-                      color:      deal.stage === "CLOSED_WON" ? "#166534" : "#991B1B",
-                    }}
-                  >
-                    {deal.stage === "CLOSED_WON" ? "Closed Won" : "Closed Lost"}
-                  </span>
+            {paginatedDeals.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="text-center py-8 text-[#6B6B67]" style={{ fontSize: 12 }}>
+                  Không có dữ liệu trong kỳ
                 </td>
               </tr>
-            ))}
+            ) : (
+              paginatedDeals.map((deal, i) => (
+                <tr
+                  key={deal.id}
+                  className="hover:bg-[#F8F8F7] transition-colors"
+                  style={{ borderBottom: i < filtered.length - 1 ? "1px solid #E8E7E2" : "none" }}
+                >
+                  {/* Deal name */}
+                  <td className="px-5 py-3">
+                    <span className="text-[#1A1A18]" style={{ fontSize: 12, fontWeight: 500 }}>
+                      {deal.name}
+                    </span>
+                  </td>
+
+                  {/* Company */}
+                  <td className="px-5 py-3">
+                    <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>{deal.company}</span>
+                  </td>
+
+                  {/* Owner */}
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="size-6 shrink-0">
+                        <AvatarFallback
+                          style={{ background: deal.ownerBg, color: deal.ownerColor, fontSize: 8, fontWeight: 700 }}
+                          className="border-0"
+                        >
+                          {deal.ownerInitials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-[#1A1A18] whitespace-nowrap" style={{ fontSize: 12 }}>
+                        {deal.owner}
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Value */}
+                  <td className="px-5 py-3">
+                    <span className="text-[#1A1A18] tabular-nums" style={{ fontSize: 12, fontWeight: 600 }}>
+                      {deal.value}
+                    </span>
+                  </td>
+
+                  {/* Close date */}
+                  <td className="px-5 py-3">
+                    <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>{deal.closedAt}</span>
+                  </td>
+
+                  {/* Stage */}
+                  <td className="px-5 py-3">
+                    <span
+                      className="px-2 py-0.5 rounded-full whitespace-nowrap"
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        background: deal.stage === "CLOSED_WON" ? "#DCFCE7" : "#FEE2E2",
+                        color:      deal.stage === "CLOSED_WON" ? "#166534" : "#991B1B",
+                      }}
+                    >
+                      {deal.stage === "CLOSED_WON" ? "Closed Won" : "Closed Lost"}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -156,19 +181,26 @@ export function TopDealsTable() {
       {/* Pagination */}
       <div className="flex items-center justify-between px-5 py-3 border-t border-[#E8E7E2]">
         <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>
-          Hiển thị {filtered.length} trong 23 deals
+          Hiển thị {totalItems > 0 ? startIndex + 1 : 0} - {endIndex} trong {totalItems} deals
         </span>
+        
         <div className="flex items-center gap-1">
-          <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>1–6 / 23</span>
+          <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>
+            Trang {currentPage} / {totalPages}
+          </span>
           <button
             className="size-7 flex items-center justify-center rounded hover:bg-[#F1EFE8] transition-colors cursor-pointer"
             style={{ border: "1px solid #E8E7E2", background: "white" }}
-          >
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            >
             <ChevronLeft size={14} className="text-[#6B6B67]" />
           </button>
           <button
             className="size-7 flex items-center justify-center rounded hover:bg-[#F1EFE8] transition-colors cursor-pointer"
             style={{ border: "1px solid #E8E7E2", background: "white" }}
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages || totalPages === 0}
           >
             <ChevronRight size={14} className="text-[#6B6B67]" />
           </button>

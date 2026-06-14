@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt'
 import { PrismaClient } from '../generated/prisma-client/client'
 import { Role, DealStage, ActivityType, AiSuggestionType } from '../generated/prisma-client/enums'
-import 'dotenv/config' // npm install dotenv nếu chưa có
+import 'dotenv/config'
 import { PrismaPg } from '@prisma/adapter-pg'
 
 const adapter = new PrismaPg({
@@ -10,8 +10,44 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter })
 
+// Helper functions for random data generation
+function getRandomElement<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)]
+}
+
+function getRandomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+function getRandomPhone(): string {
+  const prefixes = ['090', '091', '098', '093', '097', '086', '038']
+  const randomDigits = Math.floor(1000000 + Math.random() * 9000000).toString()
+  return getRandomElement(prefixes) + randomDigits
+}
+
+function removeDiacritics(str: string): string {
+  return str
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+}
+
 async function main() {
-  console.log('🌱 Bắt đầu seed data...')
+  console.log('🌱 Bắt đầu dọn dẹp dữ liệu cũ...')
+  // Clear existing records safely in order of dependency
+  await prisma.aiSuggestion.deleteMany({})
+  await prisma.task.deleteMany({})
+  await prisma.activity.deleteMany({})
+  await prisma.deal.deleteMany({})
+  await prisma.contact.deleteMany({})
+  await prisma.kpiTarget.deleteMany({})
+  await prisma.refreshToken.deleteMany({})
+  await prisma.invitation.deleteMany({})
+  await prisma.user.deleteMany({})
+  await prisma.tenant.deleteMany({})
+
+  console.log('🌱 Bắt đầu khởi tạo dữ liệu mẫu lớn...')
 
   // ── 1. TENANT ────────────────────────────────────────
   const tenant = await prisma.tenant.upsert({
@@ -25,7 +61,7 @@ async function main() {
   })
   console.log('✅ Tenant:', tenant.name)
 
-  // ── 2. USERS ─────────────────────────────────────────
+  // ── 2. USERS (8 Users) ─────────────────────────────────
   const hashedPassword = await bcrypt.hash('Password123!', 10)
 
   const admin = await prisma.user.upsert({
@@ -52,490 +88,274 @@ async function main() {
     },
   })
 
-  const salesRep = await prisma.user.upsert({
-    where: { email: 'sales@abc.com' },
-    update: {},
-    create: {
-      tenantId: tenant.id,
-      email: 'sales@abc.com',
-      password: hashedPassword,
-      name: 'Lê Sales Rep',
-      role: Role.SALES_REP,
-    },
-  })
+  // 5 Sales Reps (Matching standard frontend report performance mock names)
+  const salesRepsData = [
+    { email: 'sales@abc.com', name: 'Lê Sales Rep' },
+    { email: 'huong@abc.com', name: 'Trần Thị Hương' },
+    { email: 'quang@abc.com', name: 'Nguyễn Quang' },
+    { email: 'lan@abc.com', name: 'Phạm Thị Lan' },
+    { email: 'minh@abc.com', name: 'Vũ Đức Minh' },
+    { email: 'thu@abc.com', name: 'Lê Thị Thu' },
+  ]
 
-  console.log('✅ Users: admin / manager / sales@abc.com (Password: Password123!)')
-
-  // ── 3. CONTACTS ───────────────────────────────────────
-  const contact1 = await prisma.contact.upsert({
-    where: { id: 'contact-seed-001' },
-    update: {},
-    create: {
-      id: 'contact-seed-001',
-      tenantId: tenant.id,
-      ownerId: salesRep.id,
-      name: 'Phạm Văn Khách',
-      email: 'khach@gmail.com',
-      phone: '0901234567',
-      company: 'Công ty XYZ',
-      position: 'Giám đốc',
-    },
-  })
-
-  const contact2 = await prisma.contact.upsert({
-    where: { id: 'contact-seed-002' },
-    update: {},
-    create: {
-      id: 'contact-seed-002',
-      tenantId: tenant.id,
-      ownerId: salesRep.id,
-      name: 'Hoàng Thị Liên',
-      email: 'lien@startup.vn',
-      phone: '0912345678',
-      company: 'Startup DEF',
-      position: 'CTO',
-    },
-  })
-
-  const contact3 = await prisma.contact.upsert({
-    where: { id: 'contact-seed-003' },
-    update: {},
-    create: {
-      id: 'contact-seed-003',
-      tenantId: tenant.id,
-      ownerId: manager.id,
-      name: 'Đặng Minh Tuấn',
-      email: 'tuan@enterprise.com',
-      phone: '0987654321',
-      company: 'Enterprise Corp',
-      position: 'Trưởng phòng IT',
-    },
-  })
-
-  const contact4 = await prisma.contact.upsert({
-    where: { id: 'contact-seed-004' },
-    update: {},
-    create: {
-      id: 'contact-seed-004',
-      tenantId: tenant.id,
-      ownerId: salesRep.id,
-      name: 'Nguyễn Thị Hoa',
-      email: 'hoa@fintech.vn',
-      phone: '0933445566',
-      company: 'Fintech VN',
-      position: 'CEO',
-    },
-  })
-
-  const contact5 = await prisma.contact.upsert({
-    where: { id: 'contact-seed-005' },
-    update: {},
-    create: {
-      id: 'contact-seed-005',
-      tenantId: tenant.id,
-      ownerId: manager.id,
-      name: 'Bùi Quốc Hùng',
-      email: 'hung@logistics.com',
-      phone: '0977889900',
-      company: 'Logistics Pro',
-      position: 'Giám đốc vận hành',
-    },
-  })
-
-  const contact6 = await prisma.contact.upsert({
-    where: { id: 'contact-seed-006' },
-    update: {},
-    create: {
-      id: 'contact-seed-006',
-      tenantId: tenant.id,
-      ownerId: salesRep.id,
-      name: 'Trịnh Văn Nam',
-      email: 'nam@retailchain.vn',
-      phone: '0911223344',
-      company: 'Retail Chain VN',
-      position: 'IT Manager',
-    },
-  })
-
-  console.log('✅ Contacts: 6 liên hệ')
-
-  // ── 4. DEALS ──────────────────────────────────────────
-  // PROSPECT (2 deals)
-  const deal0a = await prisma.deal.upsert({
-    where: { id: 'deal-seed-000a' },
-    update: {},
-    create: {
-      id: 'deal-seed-000a',
-      tenantId: tenant.id,
-      contactId: contact4.id,
-      ownerId: salesRep.id,
-      title: 'Giải pháp thanh toán Fintech VN',
-      value: 80000000,
-      stage: DealStage.PROSPECT,
-      closeDate: new Date('2025-08-30'),
-      note: 'Khách hàng mới, đang tìm hiểu giải pháp',
-    },
-  })
-
-  const deal0b = await prisma.deal.upsert({
-    where: { id: 'deal-seed-000b' },
-    update: {},
-    create: {
-      id: 'deal-seed-000b',
-      tenantId: tenant.id,
-      contactId: contact5.id,
-      ownerId: manager.id,
-      title: 'Phần mềm quản lý kho Logistics Pro',
-      value: 120000000,
-      stage: DealStage.PROSPECT,
-      closeDate: new Date('2025-09-15'),
-      note: 'Referral từ Enterprise Corp',
-    },
-  })
-
-  // QUALIFIED (2 deals)
-  const deal1 = await prisma.deal.upsert({
-    where: { id: 'deal-seed-001' },
-    update: {},
-    create: {
-      id: 'deal-seed-001',
-      tenantId: tenant.id,
-      contactId: contact1.id,
-      ownerId: salesRep.id,
-      title: 'Triển khai CRM cho XYZ',
-      value: 50000000,
-      stage: DealStage.QUALIFIED,
-      closeDate: new Date('2025-06-30'),
-      note: 'Khách hàng quan tâm gói Pro',
-    },
-  })
-
-  const deal1b = await prisma.deal.upsert({
-    where: { id: 'deal-seed-001b' },
-    update: {},
-    create: {
-      id: 'deal-seed-001b',
-      tenantId: tenant.id,
-      contactId: contact6.id,
-      ownerId: salesRep.id,
-      title: 'Hệ thống POS Retail Chain',
-      value: 95000000,
-      stage: DealStage.QUALIFIED,
-      closeDate: new Date('2025-07-20'),
-      note: 'Đã demo, khách đang so sánh với đối thủ',
-    },
-  })
-
-  // PROPOSAL (2 deals)
-  const deal2 = await prisma.deal.upsert({
-    where: { id: 'deal-seed-002' },
-    update: {},
-    create: {
-      id: 'deal-seed-002',
-      tenantId: tenant.id,
-      contactId: contact2.id,
-      ownerId: salesRep.id,
-      title: 'Tích hợp API cho Startup DEF',
-      value: 20000000,
-      stage: DealStage.PROPOSAL,
-      closeDate: new Date('2025-05-15'),
-      note: 'Đã gửi proposal, chờ phản hồi',
-    },
-  })
-
-  const deal2b = await prisma.deal.upsert({
-    where: { id: 'deal-seed-002b' },
-    update: {},
-    create: {
-      id: 'deal-seed-002b',
-      tenantId: tenant.id,
-      contactId: contact4.id,
-      ownerId: manager.id,
-      title: 'Module báo cáo tài chính Fintech VN',
-      value: 45000000,
-      stage: DealStage.PROPOSAL,
-      closeDate: new Date('2025-06-01'),
-      note: 'Proposal đã gửi, đang chờ board duyệt',
-    },
-  })
-
-  // CLOSED_WON (1 deal)
-  const deal3 = await prisma.deal.upsert({
-    where: { id: 'deal-seed-003' },
-    update: {},
-    create: {
-      id: 'deal-seed-003',
-      tenantId: tenant.id,
-      contactId: contact3.id,
-      ownerId: manager.id,
-      title: 'Nâng cấp hệ thống Enterprise Corp',
-      value: 150000000,
-      stage: DealStage.CLOSED_WON,
-      closeDate: new Date('2025-04-01'),
-      note: 'Đã ký hợp đồng',
-    },
-  })
-
-  // CLOSED_LOST (1 deal)
-  const deal4 = await prisma.deal.upsert({
-    where: { id: 'deal-seed-004' },
-    update: {},
-    create: {
-      id: 'deal-seed-004',
-      tenantId: tenant.id,
-      contactId: contact5.id,
-      ownerId: salesRep.id,
-      title: 'Phần mềm HR Logistics Pro',
-      value: 35000000,
-      stage: DealStage.CLOSED_LOST,
-      closeDate: new Date('2025-03-15'),
-      note: 'Khách chọn giải pháp của đối thủ do giá thấp hơn',
-    },
-  })
-
-  console.log('✅ Deals: 8 deals (PROSPECT×2 / QUALIFIED×2 / PROPOSAL×2 / CLOSED_WON×1 / CLOSED_LOST×1)')
-
-  // ── 5. ACTIVITIES ─────────────────────────────────────
-  await prisma.activity.createMany({
-    data: [
-      // deal1 — Triển khai CRM cho XYZ
-      {
+  const salesReps: any[] = []
+  for (const rep of salesRepsData) {
+    const r = await prisma.user.upsert({
+      where: { email: rep.email },
+      update: {},
+      create: {
         tenantId: tenant.id,
-        contactId: contact1.id,
-        dealId: deal1.id,
-        userId: salesRep.id,
-        title: 'Tư vấn gói Pro',
-        type: ActivityType.CALL,
-        note: 'Gọi điện tư vấn gói Pro, khách hàng đồng ý demo',
-        date: new Date('2025-04-01T09:00:00'),
+        email: rep.email,
+        password: hashedPassword,
+        name: rep.name,
+        role: Role.SALES_REP,
       },
-      {
+    })
+    salesReps.push(r)
+  }
+
+  const allTeamUsers = [manager, ...salesReps]
+
+  console.log('✅ Users: admin / manager / 6 sales reps seeded.')
+
+  // ── 3. CONTACTS (30 Contacts) ──────────────────────────
+  const companyNames = [
+    'Vingroup', 'Viettel', 'FPT Software', 'Masan Group', 'Techcombank',
+    'Vietcombank', 'Vinamilk', 'Thế Giới Di Động', 'VNG Corporation', 'Tập đoàn Hòa Phát',
+    'Bamboo Airways', 'Kido Group', 'SMC Corporation', 'Delta Group', 'Sun Group',
+    'Nova Land', 'Coteccons', 'Bình Minh Plastics', 'Rang Dong Group', 'Thiên Long'
+  ]
+  const contactFirstNames = ['Nam', 'Lan', 'Hương', 'Quang', 'Minh', 'Thu', 'Tuấn', 'Hùng', 'Hoa', 'Liên', 'Trang', 'Sơn', 'Dũng', 'Thủy', 'Anh', 'Phương', 'Linh', 'Khánh', 'Cường', 'Hải']
+  const contactLastNames = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Vũ', 'Hoàng', 'Đặng', 'Bùi', 'Trịnh', 'Lý']
+  const positions = ['CEO', 'CTO', 'Giám đốc IT', 'Trưởng phòng Mua hàng', 'Giám đốc Vận hành', 'Trưởng phòng Kinh doanh', 'Phó giám đốc']
+
+  const contacts: any[] = []
+  for (let i = 1; i <= 30; i++) {
+    const owner = getRandomElement(salesReps)
+    const company = getRandomElement(companyNames)
+    const firstName = getRandomElement(contactFirstNames)
+    const lastName = getRandomElement(contactLastNames)
+    const fullName = `${lastName} ${firstName}`
+    
+    const cleanFirstName = removeDiacritics(firstName).toLowerCase().replace(/\s+/g, '')
+    const cleanCompany = removeDiacritics(company).toLowerCase().replace(/[^a-z0-9]/g, '')
+    const email = `${cleanFirstName}.${getRandomInt(10, 99)}@${cleanCompany}.com`
+    
+    const contact = await prisma.contact.create({
+      data: {
+        id: `contact-seed-${String(i).padStart(3, '0')}`,
         tenantId: tenant.id,
-        contactId: contact1.id,
-        dealId: deal1.id,
-        userId: salesRep.id,
-        title: 'Gửi báo giá',
-        type: ActivityType.EMAIL,
-        note: 'Gửi email báo giá và tài liệu sản phẩm',
-        date: new Date('2025-04-02T10:30:00'),
+        ownerId: owner.id,
+        name: fullName,
+        email,
+        phone: getRandomPhone(),
+        company,
+        position: getRandomElement(positions),
       },
-      {
+    })
+    contacts.push(contact)
+  }
+
+  console.log('✅ Contacts: 30 contacts generated.')
+
+  // ── 4. DEALS (45 Deals) ────────────────────────────────
+  const dealStages = [
+    DealStage.PROSPECT, DealStage.PROSPECT,
+    DealStage.QUALIFIED, DealStage.QUALIFIED,
+    DealStage.PROPOSAL, DealStage.PROPOSAL,
+    DealStage.CLOSED_WON, DealStage.CLOSED_WON, DealStage.CLOSED_WON, DealStage.CLOSED_WON, // Heavy won weight
+    DealStage.CLOSED_LOST,
+  ]
+
+  const dealTitles = [
+    'Triển khai ERP', 'Tích hợp thanh toán API', 'Nâng cấp Cloud Server', 'Hệ thống POS bán hàng',
+    'Hợp đồng bảo trì hệ thống', 'Dịch vụ Cyber Security', 'Data Analytics Dashboard',
+    'Cung cấp bản quyền Office 365', 'Phát triển ứng dụng Mobile', 'Hạ tầng mạng văn phòng mới'
+  ]
+
+  const deals: any[] = []
+  const currentYear = 2026
+
+  for (let i = 1; i <= 45; i++) {
+    const contact = getRandomElement(contacts)
+    // Make sure deal owner is the same as contact owner for clean data
+    const ownerId = contact.ownerId
+    const title = `${getRandomElement(dealTitles)} - ${contact.company}`
+    const value = getRandomInt(15, 85) * 10_000_000 // 150M to 850M
+    const stage = getRandomElement(dealStages)
+
+    // Spread deals across the months of 2026
+    const month = getRandomInt(1, 12)
+    const startDay = getRandomInt(1, 15)
+    const createdAt = new Date(currentYear, month - 1, startDay)
+
+    let closeDate: Date | null = null
+    if (stage === DealStage.CLOSED_WON || stage === DealStage.CLOSED_LOST) {
+      // Close date is 10 to 28 days after creation
+      closeDate = new Date(createdAt.getTime() + getRandomInt(10, 28) * 24 * 60 * 60 * 1000)
+    } else {
+      // Future close date
+      closeDate = new Date(createdAt.getTime() + getRandomInt(30, 60) * 24 * 60 * 60 * 1000)
+    }
+
+    const deal = await prisma.deal.create({
+      data: {
+        id: `deal-seed-${String(i).padStart(3, '0')}`,
         tenantId: tenant.id,
-        contactId: contact1.id,
-        userId: salesRep.id,
-        title: 'Demo sản phẩm',
-        type: ActivityType.MEETING,
-        note: 'Demo sản phẩm tại văn phòng khách hàng, phản hồi tích cực',
-        date: new Date('2025-04-05T14:00:00'),
+        contactId: contact.id,
+        ownerId,
+        title,
+        value,
+        stage,
+        closeDate,
+        createdAt,
+        note: `Cơ hội kinh doanh tiềm năng với ${contact.name}`,
       },
-      // deal2 — Tích hợp API Startup DEF
-      {
-        tenantId: tenant.id,
-        contactId: contact2.id,
-        dealId: deal2.id,
-        userId: salesRep.id,
-        title: 'Ghi chú tích hợp Zalo OA',
-        type: ActivityType.NOTE,
-        note: 'Khách cần tích hợp Zalo OA, cần confirm thêm với team kỹ thuật',
-        date: new Date('2025-04-03T11:00:00'),
-      },
-      {
-        tenantId: tenant.id,
-        contactId: contact2.id,
-        dealId: deal2.id,
-        userId: salesRep.id,
-        title: 'Follow up proposal',
-        type: ActivityType.CALL,
-        note: 'Follow up sau khi gửi proposal, khách đang review nội bộ',
-        date: new Date('2025-04-06T16:00:00'),
-      },
-      // deal3 — Enterprise Corp CLOSED_WON
-      {
-        tenantId: tenant.id,
-        contactId: contact3.id,
-        dealId: deal3.id,
-        userId: manager.id,
-        title: 'Họp ký hợp đồng',
-        type: ActivityType.MEETING,
-        note: 'Họp ký hợp đồng, bàn giao timeline dự án Q2/2025',
-        date: new Date('2025-04-01T09:00:00'),
-      },
-      // deal0a — Fintech VN PROSPECT
-      {
-        tenantId: tenant.id,
-        contactId: contact4.id,
-        dealId: deal0a.id,
-        userId: salesRep.id,
-        title: 'Cuộc gọi khám phá nhu cầu',
-        type: ActivityType.CALL,
-        note: 'Khách đang tìm giải pháp thay thế hệ thống cũ, ngân sách ~80-100tr',
-        date: new Date('2025-04-08T10:00:00'),
-      },
-      // deal4 — CLOSED_LOST
-      {
-        tenantId: tenant.id,
-        contactId: contact5.id,
-        dealId: deal4.id,
-        userId: salesRep.id,
-        title: 'Thông báo kết quả',
-        type: ActivityType.EMAIL,
-        note: 'Khách thông báo chọn giải pháp khác, giá thấp hơn 20%',
-        date: new Date('2025-03-14T15:00:00'),
-      },
+    })
+    deals.push(deal)
+  }
+
+  console.log('✅ Deals: 45 deals generated.')
+
+  // ── 5. ACTIVITIES (60 Activities) ──────────────────────
+  const activityTypes = [ActivityType.CALL, ActivityType.EMAIL, ActivityType.MEETING, ActivityType.NOTE]
+  const activityNotes = {
+    [ActivityType.CALL]: [
+      'Gọi điện giới thiệu dịch vụ và báo giá sơ bộ.',
+      'Gọi điện thảo luận chi tiết các yêu cầu tùy chỉnh.',
+      'Follow up sau khi gửi proposal, khách hàng hứa sẽ phản hồi sớm.',
+      'Liên hệ hỗ trợ kỹ thuật về môi trường demo.'
     ],
-    skipDuplicates: true,
-  })
-
-  console.log('✅ Activities: 8 hoạt động')
-
-  // ── 6. TASKS ──────────────────────────────────────────
-  await prisma.task.createMany({
-    data: [
-      // deal1 — QUALIFIED
-      {
-        tenantId: tenant.id,
-        dealId: deal1.id,
-        title: 'Gửi proposal chính thức',
-        done: false,
-        dueDate: new Date('2025-04-10'),
-      },
-      {
-        tenantId: tenant.id,
-        dealId: deal1.id,
-        title: 'Setup demo environment',
-        done: true,
-        dueDate: new Date('2025-04-05'),
-      },
-      {
-        tenantId: tenant.id,
-        dealId: deal1.id,
-        title: 'Confirm yêu cầu tích hợp với team kỹ thuật',
-        done: false,
-        dueDate: new Date('2025-04-15'),
-      },
-      // deal2 — PROPOSAL
-      {
-        tenantId: tenant.id,
-        dealId: deal2.id,
-        title: 'Viết tài liệu kỹ thuật API',
-        done: false,
-        dueDate: new Date('2025-04-12'),
-      },
-      {
-        tenantId: tenant.id,
-        dealId: deal2.id,
-        title: 'Follow up sau 3 ngày',
-        done: false,
-        dueDate: new Date('2025-04-09'),
-      },
-      // deal3 — CLOSED_WON
-      {
-        tenantId: tenant.id,
-        dealId: deal3.id,
-        title: 'Bàn giao tài liệu hợp đồng',
-        done: true,
-        dueDate: new Date('2025-04-02'),
-      },
-      {
-        tenantId: tenant.id,
-        dealId: deal3.id,
-        title: 'Kick-off meeting với team triển khai',
-        done: true,
-        dueDate: new Date('2025-04-07'),
-      },
-      // deal0a — PROSPECT
-      {
-        tenantId: tenant.id,
-        dealId: deal0a.id,
-        title: 'Gửi brochure sản phẩm',
-        done: false,
-        dueDate: new Date('2025-04-11'),
-      },
+    [ActivityType.EMAIL]: [
+      'Gửi brochure sản phẩm và báo giá chi tiết qua email.',
+      'Gửi email làm rõ một số điểm trong bản thảo hợp đồng.',
+      'Gửi email xác nhận lịch hẹn gặp trực tiếp tuần tới.',
+      'Gửi email cảm ơn và tóm tắt cuộc họp.'
     ],
-    skipDuplicates: true,
-  })
+    [ActivityType.MEETING]: [
+      'Họp demo sản phẩm trực tuyến qua Zoom/Meet.',
+      'Gặp trực tiếp thương thảo điều khoản hợp đồng.',
+      'Họp kick-off dự án và phân chia nhân lực.',
+      'Họp khảo sát hiện trạng hạ tầng của khách hàng.'
+    ],
+    [ActivityType.NOTE]: [
+      'Khách hàng có vẻ ưu tiên giải pháp triển khai nhanh hơn là giá thấp.',
+      'Thông tin thêm: Đối thủ đang chào giá thấp hơn 10% nhưng dịch vụ hỗ trợ kém.',
+      'Ghi chú kỹ thuật: Cần tích hợp thêm Zalo OA và cổng thanh toán VNPay.',
+      'Ghi chú: Khách hàng dự kiến ký hợp đồng vào cuối tháng này.'
+    ]
+  }
 
-  console.log('✅ Tasks: 8 tasks')
+  for (let i = 1; i <= 60; i++) {
+    const deal = getRandomElement(deals)
+    const type = getRandomElement(activityTypes)
+    const noteList = activityNotes[type]
+    const note = getRandomElement(noteList)
+    
+    // Activity date is around the deal creation date
+    const dealDate = new Date(deal.createdAt)
+    const activityDate = new Date(dealDate.getTime() + getRandomInt(1, 10) * 24 * 60 * 60 * 1000)
 
-  // ── 7. AI SUGGESTIONS ─────────────────────────────────
-  await prisma.aiSuggestion.createMany({
-    data: [
-      {
+    await prisma.activity.create({
+      data: {
+        id: `activity-seed-${String(i).padStart(3, '0')}`,
         tenantId: tenant.id,
-        jobId: 'job-seed-001',
-        dealId: deal1.id,
+        contactId: deal.contactId,
+        dealId: deal.id,
+        userId: deal.ownerId,
+        title: type === ActivityType.CALL ? 'Cuộc gọi trao đổi' : type === ActivityType.EMAIL ? 'Gửi email' : type === ActivityType.MEETING ? 'Họp mặt' : 'Ghi chú deal',
+        type,
+        note,
+        date: activityDate,
+      },
+    })
+  }
+
+  console.log('✅ Activities: 60 activities logged.')
+
+  // ── 6. TASKS (60 Tasks) ────────────────────────────────
+  const taskTitles = [
+    'Gửi báo giá chính thức', 'Chuẩn bị slide demo', 'Gọi điện follow up tiến độ',
+    'Trình duyệt bản thảo hợp đồng', 'Setup môi trường kiểm thử', 'Gửi email tóm tắt cuộc họp',
+    'Khảo sát chi tiết nhu cầu', 'Xác nhận thông tin thanh toán'
+  ]
+
+  for (let i = 1; i <= 60; i++) {
+    const deal = getRandomElement(deals)
+    const title = getRandomElement(taskTitles)
+    const done = Math.random() > 0.4 // 60% task done
+
+    const dealDate = new Date(deal.createdAt)
+    // Due date around deal creation/close date
+    const dueDate = new Date(dealDate.getTime() + getRandomInt(5, 20) * 24 * 60 * 60 * 1000)
+
+    await prisma.task.create({
+      data: {
+        id: `task-seed-${String(i).padStart(3, '0')}`,
+        tenantId: tenant.id,
+        dealId: deal.id,
+        title,
+        done,
+        dueDate,
+        createdAt: dealDate,
+      },
+    })
+  }
+
+  console.log('✅ Tasks: 60 tasks populated.')
+
+  // ── 7. AI SUGGESTIONS ──────────────────────────────────
+  // Add some sample suggestions on top deals
+  const topDealsForAi = deals.slice(0, 5)
+  for (const deal of topDealsForAi) {
+    await prisma.aiSuggestion.create({
+      data: {
+        tenantId: tenant.id,
+        jobId: `job-ai-${deal.id}`,
+        dealId: deal.id,
         type: AiSuggestionType.EMAIL_DRAFT,
-        content:
-          'Kính gửi anh Khách, cảm ơn anh đã dành thời gian tham dự buổi demo. Chúng tôi xin gửi kèm báo giá chính thức...',
-        sourceNote: 'Demo sản phẩm tại văn phòng khách hàng',
+        content: `Kính gửi đối tác, cảm ơn quý khách hàng đã thảo luận với chúng tôi về cơ hội "${deal.title}". Dưới đây là dự thảo đề xuất giải pháp...`,
+        sourceNote: 'Khách hàng có phản hồi tích cực sau demo.',
       },
-      {
-        tenantId: tenant.id,
-        jobId: 'job-seed-002',
-        dealId: deal1.id,
-        type: AiSuggestionType.TASK_LIST,
-        content: JSON.stringify(['Gửi email follow-up sau demo', 'Chuẩn bị báo giá chính thức', 'Lên lịch họp lần 2']),
-        sourceNote: 'Demo sản phẩm tại văn phòng khách hàng',
-      },
-      {
-        tenantId: tenant.id,
-        jobId: 'job-seed-003',
-        dealId: deal2.id,
-        type: AiSuggestionType.SUMMARY,
-        content:
-          'Deal đang ở giai đoạn PROPOSAL. Khách cần tích hợp Zalo OA. Cần follow up tuần tới để đẩy nhanh quyết định.',
-        sourceNote: 'Follow up sau khi gửi proposal',
-      },
-      {
-        tenantId: tenant.id,
-        jobId: 'job-seed-004',
-        dealId: deal0a.id,
-        type: AiSuggestionType.TASK_LIST,
-        content: JSON.stringify([
-          'Gửi brochure sản phẩm',
-          'Lên lịch demo online',
-          'Tìm hiểu thêm về hệ thống hiện tại của khách',
-        ]),
-        sourceNote: 'Cuộc gọi khám phá nhu cầu',
-      },
-    ],
-    skipDuplicates: true,
-  })
+    })
+  }
+  console.log('✅ AI Suggestions: 5 suggestions generated.')
 
-  console.log('✅ AI Suggestions: 4 gợi ý')
+  // ── 8. KPI TARGETS (72 Target Records - 12 Months * 6 Users) ─────────
+  // Populate monthly target KPIs for all sales reps and manager for entire 2026
+  for (const user of allTeamUsers) {
+    for (let month = 1; month <= 12; month++) {
+      // Set target targets around 150M to 500M VND
+      const target = getRandomInt(15, 50) * 10_000_000
+
+      await prisma.kpiTarget.create({
+        data: {
+          tenantId: tenant.id,
+          userId: user.id,
+          month,
+          year: currentYear,
+          target,
+        },
+      })
+    }
+  }
+
+  console.log('✅ KPI Targets: 72 monthly targets generated for 2026.')
 
   // ── SUMMARY ───────────────────────────────────────────
   console.log('\n📋 THÔNG TIN ĐĂNG NHẬP TEST:')
-  console.log('┌─────────────────────────────────────────────┐')
-  console.log('│  Role     │ Email            │ Password     │')
-  console.log('├─────────────────────────────────────────────┤')
-  console.log('│  ADMIN    │ admin@abc.com    │ Password123! │')
-  console.log('│  MANAGER  │ manager@abc.com  │ Password123! │')
-  console.log('│  SALES    │ sales@abc.com    │ Password123! │')
-  console.log('└─────────────────────────────────────────────┘')
-
-  console.log('\n🔗 IDs để test API:')
-  console.log('Tenant ID   :', tenant.id)
-  console.log(
-    'Contact IDs :',
-    contact1.id,
-    '|',
-    contact2.id,
-    '|',
-    contact3.id,
-    '|',
-    contact4.id,
-    '|',
-    contact5.id,
-    '|',
-    contact6.id,
-  )
-  console.log('Deal IDs    :')
-  console.log('  PROSPECT    :', deal0a.id, '|', deal0b.id)
-  console.log('  QUALIFIED   :', deal1.id, '|', deal1b.id)
-  console.log('  PROPOSAL    :', deal2.id, '|', deal2b.id)
-  console.log('  CLOSED_WON  :', deal3.id)
-  console.log('  CLOSED_LOST :', deal4.id)
+  console.log('┌──────────────────────────────────────────────┐')
+  console.log('│  Role     │ Email            │ Password      │')
+  console.log('├──────────────────────────────────────────────┤')
+  console.log('│  ADMIN    │ admin@abc.com    │ Password123!  │')
+  console.log('│  MANAGER  │ manager@abc.com  │ Password123!  │')
+  console.log('│  SALES 1  │ sales@abc.com    │ Password123!  │')
+  console.log('│  SALES 2  │ huong@abc.com    │ Password123!  │')
+  console.log('│  SALES 3  │ quang@abc.com    │ Password123!  │')
+  console.log('│  SALES 4  │ lan@abc.com      │ Password123!  │')
+  console.log('│  SALES 5  │ minh@abc.com     │ Password123!  │')
+  console.log('│  SALES 6  │ thu@abc.com      │ Password123!  │')
+  console.log('└──────────────────────────────────────────────┘')
 }
 
 main()
@@ -545,5 +365,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect()
-    console.log('✅ Seed hoàn tất!') // thêm dòng này
+    console.log('✅ Seed hoàn tất!')
   })
