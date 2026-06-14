@@ -3,7 +3,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
 import { ChartCard } from "./ChartCard";
-import { forecastData, fmtTr } from "./reportsData";
+import { fmtTr } from "./reportsData";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -21,22 +21,48 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-export function ForecastAreaChart() {
+interface ForecastAreaChartProps {
+  data?: {
+    month: string;
+    cumActual: number;
+    cumForecast: number;
+  }[];
+}
+
+export function ForecastAreaChart({ data = [] }: ForecastAreaChartProps) {
+  const lastItem = data[data.length - 1];
+  const percentDiff = lastItem && lastItem.cumForecast > 0
+    ? ((lastItem.cumActual - lastItem.cumForecast) / lastItem.cumForecast) * 100
+    : 0;
+
+  const actionText = percentDiff >= 0
+    ? `Vượt forecast +${percentDiff.toFixed(1)}%`
+    : `Dưới forecast ${percentDiff.toFixed(1)}%`;
+
+  const maxVal = Math.max(...data.map(d => Math.max(d.cumActual, d.cumForecast)), 100);
+  const yDomainMax = Math.ceil(maxVal * 1.2);
+
   return (
     <ChartCard
       title="Forecast vs Thực tế"
       subtitle="Doanh thu lũy kế"
       action={
-        <span
-          className="px-2 py-0.5 rounded-full text-white mr-1"
-          style={{ fontSize: 10, fontWeight: 700, background: "#1D9E75" }}
-        >
-          Vượt forecast +9.3%
-        </span>
+        data.length > 0 ? (
+          <span
+            className="px-2 py-0.5 rounded-full text-white mr-1"
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              background: percentDiff >= 0 ? "#1D9E75" : "#D85A30",
+            }}
+          >
+            {actionText}
+          </span>
+        ) : null
       }
     >
       <ResponsiveContainer width="100%" height={220}>
-        <AreaChart data={forecastData} margin={{ top: 5, right: 16, left: 0, bottom: 5 }}>
+        <AreaChart data={data} margin={{ top: 5, right: 16, left: 0, bottom: 5 }}>
           <defs>
             <linearGradient id="rpt-fva-actual" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%"  stopColor="#534AB7" stopOpacity={0.22} />
@@ -49,7 +75,7 @@ export function ForecastAreaChart() {
           </defs>
           <CartesianGrid key="fva-grid"  strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
           <XAxis         key="fva-xaxis" dataKey="month" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
-          <YAxis         key="fva-yaxis" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={fmtTr} width={48} />
+          <YAxis         key="fva-yaxis" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={fmtTr} width={48} domain={[0, yDomainMax]} />
           <Tooltip       key="fva-tt"    content={<CustomTooltip />} />
           <Area
             key="fva-forecast"

@@ -54,6 +54,7 @@ model Tenant {
   deals       Deal[]
   activities  Activity[]
   invitations Invitation[]
+  kpiTargets  KpiTarget[]
 }
 
 model User {
@@ -71,6 +72,7 @@ model User {
   ownedContacts Contact[]      @relation("ContactOwner")
   activities    Activity[]
   refreshTokens RefreshToken[] 
+  kpiTargets    KpiTarget[]
 
   @@index([tenantId])
 }
@@ -211,4 +213,21 @@ model Invitation {
   @@unique([tenantId, email])
   @@index([tenantId])
   @@index([token])
+}
+
+model KpiTarget {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String
+  target    Decimal  @default(0)
+  month     Int      // 1 to 12
+  year      Int      // e.g. 2026
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId, month, year])
+  @@index([tenantId, userId])
 }

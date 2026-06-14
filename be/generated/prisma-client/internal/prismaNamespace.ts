@@ -392,7 +392,8 @@ export const ModelName = {
   Task: 'Task',
   AiSuggestion: 'AiSuggestion',
   RefreshToken: 'RefreshToken',
-  Invitation: 'Invitation'
+  Invitation: 'Invitation',
+  KpiTarget: 'KpiTarget'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -408,7 +409,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "tenant" | "user" | "contact" | "deal" | "activity" | "task" | "aiSuggestion" | "refreshToken" | "invitation"
+    modelProps: "tenant" | "user" | "contact" | "deal" | "activity" | "task" | "aiSuggestion" | "refreshToken" | "invitation" | "kpiTarget"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1078,6 +1079,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    KpiTarget: {
+      payload: Prisma.$KpiTargetPayload<ExtArgs>
+      fields: Prisma.KpiTargetFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.KpiTargetFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KpiTargetPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.KpiTargetFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KpiTargetPayload>
+        }
+        findFirst: {
+          args: Prisma.KpiTargetFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KpiTargetPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.KpiTargetFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KpiTargetPayload>
+        }
+        findMany: {
+          args: Prisma.KpiTargetFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KpiTargetPayload>[]
+        }
+        create: {
+          args: Prisma.KpiTargetCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KpiTargetPayload>
+        }
+        createMany: {
+          args: Prisma.KpiTargetCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.KpiTargetCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KpiTargetPayload>[]
+        }
+        delete: {
+          args: Prisma.KpiTargetDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KpiTargetPayload>
+        }
+        update: {
+          args: Prisma.KpiTargetUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KpiTargetPayload>
+        }
+        deleteMany: {
+          args: Prisma.KpiTargetDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.KpiTargetUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.KpiTargetUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KpiTargetPayload>[]
+        }
+        upsert: {
+          args: Prisma.KpiTargetUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$KpiTargetPayload>
+        }
+        aggregate: {
+          args: Prisma.KpiTargetAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateKpiTarget>
+        }
+        groupBy: {
+          args: Prisma.KpiTargetGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.KpiTargetGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.KpiTargetCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.KpiTargetCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1245,6 +1320,20 @@ export const InvitationScalarFieldEnum = {
 export type InvitationScalarFieldEnum = (typeof InvitationScalarFieldEnum)[keyof typeof InvitationScalarFieldEnum]
 
 
+export const KpiTargetScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  userId: 'userId',
+  target: 'target',
+  month: 'month',
+  year: 'year',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type KpiTargetScalarFieldEnum = (typeof KpiTargetScalarFieldEnum)[keyof typeof KpiTargetScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1407,6 +1496,20 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
+
+/**
+ * Reference to a field of type 'Float'
+ */
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Float[]'
+ */
+export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -1526,6 +1629,7 @@ export type GlobalOmitConfig = {
   aiSuggestion?: Prisma.AiSuggestionOmit
   refreshToken?: Prisma.RefreshTokenOmit
   invitation?: Prisma.InvitationOmit
+  kpiTarget?: Prisma.KpiTargetOmit
 }
 
 /* Types for Logging */

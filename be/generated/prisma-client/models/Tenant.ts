@@ -187,6 +187,7 @@ export type TenantWhereInput = {
   deals?: Prisma.DealListRelationFilter
   activities?: Prisma.ActivityListRelationFilter
   invitations?: Prisma.InvitationListRelationFilter
+  kpiTargets?: Prisma.KpiTargetListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -200,6 +201,7 @@ export type TenantOrderByWithRelationInput = {
   deals?: Prisma.DealOrderByRelationAggregateInput
   activities?: Prisma.ActivityOrderByRelationAggregateInput
   invitations?: Prisma.InvitationOrderByRelationAggregateInput
+  kpiTargets?: Prisma.KpiTargetOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
@@ -216,6 +218,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   deals?: Prisma.DealListRelationFilter
   activities?: Prisma.ActivityListRelationFilter
   invitations?: Prisma.InvitationListRelationFilter
+  kpiTargets?: Prisma.KpiTargetListRelationFilter
 }, "id" | "slug">
 
 export type TenantOrderByWithAggregationInput = {
@@ -251,6 +254,7 @@ export type TenantCreateInput = {
   deals?: Prisma.DealCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -264,6 +268,7 @@ export type TenantUncheckedCreateInput = {
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -277,6 +282,7 @@ export type TenantUpdateInput = {
   deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -290,6 +296,7 @@ export type TenantUncheckedUpdateInput = {
   deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -423,6 +430,20 @@ export type TenantUpdateOneRequiredWithoutInvitationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutInvitationsInput, Prisma.TenantUpdateWithoutInvitationsInput>, Prisma.TenantUncheckedUpdateWithoutInvitationsInput>
 }
 
+export type TenantCreateNestedOneWithoutKpiTargetsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutKpiTargetsInput, Prisma.TenantUncheckedCreateWithoutKpiTargetsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutKpiTargetsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutKpiTargetsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutKpiTargetsInput, Prisma.TenantUncheckedCreateWithoutKpiTargetsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutKpiTargetsInput
+  upsert?: Prisma.TenantUpsertWithoutKpiTargetsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutKpiTargetsInput, Prisma.TenantUpdateWithoutKpiTargetsInput>, Prisma.TenantUncheckedUpdateWithoutKpiTargetsInput>
+}
+
 export type TenantCreateWithoutUsersInput = {
   id?: string
   name: string
@@ -433,6 +454,7 @@ export type TenantCreateWithoutUsersInput = {
   deals?: Prisma.DealCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutUsersInput = {
@@ -445,6 +467,7 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutUsersInput = {
@@ -473,6 +496,7 @@ export type TenantUpdateWithoutUsersInput = {
   deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutUsersInput = {
@@ -485,6 +509,7 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutContactsInput = {
@@ -497,6 +522,7 @@ export type TenantCreateWithoutContactsInput = {
   deals?: Prisma.DealCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutContactsInput = {
@@ -509,6 +535,7 @@ export type TenantUncheckedCreateWithoutContactsInput = {
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutContactsInput = {
@@ -537,6 +564,7 @@ export type TenantUpdateWithoutContactsInput = {
   deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutContactsInput = {
@@ -549,6 +577,7 @@ export type TenantUncheckedUpdateWithoutContactsInput = {
   deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutDealsInput = {
@@ -561,6 +590,7 @@ export type TenantCreateWithoutDealsInput = {
   contacts?: Prisma.ContactCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutDealsInput = {
@@ -573,6 +603,7 @@ export type TenantUncheckedCreateWithoutDealsInput = {
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutDealsInput = {
@@ -601,6 +632,7 @@ export type TenantUpdateWithoutDealsInput = {
   contacts?: Prisma.ContactUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutDealsInput = {
@@ -613,6 +645,7 @@ export type TenantUncheckedUpdateWithoutDealsInput = {
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutActivitiesInput = {
@@ -625,6 +658,7 @@ export type TenantCreateWithoutActivitiesInput = {
   contacts?: Prisma.ContactCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutActivitiesInput = {
@@ -637,6 +671,7 @@ export type TenantUncheckedCreateWithoutActivitiesInput = {
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutActivitiesInput = {
@@ -665,6 +700,7 @@ export type TenantUpdateWithoutActivitiesInput = {
   contacts?: Prisma.ContactUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutActivitiesInput = {
@@ -677,6 +713,7 @@ export type TenantUncheckedUpdateWithoutActivitiesInput = {
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutInvitationsInput = {
@@ -689,6 +726,7 @@ export type TenantCreateWithoutInvitationsInput = {
   contacts?: Prisma.ContactCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutInvitationsInput = {
@@ -701,6 +739,7 @@ export type TenantUncheckedCreateWithoutInvitationsInput = {
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutInvitationsInput = {
@@ -729,6 +768,7 @@ export type TenantUpdateWithoutInvitationsInput = {
   contacts?: Prisma.ContactUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutInvitationsInput = {
@@ -741,6 +781,75 @@ export type TenantUncheckedUpdateWithoutInvitationsInput = {
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutKpiTargetsInput = {
+  id?: string
+  name: string
+  slug: string
+  plan?: string
+  createdAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  contacts?: Prisma.ContactCreateNestedManyWithoutTenantInput
+  deals?: Prisma.DealCreateNestedManyWithoutTenantInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutKpiTargetsInput = {
+  id?: string
+  name: string
+  slug: string
+  plan?: string
+  createdAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutTenantInput
+  deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutKpiTargetsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutKpiTargetsInput, Prisma.TenantUncheckedCreateWithoutKpiTargetsInput>
+}
+
+export type TenantUpsertWithoutKpiTargetsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutKpiTargetsInput, Prisma.TenantUncheckedUpdateWithoutKpiTargetsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutKpiTargetsInput, Prisma.TenantUncheckedCreateWithoutKpiTargetsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutKpiTargetsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutKpiTargetsInput, Prisma.TenantUncheckedUpdateWithoutKpiTargetsInput>
+}
+
+export type TenantUpdateWithoutKpiTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  contacts?: Prisma.ContactUpdateManyWithoutTenantNestedInput
+  deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutKpiTargetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
+  contacts?: Prisma.ContactUncheckedUpdateManyWithoutTenantNestedInput
+  deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 
@@ -754,6 +863,7 @@ export type TenantCountOutputType = {
   deals: number
   activities: number
   invitations: number
+  kpiTargets: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -762,6 +872,7 @@ export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   deals?: boolean | TenantCountOutputTypeCountDealsArgs
   activities?: boolean | TenantCountOutputTypeCountActivitiesArgs
   invitations?: boolean | TenantCountOutputTypeCountInvitationsArgs
+  kpiTargets?: boolean | TenantCountOutputTypeCountKpiTargetsArgs
 }
 
 /**
@@ -809,6 +920,13 @@ export type TenantCountOutputTypeCountInvitationsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.InvitationWhereInput
 }
 
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountKpiTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.KpiTargetWhereInput
+}
+
 
 export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -821,6 +939,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   deals?: boolean | Prisma.Tenant$dealsArgs<ExtArgs>
   activities?: boolean | Prisma.Tenant$activitiesArgs<ExtArgs>
   invitations?: boolean | Prisma.Tenant$invitationsArgs<ExtArgs>
+  kpiTargets?: boolean | Prisma.Tenant$kpiTargetsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -855,6 +974,7 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   deals?: boolean | Prisma.Tenant$dealsArgs<ExtArgs>
   activities?: boolean | Prisma.Tenant$activitiesArgs<ExtArgs>
   invitations?: boolean | Prisma.Tenant$invitationsArgs<ExtArgs>
+  kpiTargets?: boolean | Prisma.Tenant$kpiTargetsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -868,6 +988,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     deals: Prisma.$DealPayload<ExtArgs>[]
     activities: Prisma.$ActivityPayload<ExtArgs>[]
     invitations: Prisma.$InvitationPayload<ExtArgs>[]
+    kpiTargets: Prisma.$KpiTargetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1274,6 +1395,7 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   deals<T extends Prisma.Tenant$dealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$dealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   activities<T extends Prisma.Tenant$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   invitations<T extends Prisma.Tenant$invitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  kpiTargets<T extends Prisma.Tenant$kpiTargetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$kpiTargetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KpiTargetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1818,6 +1940,30 @@ export type Tenant$invitationsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.InvitationScalarFieldEnum | Prisma.InvitationScalarFieldEnum[]
+}
+
+/**
+ * Tenant.kpiTargets
+ */
+export type Tenant$kpiTargetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the KpiTarget
+   */
+  select?: Prisma.KpiTargetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the KpiTarget
+   */
+  omit?: Prisma.KpiTargetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.KpiTargetInclude<ExtArgs> | null
+  where?: Prisma.KpiTargetWhereInput
+  orderBy?: Prisma.KpiTargetOrderByWithRelationInput | Prisma.KpiTargetOrderByWithRelationInput[]
+  cursor?: Prisma.KpiTargetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.KpiTargetScalarFieldEnum | Prisma.KpiTargetScalarFieldEnum[]
 }
 
 /**

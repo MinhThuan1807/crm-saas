@@ -21,12 +21,20 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-export function WinLossChart() {
+interface WinLossChartProps {
+  data?: {
+    stage: string;
+    win: number;
+    loss: number;
+  }[];
+}
+
+export function WinLossChart({ data = winLossData }: WinLossChartProps) {
   return (
     <ChartCard title="Win/Loss theo giai đoạn" subtitle="Tỷ lệ thắng/thua">
       <ResponsiveContainer width="100%" height={190}>
         <BarChart
-          data={winLossData}
+          data={data}
           margin={{ top: 5, right: 8, left: -16, bottom: 5 }}
           barSize={14}
           barCategoryGap="30%"

@@ -59,7 +59,8 @@ export const ModelName = {
   Task: 'Task',
   AiSuggestion: 'AiSuggestion',
   RefreshToken: 'RefreshToken',
-  Invitation: 'Invitation'
+  Invitation: 'Invitation',
+  KpiTarget: 'KpiTarget'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -204,6 +205,20 @@ export const InvitationScalarFieldEnum = {
 } as const
 
 export type InvitationScalarFieldEnum = (typeof InvitationScalarFieldEnum)[keyof typeof InvitationScalarFieldEnum]
+
+
+export const KpiTargetScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  userId: 'userId',
+  target: 'target',
+  month: 'month',
+  year: 'year',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type KpiTargetScalarFieldEnum = (typeof KpiTargetScalarFieldEnum)[keyof typeof KpiTargetScalarFieldEnum]
 
 
 export const SortOrder = {

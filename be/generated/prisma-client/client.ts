@@ -84,3 +84,8 @@ export type RefreshToken = Prisma.RefreshTokenModel
  * 
  */
 export type Invitation = Prisma.InvitationModel
+/**
+ * Model KpiTarget
+ * 
+ */
+export type KpiTarget = Prisma.KpiTargetModel

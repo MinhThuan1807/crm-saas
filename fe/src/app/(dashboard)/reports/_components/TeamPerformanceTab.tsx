@@ -1,9 +1,27 @@
+"use client";
+
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Edit2, Settings } from "lucide-react";
 import {
   ResponsiveContainer, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
 import { ChartCard } from "./ChartCard";
-import { teamPerformanceData, fmtTr } from "./reportsData";
+import { fmtTr } from "./reportsData";
+import { reportsService } from "@/services/reports.service";
+import { useMe } from "@/hooks/useAuth";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -26,13 +44,86 @@ const LEGEND = [
   { color: "#AFA9EC", label: "Target" },
 ];
 
-export function TeamPerformanceTab() {
+interface TeamPerformanceTabProps {
+  startDate?: string;
+  endDate?: string;
+}
+
+export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabProps) {
+  const queryClient = useQueryClient();
+  const { data: me } = useMe();
+  const isAdminOrManager = me?.role === "ADMIN" || me?.role === "MANAGER";
+
+  // Fetch real team performance data
+  const { data: teamData = [], isLoading } = useQuery({
+    queryKey: ["reports", "team-performance", startDate, endDate],
+    queryFn: () => reportsService.getTeamPerformance({ startDate, endDate }),
+  });
+
+  // Target Update States
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [editingUserName, setEditingUserName] = useState("");
+  const [targetVal, setTargetVal] = useState("0");
+  const [month, setMonth] = useState(6); // default to June
+  const [year, setYear] = useState(2026); // default to 2026
+
+  // KPI Target mutation
+  const updateTargetMutation = useMutation({
+    mutationFn: (data: { userId: string; target: number; month: number; year: number }) =>
+      reportsService.updateKpiTarget(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reports"] });
+      toast.success("Cập nhật target KPI thành công!");
+      setIsModalOpen(false);
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || "Cập nhật target KPI thất bại.");
+    },
+  });
+
+  const handleOpenEdit = (userId: string, name: string, currentTargetThousands: number) => {
+    setEditingUserId(userId);
+    setEditingUserName(name);
+    // Convert thousands back to millions for user input (e.g. 300,000 VND / 1000 = 300tr)
+    const millionsVal = (currentTargetThousands * 1000) / 1_000_000;
+    setTargetVal(millionsVal.toString());
+    setIsModalOpen(true);
+  };
+
+  const handleSave = () => {
+    if (!editingUserId) return;
+    const numericTarget = parseFloat(targetVal);
+    if (isNaN(numericTarget) || numericTarget < 0) {
+      toast.error("Vui lòng nhập target hợp lệ.");
+      return;
+    }
+
+    // Convert from millions input to raw currency amount
+    const rawTarget = numericTarget * 1_000_000;
+
+    updateTargetMutation.mutate({
+      userId: editingUserId,
+      target: rawTarget,
+      month,
+      year,
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[350px]">
+        <span className="text-[#6B6B67] text-sm">Đang tải dữ liệu hiệu suất đội ngũ...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-5">
       {/* Chart Row */}
       <ChartCard
         title="So sánh doanh số thực tế vs Chỉ tiêu"
-        subtitle="Doanh số đạt được so với chỉ tiêu giao cho từng thành viên trong năm nay"
+        subtitle="Doanh số đạt được so với chỉ tiêu giao cho từng thành viên trong kỳ"
         action={
           <div className="flex items-center gap-3 mr-1">
             {LEGEND.map((l) => (
@@ -45,7 +136,7 @@ export function TeamPerformanceTab() {
         }
       >
         <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={teamPerformanceData} margin={{ top: 5, right: 16, left: 0, bottom: 5 }}>
+          <BarChart data={teamData} margin={{ top: 5, right: 16, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
             <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={fmtTr} width={44} />
@@ -57,10 +148,12 @@ export function TeamPerformanceTab() {
       </ChartCard>
 
       {/* Table Row */}
-      <div className="bg-white rounded-[10px] border border-[#E8E7E2] overflow-hidden">
-        <div className="p-4 border-b border-[#E8E7E2]">
-          <h3 className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 600 }}>Chi tiết chỉ số hiệu suất</h3>
-          <p className="text-[#6B6B67] mt-0.5" style={{ fontSize: 11 }}>Đo lường chi tiết năng lực bán hàng và tần suất hoạt động</p>
+      <div className="bg-white rounded-[10px] border border-[#E8E7E2] overflow-hidden shadow-sm">
+        <div className="p-4 border-b border-[#E8E7E2] flex items-center justify-between">
+          <div>
+            <h3 className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 600 }}>Chi tiết chỉ số hiệu suất</h3>
+            <p className="text-[#6B6B67] mt-0.5" style={{ fontSize: 11 }}>Đo lường chi tiết năng lực bán hàng và tần suất hoạt động</p>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -77,10 +170,10 @@ export function TeamPerformanceTab() {
               </tr>
             </thead>
             <tbody>
-              {teamPerformanceData.map((row) => {
-                const ratio = ((row.actual / row.target) * 100).toFixed(0);
+              {teamData.map((row) => {
+                const ratio = row.target > 0 ? ((row.actual / row.target) * 100).toFixed(0) : "0";
                 return (
-                  <tr key={row.name} className="border-b border-[#E8E7E2] last:border-0 hover:bg-[#F8F8F7] transition-colors">
+                  <tr key={row.userId} className="border-b border-[#E8E7E2] last:border-0 hover:bg-[#F8F8F7] transition-colors">
                     {/* User Profile */}
                     <td className="p-3 pl-4">
                       <div className="flex items-center gap-2.5">
@@ -101,7 +194,18 @@ export function TeamPerformanceTab() {
                     </td>
                     {/* Target */}
                     <td className="p-3 text-[#6B6B67] text-right tabular-nums" style={{ fontSize: 12 }}>
-                      {fmtTr(row.target)}
+                      <div className="flex items-center justify-end gap-1.5">
+                        <span>{fmtTr(row.target)}</span>
+                        {isAdminOrManager && (
+                          <button
+                            onClick={() => handleOpenEdit(row.userId, row.name, row.target)}
+                            className="p-1 hover:bg-[#EEEDFE] rounded text-[#534AB7] hover:text-[#4840A0] transition-colors cursor-pointer"
+                            title="Chỉnh sửa KPI Target"
+                          >
+                            <Edit2 size={11} />
+                          </button>
+                        )}
+                      </div>
                     </td>
                     {/* Ratio */}
                     <td className="p-3 text-right tabular-nums" style={{ fontSize: 12 }}>
@@ -135,6 +239,82 @@ export function TeamPerformanceTab() {
           </table>
         </div>
       </div>
+
+      {/* KPI Target Edit Dialog */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle style={{ fontSize: 14, fontWeight: 600 }}>Thiết lập chỉ tiêu KPI</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4 text-xs">
+            <div className="grid grid-cols-4 items-center gap-3">
+              <Label className="text-right">Nhân viên</Label>
+              <Input
+                value={editingUserName}
+                disabled
+                className="col-span-3 text-xs h-9"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-3">
+              <Label className="text-right">Thời gian</Label>
+              <div className="col-span-3 flex gap-2">
+                <div className="flex-1 flex items-center gap-1.5">
+                  <span className="text-[10px] text-muted-foreground shrink-0">Tháng</span>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={12}
+                    value={month}
+                    onChange={(e) => setMonth(parseInt(e.target.value) || 6)}
+                    className="text-xs h-9"
+                  />
+                </div>
+                <div className="flex-1 flex items-center gap-1.5">
+                  <span className="text-[10px] text-muted-foreground shrink-0">Năm</span>
+                  <Input
+                    type="number"
+                    min={2020}
+                    max={2030}
+                    value={year}
+                    onChange={(e) => setYear(parseInt(e.target.value) || 2026)}
+                    className="text-xs h-9"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-3">
+              <Label className="text-right">Chỉ tiêu (triệu VND)</Label>
+              <Input
+                type="number"
+                min={0}
+                value={targetVal}
+                onChange={(e) => setTargetVal(e.target.value)}
+                className="col-span-3 text-xs h-9"
+                placeholder="Ví dụ: 500 (tương đương 500 triệu)"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsModalOpen(false)}
+              className="text-xs h-8"
+            >
+              Hủy
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={updateTargetMutation.isPending}
+              style={{ background: "#534AB7" }}
+              className="text-xs h-8 text-white"
+            >
+              {updateTargetMutation.isPending ? "Đang lưu..." : "Lưu thay đổi"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

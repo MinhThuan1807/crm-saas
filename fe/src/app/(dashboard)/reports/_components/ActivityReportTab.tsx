@@ -1,15 +1,18 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import {
   ResponsiveContainer, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip,
   PieChart, Pie, Cell,
 } from "recharts";
 import { ChartCard } from "./ChartCard";
-import { activityTrendData, activityStatusData } from "./reportsData";
+import { reportsService } from "@/services/reports.service";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-[#E8E7E2] rounded-lg shadow-md px-3 py-2.5 text-xs">
+    <div className="bg-white border border-[#E8E7E2] rounded-lg shadow-md px-3 py-2.5 text-xs text-left">
       <p className="text-[#1A1A18] mb-1.5" style={{ fontWeight: 600 }}>{label}</p>
       {payload.map((p: any) => (
         <div key={p.name} className="flex justify-between items-center gap-6 mb-1 last:mb-0">
@@ -31,29 +34,62 @@ const LEGEND = [
   { color: "#1D9E75", name: "Tasks" },
 ];
 
-export function ActivityReportTab() {
+interface ActivityReportTabProps {
+  startDate?: string;
+  endDate?: string;
+}
+
+export function ActivityReportTab({ startDate, endDate }: ActivityReportTabProps) {
+  // Query backend activities statistics
+  const { data, isLoading } = useQuery({
+    queryKey: ["reports", "activities", startDate, endDate],
+    queryFn: () => reportsService.getActivities({ startDate, endDate }),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[350px]">
+        <span className="text-[#6B6B67] text-sm">Đang tải báo cáo hoạt động...</span>
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  // Calculate dynamic metrics from trends
+  const totalCalls = data.trend.reduce((sum, item) => sum + item.Calls, 0);
+  const totalMeetings = data.trend.reduce((sum, item) => sum + item.Meetings, 0);
+  const totalTasks = data.trend.reduce((sum, item) => sum + item.Tasks, 0);
+
+  // Call / Meeting ratio
+  const callMeetingRatio = totalMeetings > 0 ? (totalCalls / totalMeetings).toFixed(1) : totalCalls.toString();
+
+  // Find overdue task percentage from status distribution
+  const overduePercentItem = data.statusDistribution.find(d => d.name === "Quá hạn");
+  const overduePercent = overduePercentItem ? overduePercentItem.value : 0;
+
   return (
     <div className="flex flex-col gap-5">
       {/* Row 1: KPI Cards */}
       <div className="grid grid-cols-4 gap-4">
-        <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-1.5">
+        <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-1.5 shadow-sm">
           <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Tỷ lệ Gọi / Hẹn gặp</span>
-          <span className="text-[#1A1A18] font-bold" style={{ fontSize: 20 }}>7.2 : 1</span>
-          <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>7.2 cuộc gọi để tạo 1 cuộc hẹn</span>
+          <span className="text-[#1A1A18] font-bold" style={{ fontSize: 20 }}>{callMeetingRatio} : 1</span>
+          <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>Số cuộc gọi trung bình để có 1 cuộc hẹn</span>
         </div>
-        <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-1.5">
-          <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Tỷ lệ Gặp / Chốt deal</span>
-          <span className="text-[#1A1A18] font-bold" style={{ fontSize: 20 }}>3.5 : 1</span>
-          <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>3.5 cuộc họp để chốt 1 hợp đồng</span>
+        <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-1.5 shadow-sm">
+          <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Tổng số cuộc hẹn</span>
+          <span className="text-[#1A1A18] font-bold" style={{ fontSize: 20 }}>{totalMeetings}</span>
+          <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>Tổng số cuộc họp đã tổ chức trong kỳ</span>
         </div>
-        <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-1.5">
-          <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Tần suất hoạt động / Deal</span>
-          <span className="text-[#1A1A18] font-bold" style={{ fontSize: 20 }}>48</span>
-          <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>Số tương tác trung bình mỗi deal thắng</span>
+        <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-1.5 shadow-sm">
+          <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Nhiệm vụ hoàn thành</span>
+          <span className="text-[#1A1A18] font-bold" style={{ fontSize: 20 }}>{totalTasks}</span>
+          <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>Số lượng đầu việc hoàn thành trong kỳ</span>
         </div>
-        <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-1.5">
+        <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-1.5 shadow-sm">
           <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Nhiệm vụ trễ hạn (Overdue)</span>
-          <span className="text-[#D85A30] font-bold" style={{ fontSize: 20 }}>14%</span>
+          <span className="text-[#D85A30] font-bold" style={{ fontSize: 20 }}>{overduePercent}%</span>
           <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>Cần tập trung giải quyết việc quá hạn</span>
         </div>
       </div>
@@ -77,7 +113,7 @@ export function ActivityReportTab() {
             }
           >
             <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={activityTrendData} margin={{ top: 10, right: 16, left: 0, bottom: 5 }}>
+              <BarChart data={data.trend} margin={{ top: 10, right: 16, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} width={30} />
@@ -100,7 +136,7 @@ export function ActivityReportTab() {
             <ResponsiveContainer width="100%" height={150}>
               <PieChart>
                 <Pie
-                  data={activityStatusData}
+                  data={data.statusDistribution}
                   cx="50%"
                   cy="50%"
                   innerRadius={50}
@@ -108,7 +144,7 @@ export function ActivityReportTab() {
                   paddingAngle={3}
                   dataKey="value"
                 >
-                  {activityStatusData.map((entry, index) => (
+                  {data.statusDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -118,7 +154,7 @@ export function ActivityReportTab() {
 
             {/* Custom status legend labels */}
             <div className="w-full grid grid-cols-3 gap-1 mt-1">
-              {activityStatusData.map((d) => (
+              {data.statusDistribution.map((d) => (
                 <div key={d.name} className="flex flex-col items-center text-center">
                   <div className="flex items-center gap-1 mb-0.5">
                     <div className="size-2 rounded-full shrink-0" style={{ background: d.color }} />
