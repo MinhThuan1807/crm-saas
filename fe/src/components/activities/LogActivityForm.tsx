@@ -21,6 +21,8 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { relativeTime } from "@/lib/helper";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 
 export type ActivityTab = ActivityType;
 
@@ -53,6 +55,8 @@ function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogAct
   });
 
   const note = useWatch({ control: form.control, name: "note" });
+  const selectedDateRaw = form.watch("date");
+  const selectedDate = selectedDateRaw instanceof Date ? selectedDateRaw : new Date(selectedDateRaw ? String(selectedDateRaw) : Date.now());
 
   const handleTabChange = (tab: ActivityTab) => {
     setActiveTab(tab);
@@ -142,14 +146,70 @@ function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogAct
 
         {/* Form footer */}
         <div className="flex items-center justify-between px-3.5 py-2 border-t border-border">
-          <button
-            type="button"
-            className="flex items-center gap-1 px-2.5 py-1 text-[11px] rounded-md border border-border bg-background text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          >
-            <Clock size={11} />
-            {relativeTime(new Date())}
-            <ChevronDown size={10} />
-          </button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="flex items-center gap-1 px-2.5 py-1 text-[11px] rounded-md border border-border bg-background text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              >
+                <Clock size={11} />
+                {selectedDate.toISOString().split('T')[0]}
+                <ChevronDown size={10} />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-3 bg-white flex flex-col gap-2" align="start">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => {
+                  if (!date) return;
+                  const currentHour = selectedDate.getHours();
+                  const currentMinute = selectedDate.getMinutes();
+                  const newDate = new Date(date);
+                  newDate.setHours(currentHour);
+                  newDate.setMinutes(currentMinute);
+                  newDate.setSeconds(0);
+                  form.setValue("date", newDate);
+                }}
+              />
+              <div className="flex items-center justify-between border-t border-border pt-2 gap-2">
+                <span className="text-[11px] text-muted-foreground font-medium">Giờ hoạt động</span>
+                <div className="flex items-center gap-1">
+                  {/* Hours Select */}
+                  <select
+                    value={selectedDate.getHours().toString().padStart(2, "0")}
+                    onChange={(e) => {
+                      const newDate = new Date(selectedDate);
+                      newDate.setHours(parseInt(e.target.value, 10));
+                      form.setValue("date", newDate);
+                    }}
+                    className="text-xs bg-[#F8F8F7] border border-border rounded px-1.5 py-1 outline-none font-mono"
+                  >
+                    {Array.from({ length: 24 }).map((_, i) => {
+                      const val = i.toString().padStart(2, "0");
+                      return <option key={val} value={val}>{val}</option>;
+                    })}
+                  </select>
+                  <span className="text-muted-foreground text-xs">:</span>
+                  {/* Minutes Select */}
+                  <select
+                    value={selectedDate.getMinutes().toString().padStart(2, "0")}
+                    onChange={(e) => {
+                      const newDate = new Date(selectedDate);
+                      newDate.setMinutes(parseInt(e.target.value, 10));
+                      form.setValue("date", newDate);
+                    }}
+                    className="text-xs bg-[#F8F8F7] border border-border rounded px-1.5 py-1 outline-none font-mono"
+                  >
+                    {Array.from({ length: 60 }).map((_, i) => {
+                      const val = i.toString().padStart(2, "0");
+                      return <option key={val} value={val}>{val}</option>;
+                    })}
+                  </select>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
 
           <Button
             type="submit"

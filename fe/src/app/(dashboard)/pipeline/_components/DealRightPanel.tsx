@@ -22,7 +22,7 @@ export function DealRightPanel({ dealId, activities }: DealRightPanelProps) {
   return (
     <div className="flex-1 flex flex-col overflow-y-auto bg-[#F8F8F7]">
       {/* AI Analyzer */}
-      <DealAiAnalyzer />
+      <DealAiAnalyzer dealId={dealId} />
 
       {/* Activity Timeline */}
       <div className="border-t border-border mt-2 flex flex-col flex-1">

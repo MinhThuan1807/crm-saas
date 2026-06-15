@@ -32,11 +32,25 @@ function withTimeout<T>(promise: Promise<T>, ms = OPENAI_TIMEOUT_MS) {
   return Promise.race([promise, new Promise<T>((_, rej) => setTimeout(() => rej(new Error('OpenAI timeout')), ms))])
 }
 
-const openai = new OpenAI({ apiKey: envConfig.OPENAI_API_KEY })
-const MODEL = envConfig.OPENAI_MODEL || 'gpt-4o-mini'
+const isGroq = envConfig.AI_PROVIDER === 'groq';
+
+const openai = new OpenAI(
+  isGroq
+    ? {
+        apiKey: envConfig.GROQ_API_KEY,
+        baseURL: 'https://api.groq.com/openai/v1',
+      }
+    : {
+        apiKey: envConfig.OPENAI_API_KEY,
+      }
+);
+
+const MODEL = isGroq
+  ? (envConfig.GROQ_MODEL || 'llama-3.3-70b-versatile')
+  : (envConfig.OPENAI_MODEL || 'gpt-4o-mini');
 
 async function callOpenAiAndParse(meetingNote: string, jobId: string, dealId: string): Promise<AiResponseType> {
-  const prompt = `You are an assistant that extracts actionable items from a meeting note.\nReturn ONLY a single valid JSON object (no explanation) with keys:\n{\n  "tasks": [{ "title": "<string>", "dueDate": "<ISO-8601 or null>" }],\n  "emailDraft": "<string or null>",\n  "summary": "<string or null>"\n}\nMeeting Note:\n"""${meetingNote}"""\n`
+  const prompt = `You are an assistant that extracts actionable items from a meeting note.\nReturn ONLY a single valid JSON object (no explanation) with keys:\n{\n  "tasks": [{ "title": "<string>", "dueDate": "<ISO-8601 or null>" }],\n  "emailDraft": "<string>",\n  "summary": "<string>"\n}\nNote: You MUST write a detailed follow-up email draft in Vietnamese under "emailDraft", and a brief summary in Vietnamese under "summary". Do not set them to null.\nMeeting Note:\n"""${meetingNote}"""\n`
 
   const doCall = async () => {
     const resp = await openai.chat.completions.create({
@@ -72,7 +86,7 @@ async function callOpenAiAndParse(meetingNote: string, jobId: string, dealId: st
     return validated
   } catch (firstErr) {
     try {
-      const retryPrompt = `The previous output was not valid JSON. Reply with only a single valid JSON object matching schema {"tasks":[{"title":"string","dueDate":"ISO-8601 or null"}],"emailDraft":"string or null","summary":"string or null"}. Meeting note:\n"""${meetingNote}"""`
+      const retryPrompt = `The previous output was not valid JSON. Reply with only a single valid JSON object matching schema {"tasks":[{"title":"string","dueDate":"ISO-8601 or null"}],"emailDraft":"string","summary":"string"}. All texts must be written in Vietnamese. Meeting note:\n"""${meetingNote}"""`
       const retryResp = await withTimeout(
         openai.chat.completions.create({
           model: MODEL,

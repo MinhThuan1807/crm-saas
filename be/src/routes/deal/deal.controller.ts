@@ -21,6 +21,12 @@ import {
   GetDealsPipelineResDto,
   UpdateDealResDto,
 } from './deal.dto'
+import {
+  CreateTaskBodyDto,
+  CreateTasksBulkBodyDto,
+  UpdateTaskBodyDto,
+  TaskResDto,
+} from './task.dto'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard'
 import { CurrentUser } from 'src/common/decorators/current-user.decorator'
 import { AccessTokenPayload } from 'src/common/types/jwt.type'
@@ -107,5 +113,45 @@ export class DealController {
     subscribeToAiStream(user.tenantId, dealId, res)
     // Express response will be kept open by SSE helper
     return
+  }
+
+  @Post(':id/tasks')
+  @ZodSerializerDto(TaskResDto)
+  async createTask(
+    @Param('id') dealId: string,
+    @Body() body: CreateTaskBodyDto,
+    @CurrentUser() user: AccessTokenPayload,
+  ) {
+    return this.dealService.createTask(dealId, user.tenantId, body)
+  }
+
+  @Post(':id/tasks/bulk')
+  async createTasksBulk(
+    @Param('id') dealId: string,
+    @Body() body: CreateTasksBulkBodyDto,
+    @CurrentUser() user: AccessTokenPayload,
+  ) {
+    return this.dealService.createTasksBulk(dealId, user.tenantId, body.tasks)
+  }
+
+  @Patch(':id/tasks/:taskId')
+  @ZodSerializerDto(TaskResDto)
+  async updateTask(
+    @Param('id') dealId: string,
+    @Param('taskId') taskId: string,
+    @Body() body: UpdateTaskBodyDto,
+    @CurrentUser() user: AccessTokenPayload,
+  ) {
+    return this.dealService.updateTask(dealId, user.tenantId, taskId, body)
+  }
+
+  @Delete(':id/tasks/:taskId')
+  async deleteTask(
+    @Param('id') dealId: string,
+    @Param('taskId') taskId: string,
+    @CurrentUser() user: AccessTokenPayload,
+  ) {
+    await this.dealService.deleteTask(dealId, user.tenantId, taskId)
+    return { ok: true }
   }
 }
