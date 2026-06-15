@@ -10,6 +10,7 @@ import { TokenService } from 'src/common/services/token.service'
 import { AuthRepository } from './auth.repo'
 import { Response as ExpressResponse } from 'express'
 import { COOKIE_OPTIONS } from './auth.constants'
+import { RedisService } from 'src/common/services/redis.service'
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
     private readonly sharedUserRepository: SharedUserRepository,
     private readonly tokenService: TokenService,
     private readonly authRepository: AuthRepository,
+    private readonly redisService: RedisService,
   ) {}
 
   async register(body: RegisterBodyType) {
@@ -69,7 +71,7 @@ export class AuthService {
   }
 
   async logout(refreshToken: string) {
-    await this.authRepository.deleteRefreshToken(refreshToken)
+    await this.redisService.delete(`auth:refresh:${refreshToken}`)
     return { message: 'Đăng xuất thành công' }
   }
 
@@ -84,13 +86,13 @@ export class AuthService {
     ])
 
     const decodedRefreshToken = await this.tokenService.verifyRefreshToken(refreshToken)
-    await this.prismaService.refreshToken.create({
-      data: {
-        token: refreshToken,
-        userId: userId,
-        expiresAt: new Date(decodedRefreshToken.exp * 1000),
-      },
-    })
+    const ttlSeconds = Math.max(0, Math.floor(decodedRefreshToken.exp - Date.now() / 1000))
+
+    await this.redisService.set(
+      `auth:refresh:${refreshToken}`,
+      { userId, role, tenantId },
+      ttlSeconds,
+    )
 
     return { accessToken, refreshToken }
   }
@@ -100,19 +102,19 @@ export class AuthService {
     const { userId } = await this.tokenService.verifyRefreshToken(refreshToken)
     console.log('=== verify OK, userId:', userId)
 
-    const storedToken = await this.authRepository.findRefreshTokenIncludeUser(refreshToken)
-    console.log("=== stored token from DB:", storedToken)
+    const storedToken = await this.redisService.get(`auth:refresh:${refreshToken}`)
+    console.log("=== stored token from Redis:", storedToken)
 
     if (!storedToken) {
       throw new UnauthorizedException('Invalid refresh token')
     }
 
-    await this.authRepository.deleteRefreshToken(refreshToken)
+    await this.redisService.delete(`auth:refresh:${refreshToken}`)
 
     const tokens = await this.generateTokens({
       userId,
-      role: storedToken.user.role,
-      tenantId: storedToken.user.tenantId,
+      role: storedToken.role,
+      tenantId: storedToken.tenantId,
     })
 
     res.cookie('accessToken', tokens.accessToken, {

@@ -18,6 +18,7 @@ import { AiService } from '../ai/ai.service'
 import { ContactsRepository } from '../contacts/contacts.repo'
 import { ROLE } from 'src/common/constants/role.constanst'
 import { PrismaService } from 'src/common/services/prisma.service'
+import { RedisService } from 'src/common/services/redis.service'
 
 @Injectable()
 export class DealService {
@@ -27,6 +28,7 @@ export class DealService {
     private readonly contactsRepo: ContactsRepository,
     private readonly prisma: PrismaService,
     private readonly taskRepo: TaskRepository,
+    private readonly redisService: RedisService,
   ) {}
 
   async create(tenantId: string, data: CreateDealBodyType, userContext?: { userId: string; role: string }) {
@@ -39,7 +41,9 @@ export class DealService {
         throw new NotFoundException('Liên hệ không tồn tại')
       }
     }
-    return this.dealRepo.create(tenantId, data)
+    const deal = await this.dealRepo.create(tenantId, data)
+    await this.redisService.invalidateTenantCache(tenantId)
+    return deal
   }
 
   async getPipleline(tenantId: string, userContext?: { userId: string; role: string }) {
@@ -72,7 +76,9 @@ export class DealService {
     if (!deal) {
       throw new NotFoundException('Không tìm thấy deal')
     }
-    return this.dealRepo.update(dealId, tenantId, body)
+    const updated = await this.dealRepo.update(dealId, tenantId, body)
+    await this.redisService.invalidateTenantCache(tenantId)
+    return updated
   }
 
   async updateDealStage(dealId: string, tenantId: string, stage: DealStageType, userContext?: { userId: string; role: string }) {
@@ -84,7 +90,9 @@ export class DealService {
       throw new UnprocessableEntityException('Giai đoạn không hợp lệ')
     }
 
-    return this.dealRepo.updateStage(dealId, tenantId, stage)
+    const updated = await this.dealRepo.updateStage(dealId, tenantId, stage)
+    await this.redisService.invalidateTenantCache(tenantId)
+    return updated
   }
 
   async delete(dealId: string, tenantId: string, userContext?: { userId: string; role: string }) {
@@ -93,6 +101,7 @@ export class DealService {
       throw new NotFoundException('Không tìm thấy deal')
     }
     await this.dealRepo.softDelete(dealId, tenantId)
+    await this.redisService.invalidateTenantCache(tenantId)
     return { message: 'Xóa deal thành công' }
   }
 
@@ -123,18 +132,26 @@ export class DealService {
   }
 
   async createTask(dealId: string, tenantId: string, data: CreateTaskBodyType) {
-    return this.taskRepo.create(dealId, tenantId, data)
+    const task = await this.taskRepo.create(dealId, tenantId, data)
+    await this.redisService.invalidateTenantCache(tenantId)
+    return task
   }
 
   async createTasksBulk(dealId: string, tenantId: string, tasks: CreateTaskBodyType[]) {
-    return this.taskRepo.createMany(dealId, tenantId, tasks)
+    const result = await this.taskRepo.createMany(dealId, tenantId, tasks)
+    await this.redisService.invalidateTenantCache(tenantId)
+    return result
   }
 
   async updateTask(dealId: string, tenantId: string, taskId: string, data: UpdateTaskBodyType) {
-    return this.taskRepo.update(dealId, tenantId, taskId, data)
+    const task = await this.taskRepo.update(dealId, tenantId, taskId, data)
+    await this.redisService.invalidateTenantCache(tenantId)
+    return task
   }
 
   async deleteTask(dealId: string, tenantId: string, taskId: string) {
-    return this.taskRepo.delete(dealId, tenantId, taskId)
+    const result = await this.taskRepo.delete(dealId, tenantId, taskId)
+    await this.redisService.invalidateTenantCache(tenantId)
+    return result
   }
 }
