@@ -42,15 +42,3 @@ Dự án được phân tách rõ ràng thành hai phân hệ Frontend và Backe
 *   **AI Integration:** OpenAI API SDK (`gpt-4o-mini` hoặc cấu hình tương đương) để phân tích ngôn ngữ tự nhiên và trích xuất thông tin.
 
 ---
-
-## 💡 Những Vấn Đề Kỹ Thuật Đã Giải Quyết
-
-Trong quá trình phát triển dự án thực tế, hệ thống đã giải quyết thành công các bài toán cốt lõi sau:
-
-1.  **Thiết kế Multi-Tenant tách biệt dữ liệu:**
-    *   Hệ thống cho phép nhiều doanh nghiệp cùng chạy chung một cơ sở hạ tầng nhưng dữ liệu hoàn toàn độc lập. Cơ chế phân quyền xác thực qua JWT giúp bảo mật tuyệt đối dữ liệu giữa các doanh nghiệp.
-2.  **Xử lý bất đồng bộ tránh nghẽn luồng (AI Background Processing):**
-    *   Việc gọi OpenAI API có thể mất từ 5-15 giây và dễ gặp lỗi mạng/hết hạn quota. Hệ thống đã giải quyết triệt để bằng cách đưa các yêu cầu phân tích vào hàng đợi BullMQ.
-    *   Các worker chạy ngầm sẽ lấy job ra xử lý và có sẵn cấu hình tự động retry, cơ chế catch-timeout (hết hạn 30s) và phân loại lỗi thông minh (Unauthorized, Rate Limit, Server Error).
-3.  **Đồng bộ giao diện thời gian thực với SSE:**
-    *   Khi người dùng gửi ghi chú cuộc họp để AI phân tích, frontend không cần phải chờ đợi phản hồi đồng bộ hay thực hiện polling liên tục. Hệ thống thiết lập kết nối Server-Sent Events (SSE) để truyền phát trạng thái `ai-connected` -> `heartbeat` -> `ai-complete` / `ai-error` giúp giao diện tự động cập nhật ngay khi worker hoàn thành tác vụ.
