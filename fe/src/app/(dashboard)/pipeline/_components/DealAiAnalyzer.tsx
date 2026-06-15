@@ -15,6 +15,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { dealsService } from "@/services/deals.service";
+import { useQueryClient } from "@tanstack/react-query";
+import { dealKeys } from "@/hooks/useDeals";
+import { toast } from "sonner";
 
 // ── AI content constants ────────────────────────────────────────────────────────
 const MEETING_NOTE =
@@ -61,7 +65,11 @@ const EMAIL_DRAFT =
 
 type Phase = "idle" | "analyzing" | "streaming_tasks" | "streaming_email" | "done";
 
-export function DealAiAnalyzer() {
+interface DealAiAnalyzerProps {
+  dealId: string;
+}
+
+export function DealAiAnalyzer({ dealId }: DealAiAnalyzerProps) {
   const [note, setNote] = useState(MEETING_NOTE);
   const [phase, setPhase] = useState<Phase>("idle");
   const [revealedTasks, setRevealedTasks] = useState(0);
@@ -69,28 +77,36 @@ export function DealAiAnalyzer() {
   const [emailText, setEmailText] = useState("");
   const [emailEditing, setEmailEditing] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [isAccepting, setIsAccepting] = useState(false);
+  const [tasksAccepted, setTasksAccepted] = useState(false);
+
+  const queryClient = useQueryClient();
+  const realTasksRef = useRef<AITask[]>([]);
+  const rawTasksRef = useRef<Array<{ title: string; dueDate?: string | null }>>([]);
+  const realEmailRef = useRef<string>("");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
+
+  // Clean up SSE connection on unmount
+  useEffect(() => {
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
+  }, []);
 
   // ── Streaming state machine ──────────────────────────────────────────────
   useEffect(() => {
-    if (phase !== "analyzing") return;
-    const t = setTimeout(() => {
-      setRevealedTasks(0);
-      setAiTasks([]);
-      setEmailText("");
-      setPhase("streaming_tasks");
-    }, 1500);
-    return () => clearTimeout(t);
-  }, [phase]);
-
-  useEffect(() => {
     if (phase !== "streaming_tasks") return;
-    if (revealedTasks >= AI_TASKS.length) {
+    const targetTasks = realTasksRef.current;
+    if (revealedTasks >= targetTasks.length) {
       const t = setTimeout(() => setPhase("streaming_email"), 450);
       return () => clearTimeout(t);
     }
     const t = setTimeout(() => {
-      setAiTasks((prev) => [...prev, { ...AI_TASKS[revealedTasks], done: false }]);
+      setAiTasks((prev) => [...prev, targetTasks[revealedTasks]]);
       setRevealedTasks((n) => n + 1);
     }, 320);
     return () => clearTimeout(t);
@@ -99,11 +115,12 @@ export function DealAiAnalyzer() {
   useEffect(() => {
     if (phase !== "streaming_email") return;
     let i = 0;
+    const draft = realEmailRef.current;
     intervalRef.current = setInterval(() => {
       i += Math.ceil(Math.random() * 7 + 5);
-      const slice = EMAIL_DRAFT.slice(0, Math.min(i, EMAIL_DRAFT.length));
+      const slice = draft.slice(0, Math.min(i, draft.length));
       setEmailText(slice);
-      if (i >= EMAIL_DRAFT.length) {
+      if (i >= draft.length) {
         clearInterval(intervalRef.current!);
         setPhase("done");
       }
@@ -113,27 +130,116 @@ export function DealAiAnalyzer() {
     };
   }, [phase]);
 
-  const startAnalyze = () => {
+  const startAnalyze = async () => {
     setPhase("analyzing");
     setRevealedTasks(0);
     setAiTasks([]);
     setEmailText("");
     setCopied(false);
+    setErrorMsg("");
+    setTasksAccepted(false);
+
+    try {
+      // 1. Gửi yêu cầu phân tích lên backend
+      await dealsService.analyze(dealId, note);
+
+      // 2. Thiết lập kết nối EventSource để stream kết quả
+      const eventSource = new EventSource(`/api/deals/${dealId}/ai-stream`, {
+        withCredentials: true,
+      });
+
+      eventSourceRef.current = eventSource;
+
+      eventSource.addEventListener("ai-connected", () => {
+        console.log("SSE connected successfully");
+      });
+
+      eventSource.addEventListener("ai-complete", (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          const mapped = (data.tasks || []).map((t: any, idx: number) => ({
+            id: `ai-${idx}-${Date.now()}`,
+            title: t.title,
+            due: t.dueDate ? new Date(t.dueDate).toLocaleDateString("vi-VN") : "Không có hạn",
+            done: false,
+          }));
+
+          realTasksRef.current = mapped;
+          rawTasksRef.current = data.tasks || [];
+          realEmailRef.current = data.emailDraft || "Không có nội dung email được tạo.";
+
+          // Chuyển sang phase streaming
+          setPhase("streaming_tasks");
+        } catch (err) {
+          console.error("Error parsing ai-complete payload:", err);
+          setErrorMsg("Dữ liệu trả về từ AI không hợp lệ.");
+          setPhase("idle");
+        }
+        eventSource.close();
+      });
+
+      eventSource.addEventListener("ai-error", (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          setErrorMsg(data.message || "Lỗi xử lý từ hệ thống AI.");
+        } catch {
+          setErrorMsg("Hệ thống AI gặp sự cố.");
+        }
+        setPhase("idle");
+        eventSource.close();
+      });
+
+      eventSource.onerror = (e) => {
+        console.error("EventSource connection error:", e);
+        setErrorMsg("Mất kết nối với máy chủ AI.");
+        setPhase("idle");
+        eventSource.close();
+      };
+
+    } catch (err: any) {
+      console.error("Error triggering analyze:", err);
+      setErrorMsg(
+        err.response?.data?.message || "Không thể khởi động phân tích AI. Vui lòng thử lại sau."
+      );
+      setPhase("idle");
+    }
   };
 
   const reset = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
     setPhase("idle");
     setRevealedTasks(0);
     setAiTasks([]);
     setEmailText("");
     setCopied(false);
+    setErrorMsg("");
+    setTasksAccepted(false);
   };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(emailText).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2200);
+  };
+
+  const handleAcceptTasks = async () => {
+    if (rawTasksRef.current.length === 0) return;
+    setIsAccepting(true);
+    try {
+      await dealsService.createTasksBulk(dealId, rawTasksRef.current);
+      await queryClient.invalidateQueries({ queryKey: dealKeys.detail(dealId) });
+      setTasksAccepted(true);
+      toast.success("Đã thêm các task gợi ý vào Deal thành công!");
+    } catch (err) {
+      console.error("Failed to accept tasks:", err);
+      toast.error("Không thể lưu tasks vào Deal.");
+    } finally {
+      setIsAccepting(false);
+    }
   };
 
   const toggleAiTask = (id: string) =>
@@ -214,6 +320,11 @@ export function DealAiAnalyzer() {
               </>
             )}
           </Button>
+          {errorMsg && (
+            <div className="mt-2 text-xs text-red-500 bg-red-50/50 border border-red-100 rounded-lg p-2.5 animate-in fade-in duration-300">
+              {errorMsg}
+            </div>
+          )}
         </div>
       </div>
 
@@ -322,6 +433,38 @@ export function DealAiAnalyzer() {
                   <span className="text-muted-foreground" style={{ fontSize: 11 }}>
                     Đang tạo thêm...
                   </span>
+                </div>
+              )}
+
+              {/* Accept tasks button */}
+              {phase === "done" && (
+                <div className="pt-2 px-3 pb-1 border-t border-border/50">
+                  <Button
+                    onClick={handleAcceptTasks}
+                    disabled={isAccepting || tasksAccepted}
+                    variant={tasksAccepted ? "outline" : "default"}
+                    className={cn(
+                      "w-full h-8 text-xs gap-1.5 transition-all",
+                      tasksAccepted && "bg-green-50 text-green-700 hover:bg-green-50 border-green-200"
+                    )}
+                  >
+                    {isAccepting ? (
+                      <>
+                        <Loader2 size={11} className="animate-spin" />
+                        Đang đồng bộ...
+                      </>
+                    ) : tasksAccepted ? (
+                      <>
+                        <Check size={11} />
+                        Đã chấp nhận và thêm vào Deal
+                      </>
+                    ) : (
+                      <>
+                        <Check size={11} />
+                        Chấp nhận và Thêm Tasks vào Deal
+                      </>
+                    )}
+                  </Button>
                 </div>
               )}
             </div>

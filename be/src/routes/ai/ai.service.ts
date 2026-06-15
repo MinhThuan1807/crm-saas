@@ -96,28 +96,6 @@ export async function saveAiResultAtomic(
       },
     })
 
-    const tasks = parsed.tasks ?? []
-    for (const t of tasks) {
-      let dueDateValue: Date | undefined = undefined
-      if (t.dueDate) {
-        const parsedDate = new Date(t.dueDate)
-        if (!Number.isNaN(parsedDate.getTime())) {
-          dueDateValue = parsedDate
-        } else {
-          log.warn(`Invalid dueDate for task, ignoring dueDate: ${t.dueDate}`, { jobId, dealId })
-        }
-      }
-
-      await tx.task.create({
-        data: {
-          tenantId,
-          dealId,
-          title: t.title,
-          dueDate: dueDateValue,
-        },
-      })
-    }
-
-    return { suggestionsCreated: 3, tasksCreated: tasks.length }
+    return { suggestionsCreated: 3, tasksCreated: 0 }
   })
 }

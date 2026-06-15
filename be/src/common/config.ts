@@ -22,14 +22,33 @@ const ConfigSchema = z.object({
   NODE_ENV: z.string(),
   PORT: z.string(),
 
-  OPENAI_API_KEY: z.string().min(1),
+  OPENAI_API_KEY: z.string().optional(),
   OPENAI_MODEL: z.string().default('gpt-4o-mini'),
+  GROQ_API_KEY: z.string().optional(),
+  GROQ_MODEL: z.string().default('llama-3.3-70b-versatile'),
+  AI_PROVIDER: z.enum(['openai', 'groq']).default('openai'),
+
   REDIS_HOST: z.string().min(1),
   REDIS_PORT: z.coerce.number().int().positive(),
   REDIS_PASSWORD: z.string().optional(),
   REDIS_TLS: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
   RESEND_FROM_EMAIL: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.AI_PROVIDER === 'openai' && !data.OPENAI_API_KEY) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'OPENAI_API_KEY is required when AI_PROVIDER is openai',
+      path: ['OPENAI_API_KEY'],
+    });
+  }
+  if (data.AI_PROVIDER === 'groq' && !data.GROQ_API_KEY) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'GROQ_API_KEY is required when AI_PROVIDER is groq',
+      path: ['GROQ_API_KEY'],
+    });
+  }
 })
 
 // const configServer = plainToInstance(ConfigSchema, process.env);

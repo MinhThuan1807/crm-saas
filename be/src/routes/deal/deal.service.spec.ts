@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { NotFoundException } from '@nestjs/common'
 import { DealService } from './deal.service'
 import { DealRepository } from './deal.repo'
+import { TaskRepository } from './task.repo'
 import { DealStageConst } from './deal.model'
 import { ContactsRepository } from '../contacts/contacts.repo'
 
@@ -48,6 +49,13 @@ const mockContactsRepo = {
   findOne: jest.fn(),
 }
 
+const mockTaskRepo = {
+  create: jest.fn(),
+  createMany: jest.fn(),
+  update: jest.fn(),
+  delete: jest.fn(),
+}
+
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe('DealService', () => {
@@ -59,6 +67,7 @@ describe('DealService', () => {
         DealService,
         { provide: DealRepository, useValue: mockDealRepo },
         { provide: ContactsRepository, useValue: mockContactsRepo },
+        { provide: TaskRepository, useValue: mockTaskRepo },
       ],
     }).compile()
 

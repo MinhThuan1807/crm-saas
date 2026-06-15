@@ -40,4 +40,29 @@ export const dealsService = {
   delete: async (id: string): Promise<void> => {
     await axiosInstance.delete(`deals/${id}`);
   },
+
+  analyze: async (id: string, meetingNote: string): Promise<{ jobId: string }> => {
+    const res = await axiosInstance.post(`deals/${id}/analyze`, { meetingNote });
+    return res.data;
+  },
+
+  createTask: async (dealId: string, title: string, dueDate?: string | null): Promise<any> => {
+    const res = await axiosInstance.post(`deals/${dealId}/tasks`, { title, dueDate });
+    return res.data;
+  },
+
+  createTasksBulk: async (dealId: string, tasks: Array<{ title: string; dueDate?: string | null }>): Promise<any> => {
+    const res = await axiosInstance.post(`deals/${dealId}/tasks/bulk`, { tasks });
+    return res.data;
+  },
+
+  updateTask: async (dealId: string, taskId: string, data: { title?: string; done?: boolean; dueDate?: string | null }): Promise<any> => {
+    const res = await axiosInstance.patch(`deals/${dealId}/tasks/${taskId}`, data);
+    return res.data;
+  },
+
+  deleteTask: async (dealId: string, taskId: string): Promise<any> => {
+    const res = await axiosInstance.delete(`deals/${dealId}/tasks/${taskId}`);
+    return res.data;
+  },
 };

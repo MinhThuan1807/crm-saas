@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Calendar,
   Phone,
@@ -12,6 +12,7 @@ import {
   Target,
   Flag,
   CheckCircle2,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -23,6 +24,13 @@ import { cn } from "@/lib/utils";
 import { DealDetail } from "./types";
 import { Task } from "./types";
 import {  formatCurrency, formatDate, getInitials } from "@/lib/helper";
+import { useQueryClient } from "@tanstack/react-query";
+import { dealKeys } from "@/hooks/useDeals";
+import { dealsService } from "@/services/deals.service";
+import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as ShadcnCalendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 type Priority = "high" | "medium" | "low";
 type DueStatus = "overdue" | "today" | "upcoming" | "done";
@@ -48,33 +56,115 @@ type DealLeftPanelProps = {
 
 // ── Component ───────────────────────────────────────────────────────────────
 export function DealLeftPanel({ deal, onEdit }: DealLeftPanelProps) {
-  const [tasks, setTasks]         = useState<Task[]>(deal?.tasks);
+  const [tasks, setTasks]         = useState<Task[]>(deal?.tasks || []);
   const [addingTask, setAddingTask] = useState(false);
   const [newTitle, setNewTitle]   = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [newDueDate, setNewDueDate] = useState<string | null>(null);
 
-  const toggle = (id: string) =>
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle]   = useState("");
+  const [editingDueDate, setEditingDueDate] = useState<string | null>(null);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    setTasks(deal?.tasks || []);
+  }, [deal?.tasks]);
+
+  const toggle = async (id: string) => {
+    const target = tasks.find((t) => t.id === id);
+    if (!target) return;
+    const oldDone = target.done;
+
+    // Optimistic update local state
     setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t))
+      prev.map((t) => (t.id === id ? { ...t, done: !oldDone } : t))
     );
 
-  const commitAdd = () => {
-    // const title = newTitle.trim();
-    // if (title) {
-    //   setTasks((prev) => [
-    //     ...prev,
-    //     {
-    //       id: `t${Date.now()}`,
-    //       title,
-    //       due: "—",
-    //       done: false,
-    //       priority: "medium",
-    //       dueStatus: "upcoming",
-    //     },
-    //   ]);
-    // }
-    // setNewTitle("");
-    // setAddingTask(false);
+    try {
+      await dealsService.updateTask(deal.id, id, { done: !oldDone });
+      await queryClient.invalidateQueries({ queryKey: dealKeys.detail(deal.id) });
+    } catch (err) {
+      console.error("Failed to update task state:", err);
+      toast.error("Không thể cập nhật trạng thái task.");
+      // Rollback
+      setTasks((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, done: oldDone } : t))
+      );
+    }
+  };
+
+  const commitAdd = async () => {
+    const title = newTitle.trim();
+    if (!title) {
+      setAddingTask(false);
+      setNewDueDate(null);
+      return;
+    }
+
+    setNewTitle("");
+    setNewDueDate(null);
+    setAddingTask(false);
+
+    try {
+      await dealsService.createTask(deal.id, title, newDueDate);
+      await queryClient.invalidateQueries({ queryKey: dealKeys.detail(deal.id) });
+      toast.success("Đã thêm task mới!");
+    } catch (err) {
+      console.error("Failed to add task:", err);
+      toast.error("Không thể tạo task mới.");
+    }
+  };
+
+  const commitEdit = async (taskId: string) => {
+    const title = editingTitle.trim();
+    if (!title) {
+      toast.error("Tiêu đề task không được để trống.");
+      return;
+    }
+
+    // Optimistically update local state
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === taskId
+          ? {
+              ...t,
+              title,
+              dueDate: editingDueDate ? new Date(editingDueDate) : null,
+            }
+          : t
+      )
+    );
+    setEditingTaskId(null);
+
+    try {
+      await dealsService.updateTask(deal.id, taskId, {
+        title,
+        dueDate: editingDueDate ? new Date(editingDueDate).toISOString() : null,
+      });
+      await queryClient.invalidateQueries({ queryKey: dealKeys.detail(deal.id) });
+      toast.success("Đã cập nhật task!");
+    } catch (err) {
+      console.error("Failed to update task:", err);
+      toast.error("Không thể cập nhật task.");
+      await queryClient.invalidateQueries({ queryKey: dealKeys.detail(deal.id) });
+    }
+  };
+
+  const handleDeleteTask = async (id: string) => {
+    // Optimistic delete local state
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+
+    try {
+      await dealsService.deleteTask(deal.id, id);
+      await queryClient.invalidateQueries({ queryKey: dealKeys.detail(deal.id) });
+      toast.success("Đã xóa task thành công!");
+    } catch (err) {
+      console.error("Failed to delete task:", err);
+      toast.error("Không thể xóa task.");
+      await queryClient.invalidateQueries({ queryKey: dealKeys.detail(deal.id) });
+    }
   };
 
   const currentStageIdx = PIPELINE_STAGES.findIndex(
@@ -350,79 +440,192 @@ export function DealLeftPanel({ deal, onEdit }: DealLeftPanelProps) {
 
         {/* Task rows */}
         <div className="space-y-1.5">
-          {tasks.map((task) => (
-            <div
-              key={task.id}
-              onClick={() => toggle(task.id)}
-              className={cn(
-                "flex items-start gap-2.5 px-3 py-2.5 rounded-lg border cursor-pointer transition-all select-none",
-                task.done
-                  ? "border-green-100 bg-green-50/60"
-                  : "border-border bg-background hover:bg-muted/20"
-              )}
-            >
-              <Checkbox
-                checked={task.done}
-                onCheckedChange={() => toggle(task.id)}
-                className="mt-0.5 shrink-0 outline-1 border-2 border-border cursor-pointer hover:border-primary "
-                onClick={(e) => e.stopPropagation()}
-              />
-              <div className="flex-1 min-w-0">
-                <p
-                  className={cn(
-                    "leading-snug",
-                    task.done ? "text-muted-foreground line-through" : "text-foreground"
-                  )}
-                  style={{ fontSize: 13, fontWeight: 500 }}
+          {tasks.map((task) => {
+            const isEditing = editingTaskId === task.id;
+
+            if (isEditing) {
+              return (
+                <div
+                  key={task.id}
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex flex-col gap-2 p-3 rounded-lg border border-primary/40 bg-secondary/10"
                 >
-                  {task.title}
-                </p>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <Calendar size={9} strokeWidth={1.7} className="text-muted-foreground shrink-0" />
-                  <span
-                    // className={cn(
-                    //   task.done
-                    //     ? "text-muted-foreground"
-                    //     : task.dueStatus === "overdue"
-                    //     ? "text-red-500"
-                    //     : task.dueStatus === "today"
-                    //     ? "text-orange-500"
-                    //     : "text-muted-foreground"
-                    // )}
-                    style={{ fontSize: 11 }}
+                  <input
+                    value={editingTitle}
+                    onChange={(e) => setEditingTitle(e.target.value)}
+                    placeholder="Tên task..."
+                    className="w-full bg-background border border-border rounded px-2 py-1 outline-none text-foreground text-xs"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") commitEdit(task.id);
+                      if (e.key === "Escape") setEditingTaskId(null);
+                    }}
+                  />
+                  <div className="flex items-center justify-between gap-2">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="h-7 px-2 text-xs flex items-center gap-1.5 bg-background border-border text-muted-foreground hover:text-foreground"
+                        >
+                          <Calendar size={12} />
+                          {editingDueDate ? format(new Date(editingDueDate), "dd/MM/yyyy") : "Chọn hạn chót"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 bg-white" align="start">
+                        <ShadcnCalendar
+                          mode="single"
+                          selected={editingDueDate ? new Date(editingDueDate) : undefined}
+                          onSelect={(date) => {
+                            setEditingDueDate(date ? date.toISOString().split("T")[0] : null);
+                          }}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 px-2 text-xs text-muted-foreground"
+                        onClick={() => setEditingTaskId(null)}
+                      >
+                        Hủy
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="h-7 px-2 text-xs bg-primary text-white"
+                        onClick={() => commitEdit(task.id)}
+                      >
+                        Lưu
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <div
+                key={task.id}
+                onClick={() => toggle(task.id)}
+                className={cn(
+                  "flex items-start gap-2.5 px-3 py-2.5 rounded-lg border cursor-pointer transition-all select-none group",
+                  task.done
+                    ? "border-green-100 bg-green-50/60"
+                    : "border-border bg-background hover:bg-muted/20"
+                )}
+              >
+                <Checkbox
+                  checked={task.done}
+                  onCheckedChange={() => toggle(task.id)}
+                  className="mt-0.5 shrink-0 outline-1 border-2 border-border cursor-pointer hover:border-primary "
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <div className="flex-1 min-w-0">
+                  <p
+                    className={cn(
+                      "leading-snug",
+                      task.done ? "text-muted-foreground line-through" : "text-foreground"
+                    )}
+                    style={{ fontSize: 13, fontWeight: 500 }}
                   >
-                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "Không hạn chót"}
-                    {/* {!task.done && task.dueStatus === "overdue" && " · Quá hạn"} */}
-                    {/* {!task.done && task.dueStatus === "today"   && " · Hôm nay"} */}
-                    {/* {!task.done && task.dueStatus === "today"   && " · Hôm nay"} */}
-                  </span>
+                    {task.title}
+                  </p>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <Calendar size={9} strokeWidth={1.7} className="text-muted-foreground shrink-0" />
+                    <span style={{ fontSize: 11 }} className="text-muted-foreground">
+                      {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "Không hạn chót"}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingTaskId(task.id);
+                      setEditingTitle(task.title);
+                      setEditingDueDate(task.dueDate ? new Date(task.dueDate).toISOString().split("T")[0] : null);
+                    }}
+                    className="p-1 text-muted-foreground hover:text-primary rounded hover:bg-muted shrink-0 mt-0.5 bg-transparent border-0 cursor-pointer"
+                  >
+                    <Edit2 size={12} />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteTask(task.id);
+                    }}
+                    className="p-1 text-muted-foreground hover:text-red-500 rounded hover:bg-muted shrink-0 mt-0.5 bg-transparent border-0 cursor-pointer"
+                  >
+                    <Trash2 size={12} />
+                  </button>
                 </div>
               </div>
-              {/* Priority dot */}
-              <div
-                className="size-1.5 rounded-full shrink-0 mt-1.5"
-                // style={{ background: task.done ? "#d1d5db" : PRIORITY_DOT[task.priority] }}
-              />
-            </div>
-          ))}
+            );
+          })}
 
           {/* Inline new task input */}
           {addingTask && (
-            <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-primary/40 bg-secondary/20">
-              <Checkbox disabled className="shrink-0 mt-0.5 opacity-50" />
+            <div className="flex flex-col gap-2 p-3 rounded-lg border border-primary/40 bg-secondary/10">
               <input
                 ref={inputRef}
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="Tên task mới..."
+                className="w-full bg-background border border-border rounded px-2 py-1 outline-none text-foreground text-xs"
                 onKeyDown={(e) => {
-                  if (e.key === "Enter")  commitAdd();
-                  if (e.key === "Escape") { setAddingTask(false); setNewTitle(""); }
+                  if (e.key === "Enter") commitAdd();
+                  if (e.key === "Escape") {
+                    setAddingTask(false);
+                    setNewTitle("");
+                    setNewDueDate(null);
+                  }
                 }}
-                onBlur={commitAdd}
-                placeholder="Tên task mới... (Enter để thêm)"
-                className="flex-1 bg-transparent border-0 outline-none text-foreground placeholder:text-muted-foreground/50"
-                style={{ fontSize: 13 }}
               />
+              <div className="flex items-center justify-between gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="h-7 px-2 text-xs flex items-center gap-1.5 bg-background border-border text-muted-foreground hover:text-foreground"
+                    >
+                      <Calendar size={12} />
+                      {newDueDate ? format(new Date(newDueDate), "dd/MM/yyyy") : "Chọn hạn chót"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-white" align="start">
+                    <ShadcnCalendar
+                      mode="single"
+                      selected={newDueDate ? new Date(newDueDate) : undefined}
+                      onSelect={(date) => {
+                        setNewDueDate(date ? date.toISOString().split("T")[0] : null);
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+                
+                <div className="flex gap-1">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 px-2 text-xs text-muted-foreground"
+                    onClick={() => {
+                      setAddingTask(false);
+                      setNewTitle("");
+                      setNewDueDate(null);
+                    }}
+                  >
+                    Hủy
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="h-7 px-2 text-xs bg-primary text-white"
+                    onClick={commitAdd}
+                  >
+                    Thêm
+                  </Button>
+                </div>
+              </div>
             </div>
           )}
         </div>

@@ -12,9 +12,12 @@ import {
   AnalyzeDealResType,
 } from './deal.model'
 import { DealRepository } from './deal.repo'
+import { TaskRepository } from './task.repo'
+import { CreateTaskBodyType, UpdateTaskBodyType } from './task.model'
 import { AiService } from '../ai/ai.service'
 import { ContactsRepository } from '../contacts/contacts.repo'
 import { ROLE } from 'src/common/constants/role.constanst'
+import { PrismaService } from 'src/common/services/prisma.service'
 
 @Injectable()
 export class DealService {
@@ -22,6 +25,8 @@ export class DealService {
     private readonly dealRepo: DealRepository,
     private readonly aiService: AiService,
     private readonly contactsRepo: ContactsRepository,
+    private readonly prisma: PrismaService,
+    private readonly taskRepo: TaskRepository,
   ) {}
 
   async create(tenantId: string, data: CreateDealBodyType, userContext?: { userId: string; role: string }) {
@@ -115,5 +120,21 @@ export class DealService {
     })
 
     return { jobId }
+  }
+
+  async createTask(dealId: string, tenantId: string, data: CreateTaskBodyType) {
+    return this.taskRepo.create(dealId, tenantId, data)
+  }
+
+  async createTasksBulk(dealId: string, tenantId: string, tasks: CreateTaskBodyType[]) {
+    return this.taskRepo.createMany(dealId, tenantId, tasks)
+  }
+
+  async updateTask(dealId: string, tenantId: string, taskId: string, data: UpdateTaskBodyType) {
+    return this.taskRepo.update(dealId, tenantId, taskId, data)
+  }
+
+  async deleteTask(dealId: string, tenantId: string, taskId: string) {
+    return this.taskRepo.delete(dealId, tenantId, taskId)
   }
 }
