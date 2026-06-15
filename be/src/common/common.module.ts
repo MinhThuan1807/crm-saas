@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { PrismaService } from './services/prisma.service';
 import { TokenService } from './services/token.service';
 import { HashingService } from './services/hashing.service';
@@ -9,7 +9,7 @@ import { MailService } from './services/mail.service';
 
 // const sharedProviders = PrismaService;
 const sharedProviders = [PrismaService, TokenService, HashingService , SharedUserRepository, RedisService, MailService];
-
+@Global()
 @Module({
    imports: [
     JwtModule.register({}), 

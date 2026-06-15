@@ -51,4 +51,20 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async clear() {
     await this.redis.flushdb();
   }
+  // Tăng thêm bản cache của tenant lên 1 (hủy toàn bộ cache cũ)
+  async invalidateTenantCache(tenantId: string): Promise<number> {
+    const key = `cache:tenant_version:${tenantId}`
+    return await this.redis.incr(key);
+  }
+
+  //Lấy phiên bản cache hiện tại của tenant
+  async getTenantCacheVersion(tenantId: string): Promise<string> {
+    const key = `cache:tenant_version:${tenantId}`;
+    let version = await this.redis.get(key);
+    if(!version) {
+      version = '1';
+      await this.redis.set(key, version);
+    }
+    return version;
+  }
 }

@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ContactsRepository } from './contacts.repo';
 import { CreateContactBodyType, GetContactsQueryType } from './contacts.model';
+import { RedisService } from 'src/common/services/redis.service';
 
 @Injectable()
 export class ContactsService {
-  constructor(private readonly contactRepository: ContactsRepository) {}
+  constructor(
+    private readonly contactRepository: ContactsRepository,
+    private readonly redisService: RedisService,
+  ) {}
 
   async getAllContacts(tenantId: string, query: GetContactsQueryType, userContext?: { userId: string; role: string }) {
       const { cursor, limit, search } = query;
@@ -39,8 +43,10 @@ export class ContactsService {
     return contact;
   }
 
-  createContact(tenantId: string, ownerId: string, body: CreateContactBodyType) {
-    return this.contactRepository.create(tenantId, ownerId, body)
+  async createContact(tenantId: string, ownerId: string, body: CreateContactBodyType) {
+    const result = await this.contactRepository.create(tenantId, ownerId, body)
+    await this.redisService.invalidateTenantCache(tenantId)
+    return result
   }
 
   async update(contactId: string, tenantId: string, body: Partial<CreateContactBodyType>, userContext?: { userId: string; role: string }) {
@@ -48,7 +54,9 @@ export class ContactsService {
     if (!exits) {
       throw new NotFoundException('Hợp đồng không tồn tại');
     }
-    return this.contactRepository.update(contactId, tenantId, body);
+    const result = await this.contactRepository.update(contactId, tenantId, body);
+    await this.redisService.invalidateTenantCache(tenantId)
+    return result
   }
 
   async delete(contactId: string, tenantId: string, userContext?: { userId: string; role: string }) {
@@ -56,7 +64,9 @@ export class ContactsService {
     if (!exits) {
       throw new NotFoundException('Hợp đồng không tồn tại');
     }
-    return this.contactRepository.delete(contactId, tenantId)
+    const result = await this.contactRepository.delete(contactId, tenantId)
+    await this.redisService.invalidateTenantCache(tenantId)
+    return result
   }
 
   async restore(contactId: string, tenantId: string, userContext?: { userId: string; role: string }) {
@@ -64,7 +74,9 @@ export class ContactsService {
     if (!exits) {
       throw new NotFoundException('Hợp đồng không tồn tại');
     }
-    return this.contactRepository.restore(contactId, tenantId)
+    const result = await this.contactRepository.restore(contactId, tenantId)
+    await this.redisService.invalidateTenantCache(tenantId)
+    return result
   }
 }
 

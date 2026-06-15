@@ -12,6 +12,7 @@ import { ActivityWithRelations } from './activities.repo'
 import { ContactsRepository } from '../contacts/contacts.repo'
 import { DealRepository } from '../deal/deal.repo'
 import { ROLE } from 'src/common/constants/role.constanst'
+import { RedisService } from 'src/common/services/redis.service'
 
 @Injectable()
 export class ActivitiesService {
@@ -19,6 +20,7 @@ export class ActivitiesService {
     private readonly activitiesRepo: ActivitiesRepository,
     private readonly contactsRepo: ContactsRepository,
     private readonly dealRepo: DealRepository,
+    private readonly redisService: RedisService,
   ) {}
 
   // Tạo activity gắn với contact — validate contact thuộc tenant trước
@@ -32,7 +34,9 @@ export class ActivitiesService {
     const contact = await this.contactsRepo.findOne(contactId, tenantId, userContext)
     if (!contact) throw new NotFoundException('Liên hệ không tồn tại')
 
-    return this.activitiesRepo.create(tenantId, userId, body, { contactId })
+    const activity = await this.activitiesRepo.create(tenantId, userId, body, { contactId })
+    await this.redisService.invalidateTenantCache(tenantId)
+    return activity
   }
 
   // Tạo activity gắn với deal — validate deal thuộc tenant trước
@@ -55,10 +59,12 @@ export class ActivitiesService {
 
     const targetContactId = body.contactId || deal.contactId
 
-    return this.activitiesRepo.create(tenantId, userId, body, {
+    const activity = await this.activitiesRepo.create(tenantId, userId, body, {
       dealId,
       contactId: targetContactId,
     })
+    await this.redisService.invalidateTenantCache(tenantId)
+    return activity
   }
 
   // Lấy activities theo contact — validate contact trước
@@ -118,7 +124,9 @@ export class ActivitiesService {
       throw new ForbiddenException('Bạn không có quyền sửa hoạt động này')
     }
 
-    return this.activitiesRepo.update(activityId, tenantId, body)
+    const activity = await this.activitiesRepo.update(activityId, tenantId, body)
+    await this.redisService.invalidateTenantCache(tenantId)
+    return activity
   }
 
   // Hard delete — Activity không có deletedAt (Audit-safe Lock)
@@ -137,6 +145,7 @@ export class ActivitiesService {
 
     try {
       await this.activitiesRepo.hardDelete(activityId, tenantId)
+      await this.redisService.invalidateTenantCache(tenantId)
       return { message: 'Xóa hoạt động thành công' }
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {

@@ -186,6 +186,7 @@ new Worker(
 
     try {
       await saveAiResultAtomic(prisma, aiResult!, jobId, tenantId, dealId, meetingNote)
+      await connection.incr(`cache:tenant_version:${tenantId}`)
       // publish ai-complete to any SSE subscribers
       try {
         publishAiEvent(tenantId, dealId, 'ai-complete', {
