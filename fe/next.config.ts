@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   async rewrites() {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.codelaicuocdoi.io.vn";
     return [
       {
         source: "/api/:path*",
