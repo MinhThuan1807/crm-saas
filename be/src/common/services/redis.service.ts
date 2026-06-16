@@ -11,6 +11,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       host: envConfig.REDIS_HOST,
       port: envConfig.REDIS_PORT,
       password: process.env.REDIS_PASSWORD, 
+      tls: {},
     });
 
     this.redis.on('connect', () => {
