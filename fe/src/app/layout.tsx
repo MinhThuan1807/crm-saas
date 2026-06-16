@@ -17,6 +17,7 @@ const geistInter = Geist({
 export const metadata: Metadata = {
   title: "CRM Multi tenant Saas",
   description: "Hệ thống quản lý khách hàng dành cho SME Việt Nam: pipeline bán hàng, chăm sóc khách hàng, và AI gợi ý follow-up.",
+  referrer: "no-referrer-when-downgrade",
 };
 
 export default function RootLayout({
