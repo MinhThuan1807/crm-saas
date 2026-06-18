@@ -7,11 +7,12 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   private redis: Redis;
 
   async onModuleInit() {
+    const useTls = envConfig.REDIS_TLS === 'true';
     this.redis = new Redis({
       host: envConfig.REDIS_HOST,
       port: envConfig.REDIS_PORT,
       password: process.env.REDIS_PASSWORD, 
-      tls: {},
+      tls: useTls ? {} : undefined,
     });
 
     this.redis.on('connect', () => {
