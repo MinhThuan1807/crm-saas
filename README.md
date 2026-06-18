@@ -44,15 +44,20 @@ Hệ thống quản lý quan hệ khách hàng (CRM) dưới dạng phần mềm
 
 *Dưới đây là một số giao diện tiêu biểu của hệ thống:*
 
-| **Dashboard Phân Tích & Báo Cáo** | **Kanban Board quản lý Deal Pipeline** |
+| **Dashboard Phân Tích** | **Báo Cáo & Thống Kê** |
 | --- | --- |
-| ![Dashboard](assets/dashboard.jpg) | ![Kanban Board](assets/pipeline.jpg) |
-| *Biểu đồ thống kê doanh thu, tỷ lệ chuyển đổi và hiệu suất sales.* | *Kéo thả mượt mà để cập nhật trạng thái các cơ hội bán hàng.* |
+| ![Dashboard](assets/dashboard.jpg) | ![Báo Cáo](assets/reports.jpg) |
+| *Biểu đồ thống kê doanh thu và tổng quan hoạt động kinh doanh.* | *Phân tích chi tiết phễu bán hàng và báo cáo hiệu suất.* |
 
-| **AI Meeting Brief & Action Items** | **Cấu hình Phân quyền & Multi-Tenant** |
+| **Kanban Board quản lý Deal Pipeline** | **AI Meeting Brief & Action Items** |
 | --- | --- |
-| ![AI Integration](assets/AI-intergation.jpg) | ![Tenant Settings](assets/tenant%20isolation.jpg) |
-| *AI tự động phân tích ghi chú cuộc họp và đề xuất danh sách công việc.* | *Quản lý phân quyền chặt chẽ giữa các doanh nghiệp độc lập.* |
+| ![Kanban Board](assets/pipeline.jpg) | ![AI Integration](assets/AI-intergation.jpg) |
+| *Kéo thả mượt mà để cập nhật trạng thái các cơ hội bán hàng.* | *AI tự động phân tích ghi chú cuộc họp và đề xuất danh sách công việc.* |
+
+| **Cấu hình Phân quyền & Multi-Tenant** |
+| --- |
+| ![Tenant Settings](assets/tenant%20isolation.jpg) |
+| *Quản lý phân quyền chặt chẽ giữa các doanh nghiệp độc lập.* |
 
 ---
 
@@ -276,5 +281,5 @@ docker run --name crm-redis -p 6379:6379 -d redis
 
 ## 📝 Bản Quyền & Giấy Phép
 Dự án được phân phối dưới giấy phép **MIT License**. Bạn có thể tự do clone và phát triển thêm.  
-*Liên hệ hỗ trợ hoặc đóng góp ý kiến qua email: `nguyenthuan05.word@gmail.com`*
+*Liên hệ hỗ trợ hoặc đóng góp ý kiến qua email: `nguyenthuan05.work@gmail.com`*
 
