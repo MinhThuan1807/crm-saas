@@ -18,17 +18,15 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { RecentDealType } from "@/lib/validations/dashboard.schema";
+import { getInitials, getAvatarColors, formatVndShort, STAGE_COLORS } from "@/lib/helper";
 
 interface Deal {
   id: string;
   title: string;
   company: string;
   stage: string;
-  stageBg: string;
-  stageColor: string;
-  value: string;
-  owner: { initials: string; bg: string; color: string };
+  value: number;
+  owner: { id: string; name: string };
   daysAgo: number;
 }
 
@@ -37,55 +35,45 @@ const MOCK_DEALS: Deal[] = [
     id: "d1",
     title: "Security Audit Platform",
     company: "Ngân hàng JKL",
-    stage: "Proposal",
-    stageBg: "#FEF3E2",
-    stageColor: "#854F0B",
-    value: "480tr",
-    owner: { initials: "TH", bg: "#D4F5E4", color: "#1A5C38" },
+    stage: "PROPOSAL",
+    value: 480000000,
+    owner: { id: "u1", name: "Trần Thị Hương" },
     daysAgo: 0,
   },
   {
     id: "d2",
     title: "ERP Implementation",
     company: "Tập đoàn MNO",
-    stage: "Qualified",
-    stageBg: "#E6F4D7",
-    stageColor: "#3B6D11",
-    value: "720tr",
-    owner: { initials: "NQ", bg: "#D4E8F5", color: "#1A4C6A" },
+    stage: "QUALIFIED",
+    value: 720000000,
+    owner: { id: "u2", name: "Nguyễn Quang" },
     daysAgo: 1,
   },
   {
     id: "d3",
     title: "Cloud Migration",
     company: "Công ty Cổ phần PQR",
-    stage: "Prospect",
-    stageBg: "#EEEDFE",
-    stageColor: "#534AB7",
-    value: "320tr",
-    owner: { initials: "PL", bg: "#F5D4D4", color: "#6A1A1A" },
+    stage: "PROSPECT",
+    value: 320000000,
+    owner: { id: "u3", name: "Phạm Thị Lan" },
     daysAgo: 2,
   },
   {
     id: "d4",
     title: "HR Management System",
     company: "Tập đoàn STU",
-    stage: "Closed Won",
-    stageBg: "#DCFCE7",
-    stageColor: "#166534",
-    value: "195tr",
-    owner: { initials: "VD", bg: "#FFF0D4", color: "#6A400A" },
+    stage: "CLOSED_WON",
+    value: 195000000,
+    owner: { id: "u4", name: "Vũ Đức Minh" },
     daysAgo: 3,
   },
   {
     id: "d5",
     title: "Data Analytics Dashboard",
     company: "Cty TNHH VWX",
-    stage: "Proposal",
-    stageBg: "#FEF3E2",
-    stageColor: "#854F0B",
-    value: "560tr",
-    owner: { initials: "LT", bg: "#EEE8FD", color: "#3D2D8A" },
+    stage: "PROPOSAL",
+    value: 560000000,
+    owner: { id: "u5", name: "Lê Thị Thu" },
     daysAgo: 5,
   },
 ];
@@ -99,7 +87,7 @@ function timeLabel(daysAgo: number) {
 }
 
 interface RecentDealsProps {
-  deals?: RecentDealType[];
+  deals?: Deal[];
   isLoading?: boolean;
 }
 
@@ -202,22 +190,27 @@ export function RecentDeals({ deals = MOCK_DEALS, isLoading = false }: RecentDea
 
                   {/* Stage badge */}
                   <TableCell className="px-2 py-3">
-                    <span
-                      className="inline-block rounded-full px-2 py-0.5 whitespace-nowrap"
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 500,
-                        color: deal.stageColor,
-                        background: deal.stageBg,
-                      }}
-                    >
-                      {deal.stage}
-                    </span>
+                    {(() => {
+                      const stageColors = STAGE_COLORS[deal.stage as keyof typeof STAGE_COLORS] || STAGE_COLORS.PROSPECT;
+                      return (
+                        <span
+                          className="inline-block rounded-full px-2 py-0.5 whitespace-nowrap"
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 500,
+                            color: stageColors.text,
+                            background: stageColors.bg,
+                          }}
+                        >
+                          {stageColors.label}
+                        </span>
+                      );
+                    })()}
                   </TableCell>
 
                   {/* Value */}
                   <TableCell className="px-2 py-3 text-foreground tabular-nums" style={{ fontSize: 13, fontWeight: 600 }}>
-                    {deal.value}
+                    {formatVndShort(deal.value)}
                   </TableCell>
 
                   {/* Owner */}
@@ -226,13 +219,13 @@ export function RecentDeals({ deals = MOCK_DEALS, isLoading = false }: RecentDea
                       <AvatarFallback
                         className="border-0"
                         style={{
-                          background: deal.owner.bg,
-                          color: deal.owner.color,
+                          background: getAvatarColors(deal.owner.id).bg,
+                          color: getAvatarColors(deal.owner.id).color,
                           fontSize: 10,
                           fontWeight: 600,
                         }}
                       >
-                        {deal.owner.initials}
+                        {getInitials(deal.owner.name)}
                       </AvatarFallback>
                     </Avatar>
                   </TableCell>

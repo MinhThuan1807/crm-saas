@@ -15,6 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMe } from "@/hooks/useAuth";
 import { dashboardService } from "@/services/dashboard.service";
 import { DashboardPeriod } from "@/lib/validations/dashboard.schema";
+import { formatVndShort } from "@/lib/helper";
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState<DashboardPeriod>("quarter");
@@ -109,22 +110,43 @@ export default function DashboardPage() {
             <div className="grid grid-cols-4 gap-4">
               <MetricCard
                 label={dashboardData.metrics.totalDealValue.label}
-                value={dashboardData.metrics.totalDealValue.value}
-                trend={dashboardData.metrics.totalDealValue.trend}
+                value={formatVndShort(dashboardData.metrics.totalDealValue.value)}
+                trend={
+                  dashboardData.metrics.totalDealValue.trend
+                    ? {
+                        value: `${dashboardData.metrics.totalDealValue.trend.value >= 0 ? "+" : ""}${dashboardData.metrics.totalDealValue.trend.value}%`,
+                        positive: dashboardData.metrics.totalDealValue.trend.positive,
+                      }
+                    : undefined
+                }
                 subtext={dashboardData.metrics.totalDealValue.subtext}
                 icon={Wallet}
               />
               <MetricCard
                 label={dashboardData.metrics.openDeals.label}
-                value={dashboardData.metrics.openDeals.value}
-                trend={dashboardData.metrics.openDeals.trend}
+                value={String(dashboardData.metrics.openDeals.value)}
+                trend={
+                  dashboardData.metrics.openDeals.trend
+                    ? {
+                        value: `${dashboardData.metrics.openDeals.trend.value >= 0 ? "+" : ""}${dashboardData.metrics.openDeals.trend.value} ${period === "week" ? "tuần này" : period === "quarter" ? "quý này" : "tháng này"}`,
+                        positive: dashboardData.metrics.openDeals.trend.positive,
+                      }
+                    : undefined
+                }
                 subtext={dashboardData.metrics.openDeals.subtext}
                 icon={GitBranch}
               />
               <MetricCard
                 label={dashboardData.metrics.winRate.label}
-                value={dashboardData.metrics.winRate.value}
-                trend={dashboardData.metrics.winRate.trend}
+                value={`${dashboardData.metrics.winRate.value}%`}
+                trend={
+                  dashboardData.metrics.winRate.trend
+                    ? {
+                        value: `${dashboardData.metrics.winRate.trend.value >= 0 ? "+" : ""}${dashboardData.metrics.winRate.trend.value}%`,
+                        positive: dashboardData.metrics.winRate.trend.positive,
+                      }
+                    : undefined
+                }
                 subtext={dashboardData.metrics.winRate.subtext}
                 icon={Target}
                 iconBg="#FEE2E2"
@@ -132,7 +154,7 @@ export default function DashboardPage() {
               />
               <MetricCard
                 label={dashboardData.metrics.monthlyRevenue.label}
-                value={dashboardData.metrics.monthlyRevenue.value}
+                value={formatVndShort(dashboardData.metrics.monthlyRevenue.value)}
                 icon={TrendingUp}
                 progress={dashboardData.metrics.monthlyRevenue.progress}
               />

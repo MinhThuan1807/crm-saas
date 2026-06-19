@@ -15,6 +15,7 @@ import { TeamPerformanceTab } from "./_components/TeamPerformanceTab";
 import { PipelineAnalysisTab } from "./_components/PipelineAnalysisTab";
 import { ActivityReportTab } from "./_components/ActivityReportTab";
 import { reportsService } from "@/services/reports.service";
+import { formatVndShort } from "@/lib/helper";
 
 // ── Tabs ─────────────────────────────────────────────────────────────────────
 type Tab = "overview" | "team" | "pipeline" | "activity";
@@ -166,32 +167,31 @@ export default function ReportsPage() {
                 <div className="grid grid-cols-5 gap-4">
                   <KpiCard
                     label="Tổng doanh thu"
-                    value={overviewData.kpis.totalRevenue.value}
+                    value={formatVndShort(overviewData.kpis.totalRevenue.value)}
                     delta={overviewData.kpis.totalRevenue.delta}
                     up={overviewData.kpis.totalRevenue.up}
                   />
                   <KpiCard
                     label="Tổng deals đóng"
-                    value={overviewData.kpis.closedDeals.value}
+                    value={String(overviewData.kpis.closedDeals.value)}
                     delta={overviewData.kpis.closedDeals.delta}
                     up={overviewData.kpis.closedDeals.up}
-                    subtext={overviewData.kpis.closedDeals.subtext}
                   />
                   <KpiCard
                     label="Win rate TB"
-                    value={overviewData.kpis.winRate.value}
+                    value={`${overviewData.kpis.winRate.value}%`}
                     delta={overviewData.kpis.winRate.delta}
                     up={overviewData.kpis.winRate.up}
                   />
                   <KpiCard
                     label="Avg deal size"
-                    value={overviewData.kpis.avgDealSize.value}
+                    value={formatVndShort(overviewData.kpis.avgDealSize.value)}
                     delta={overviewData.kpis.avgDealSize.delta}
                     up={overviewData.kpis.avgDealSize.up}
                   />
                   <KpiCard
                     label="Avg days to close"
-                    value={overviewData.kpis.avgDaysToClose.value}
+                    value={`${overviewData.kpis.avgDaysToClose.value} ngày`}
                     delta={overviewData.kpis.avgDaysToClose.delta}
                     up={overviewData.kpis.avgDaysToClose.up}
                   />
@@ -206,7 +206,7 @@ export default function ReportsPage() {
                 {/* Row 3: Win/Loss Chart only */}
                 <div className="grid grid-cols-3 gap-4">
                   <div className="col-span-2">
-                    <WinLossChart />
+                    <WinLossChart data={overviewData.winLossData} />
                   </div>
                   <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-5 flex flex-col justify-between">
                     <div>
@@ -219,7 +219,7 @@ export default function ReportsPage() {
                     {/* Hiển thị chỉ số KPI Win Rate thực tế để lấp khoảng trống ở giữa */}
                     <div className="flex flex-col items-center justify-center py-6">
                       <span className="text-[#534AB7] text-4xl font-bold tracking-tight">
-                        {overviewData.kpis.winRate.value}
+                        {overviewData.kpis.winRate.value}%
                       </span>
                       <span className="text-[#6B6B67] mt-1" style={{ fontSize: 11 }}>
                         Tỷ lệ thắng trung bình kỳ này

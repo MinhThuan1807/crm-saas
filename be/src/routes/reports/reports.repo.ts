@@ -14,6 +14,13 @@ export class ReportsRepository {
         createdAt: { gte: start, lte: end },
         ...userFilter,
       },
+      include: {
+        activities: {
+          select: {
+            id: true,
+          },
+        },
+      },
     })
   }
 

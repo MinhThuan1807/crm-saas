@@ -7,13 +7,14 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { formatVndShort } from "@/lib/helper";
 
 interface MetricCardProps {
   label: string;
   value: string;
   subtext?: string;
   trend?: { value: string; positive: boolean };
-  progress?: { current: number; target: number; label: string };
+  progress?: { current: number; target: number; label?: string };
   icon?: LucideIcon;
   iconBg?: string;
   iconColor?: string;
@@ -94,7 +95,7 @@ export function MetricCard({
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground" style={{ fontSize: 11 }}>
-                {progress.label}
+                {progress.label || `Target: ${formatVndShort(progress.target)}`}
               </span>
               <span
                 style={{

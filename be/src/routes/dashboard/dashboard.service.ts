@@ -10,64 +10,6 @@ const TARGET_REVENUE_VND = process.env.MONTHLY_REVENUE_TARGET
   ? parseInt(process.env.MONTHLY_REVENUE_TARGET, 10)
   : 500000000
 
-const AVATAR_COLORS = [
-  { bg: '#D4F5E4', color: '#1A5C38' }, // Greenish
-  { bg: '#D4E8F5', color: '#1A4C6A' }, // Bluish
-  { bg: '#F5D4D4', color: '#6A1A1A' }, // Reddish
-  { bg: '#FFF0D4', color: '#6A400A' }, // Orangish
-  { bg: '#EEE8FD', color: '#3D2D8A' }, // Purplish
-]
-
-const STAGE_COLORS = {
-  PROSPECT: { funnel: '#C4C0F0', bg: '#EEEDFE', text: '#534AB7' },
-  QUALIFIED: { funnel: '#9B94E3', bg: '#E6F4D7', text: '#3B6D11' },
-  PROPOSAL: { funnel: '#7168CC', bg: '#FEF3E2', text: '#854F0B' },
-  CLOSED_WON: { funnel: '#534AB7', bg: '#DCFCE7', text: '#166534' },
-  CLOSED_LOST: { funnel: '#E11D48', bg: '#FEE2E2', text: '#A32D2D' },
-}
-
-const ACTIVITY_CONFIG = {
-  CALL: { bg: '#E6F4D7', color: '#3B6D11' },
-  EMAIL: { bg: '#EEEDFE', color: '#534AB7' },
-  MEETING: { bg: '#FEF3E2', color: '#854F0B' },
-  NOTE: { bg: '#F1EFE8', color: '#6B6B67' },
-}
-
-function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/)
-  if (parts.length >= 2) {
-    const first = parts[0][0]
-    const last = parts[parts.length - 1][0]
-    return (first + last).toUpperCase()
-  }
-  return parts[0] ? parts[0][0].toUpperCase() : ''
-}
-
-function getAvatarColors(id: string) {
-  let hash = 0
-  for (let i = 0; i < id.length; i++) {
-    hash = id.charCodeAt(i) + ((hash << 5) - hash)
-  }
-  const index = Math.abs(hash) % AVATAR_COLORS.length
-  return AVATAR_COLORS[index]
-}
-
-function formatVnd(value: number): string {
-  if (value >= 1e9) {
-    const b = value / 1e9
-    return `${Number(b.toFixed(1))} tỷ`
-  }
-  if (value >= 1e6) {
-    const m = value / 1e6
-    return `${Number(m.toFixed(1))}tr`
-  }
-  if (value >= 1e3) {
-    const k = value / 1e3
-    return `${Number(k.toFixed(1))}k`
-  }
-  return `${value}`
-}
-
 function getPeriodRanges(period: DashboardPeriodType) {
   const now = new Date()
   const currentStart = new Date(now)
@@ -210,8 +152,7 @@ export class DashboardService {
       return {
         name: stage.name,
         count,
-        value: formatVnd(totalValue),
-        color: STAGE_COLORS[stage.key].funnel,
+        value: totalValue,
       }
     })
 
@@ -242,7 +183,7 @@ export class DashboardService {
           id: u.id,
           name: u.name,
           deals: dealsCount,
-          revenue: Math.round(revenue / 1e6), // in millions
+          revenue: Math.round(revenue),
         }
       }),
     )
@@ -253,15 +194,12 @@ export class DashboardService {
       .sort((a, b) => b.revenue - a.revenue || b.deals - a.deals)
       .slice(0, 5)
       .map((rep, idx) => {
-        const colors = getAvatarColors(rep.id)
         return {
           rank: idx + 1,
-          initials: getInitials(rep.name),
+          userId: rep.id,
           name: rep.name,
           deals: rep.deals,
           revenue: rep.revenue,
-          avatarBg: colors.bg,
-          avatarColor: colors.color,
         }
       })
 
@@ -284,21 +222,16 @@ export class DashboardService {
     const recentDeals = recentDealsRaw.map((d) => {
       const diffTime = Math.abs(now.getTime() - d.createdAt.getTime())
       const daysAgo = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-      const stageColors = STAGE_COLORS[d.stage] || STAGE_COLORS.PROSPECT
-      const ownerColors = getAvatarColors(d.owner.id)
 
       return {
         id: d.id,
         title: d.title,
         company: d.contact?.company || 'N/A',
-        stage: d.stage === DealStage.CLOSED_WON ? 'Closed Won' : d.stage === DealStage.CLOSED_LOST ? 'Closed Lost' : d.stage.charAt(0) + d.stage.slice(1).toLowerCase(),
-        stageBg: stageColors.bg,
-        stageColor: stageColors.text,
-        value: formatVnd(Number(d.value)),
+        stage: d.stage,
+        value: Number(d.value),
         owner: {
-          initials: getInitials(d.owner.name),
-          bg: ownerColors.bg,
-          color: ownerColors.color,
+          id: d.owner.id,
+          name: d.owner.name,
         },
         daysAgo,
       }
@@ -322,76 +255,59 @@ export class DashboardService {
     })
 
     const upcomingActivities = upcomingActivitiesRaw.map((act) => {
-      const actDate = new Date(act.date)
-      const isToday = actDate.toDateString() === now.toDateString()
-      const tomorrow = new Date(now)
-      tomorrow.setDate(now.getDate() + 1)
-      const isTomorrow = actDate.toDateString() === tomorrow.toDateString()
-
-      let timeLabel = ''
-      const timeStr = actDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false })
-      if (isToday) {
-        timeLabel = `Hôm nay ${timeStr}`
-      } else if (isTomorrow) {
-        timeLabel = `Ngày mai ${timeStr}`
-      } else {
-        timeLabel = `${actDate.getDate()}/${actDate.getMonth() + 1} ${timeStr}`
-      }
-
       return {
         id: act.id,
-        type: act.type.toLowerCase(),
+        type: act.type,
         title: act.title || 'Hoạt động crm',
         contact: act.contact?.name || 'N/A',
         company: act.contact?.company || 'N/A',
-        time: timeLabel,
+        time: act.date.toISOString(),
       }
     })
 
     // ─── COMPILE RESPONSE ───
-    const result =  {
+    const result = {
       metrics: {
         totalDealValue: {
           label: 'Tổng deal value',
-          value: formatVnd(currentTotalValue),
+          value: currentTotalValue,
           trend: {
-            value: `${totalValueTrend >= 0 ? '+' : ''}${totalValueTrend}%`,
+            value: totalValueTrend,
             positive: totalValueTrend >= 0,
           },
           subtext: 'So với kỳ trước',
         },
         openDeals: {
           label: 'Deals đang mở',
-          value: `${currentOpenDeals.length}`,
+          value: currentOpenDeals.length,
           trend: {
-            value: `${openDealsDiff >= 0 ? '+' : ''}${openDealsDiff} ${periodLabel}`,
+            value: openDealsDiff,
             positive: openDealsDiff >= 0,
           },
           subtext: 'Đang trong pipeline',
         },
         winRate: {
           label: 'Tỷ lệ chốt',
-          value: `${currentWinRate}%`,
+          value: currentWinRate,
           trend: {
-            value: `${winRateDiff >= 0 ? '+' : ''}${winRateDiff}%`,
+            value: winRateDiff,
             positive: winRateDiff >= 0,
           },
           subtext: 'So với kỳ trước',
         },
         monthlyRevenue: {
           label: 'Doanh thu tháng',
-          value: formatVnd(actualRevenue),
+          value: actualRevenue,
           progress: {
-            current: Math.round(actualRevenue / 1e6), // in millions
-            target: Math.round(targetRevenue / 1e6), // in millions
-            label: `Target: ${formatVnd(targetRevenue)}`,
+            current: actualRevenue,
+            target: targetRevenue,
           },
         },
       },
       pipelineFunnel: {
         stages: pipelineStages,
         totalCount: pipelineTotalCount,
-        totalValue: formatVnd(pipelineTotalValue),
+        totalValue: pipelineTotalValue,
       },
       leaderboard,
       recentDeals,

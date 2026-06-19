@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Edit2, Settings } from "lucide-react";
+import { Edit2, Settings, Users } from "lucide-react";
 import {
   ResponsiveContainer, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
 import { ChartCard } from "./ChartCard";
-import { fmtTr } from "./reportsData";
+import { EmptyState } from "./EmptyState";
+import { formatVndShort, getInitials, getAvatarColors } from "@/lib/helper";
 import { reportsService } from "@/services/reports.service";
 import { useMe } from "@/hooks/useAuth";
 import {
@@ -32,7 +33,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <div key={p.dataKey} className="flex items-center gap-2 mb-0.5">
           <span className="size-2 rounded-full shrink-0" style={{ background: p.color ?? p.fill }} />
           <span className="text-[#6B6B67]">{p.name}:</span>
-          <span className="text-[#1A1A18]" style={{ fontWeight: 500 }}>{fmtTr(p.value)}</span>
+          <span className="text-[#1A1A18]" style={{ fontWeight: 500 }}>{formatVndShort(p.value)}</span>
         </div>
       ))}
     </div>
@@ -82,11 +83,11 @@ export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabPro
     },
   });
 
-  const handleOpenEdit = (userId: string, name: string, currentTargetThousands: number) => {
+  const handleOpenEdit = (userId: string, name: string, currentTarget: number) => {
     setEditingUserId(userId);
     setEditingUserName(name);
-    // Convert thousands back to millions for user input (e.g. 300,000 VND / 1000 = 300tr)
-    const millionsVal = (currentTargetThousands * 1000) / 1_000_000;
+    // Convert target to millions for user input (currentTarget is now in raw VND, e.g. 500,000,000)
+    const millionsVal = currentTarget / 1_000_000;
     setTargetVal(millionsVal.toString());
     setIsModalOpen(true);
   };
@@ -118,6 +119,8 @@ export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabPro
     );
   }
 
+  const isDataEmpty = teamData.length === 0;
+
   return (
     <div className="flex flex-col gap-5">
       {/* Chart Row */}
@@ -125,26 +128,37 @@ export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabPro
         title="So sánh doanh số thực tế vs Chỉ tiêu"
         subtitle="Doanh số đạt được so với chỉ tiêu giao cho từng thành viên trong kỳ"
         action={
-          <div className="flex items-center gap-3 mr-1">
-            {LEGEND.map((l) => (
-              <div key={l.label} className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-sm shrink-0" style={{ background: l.color }} />
-                <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>{l.label}</span>
-              </div>
-            ))}
-          </div>
+          !isDataEmpty && (
+            <div className="flex items-center gap-3 mr-1">
+              {LEGEND.map((l) => (
+                <div key={l.label} className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-sm shrink-0" style={{ background: l.color }} />
+                  <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>{l.label}</span>
+                </div>
+              ))}
+            </div>
+          )
         }
       >
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={teamData} margin={{ top: 5, right: 16, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
-            <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={fmtTr} width={44} />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="actual" name="Thực tế" fill="#534AB7" radius={[4, 4, 0, 0]} maxBarSize={30} />
-            <Bar dataKey="target" name="Target" fill="#AFA9EC" radius={[4, 4, 0, 0]} maxBarSize={30} />
-          </BarChart>
-        </ResponsiveContainer>
+        {isDataEmpty ? (
+          <EmptyState
+            icon={Users}
+            title="Chưa có dữ liệu hiệu suất"
+            description="Chưa có thông tin doanh số thực tế và chỉ tiêu cho từng thành viên trong khoảng thời gian này."
+            height={240}
+          />
+        ) : (
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={teamData} margin={{ top: 5, right: 16, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={formatVndShort} width={44} />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="actual" name="Thực tế" fill="#534AB7" radius={[4, 4, 0, 0]} maxBarSize={30} />
+              <Bar dataKey="target" name="Target" fill="#AFA9EC" radius={[4, 4, 0, 0]} maxBarSize={30} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </ChartCard>
 
       {/* Table Row */}
@@ -170,71 +184,82 @@ export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabPro
               </tr>
             </thead>
             <tbody>
-              {teamData.map((row) => {
-                const ratio = row.target > 0 ? ((row.actual / row.target) * 100).toFixed(0) : "0";
-                return (
-                  <tr key={row.userId} className="border-b border-[#E8E7E2] last:border-0 hover:bg-[#F8F8F7] transition-colors">
-                    {/* User Profile */}
-                    <td className="p-3 pl-4">
-                      <div className="flex items-center gap-2.5">
-                        <div
-                          className="size-7 rounded-full flex items-center justify-center font-bold text-xs"
-                          style={{ background: row.bg, color: row.text }}
-                        >
-                          {row.initials}
-                        </div>
-                        <span className="text-[#1A1A18] font-medium" style={{ fontSize: 12 }}>
-                          {row.name}
-                        </span>
-                      </div>
-                    </td>
-                    {/* Actual */}
-                    <td className="p-3 text-[#1A1A18] text-right font-medium tabular-nums" style={{ fontSize: 12 }}>
-                      {fmtTr(row.actual)}
-                    </td>
-                    {/* Target */}
-                    <td className="p-3 text-[#6B6B67] text-right tabular-nums" style={{ fontSize: 12 }}>
-                      <div className="flex items-center justify-end gap-1.5">
-                        <span>{fmtTr(row.target)}</span>
-                        {isAdminOrManager && (
-                          <button
-                            onClick={() => handleOpenEdit(row.userId, row.name, row.target)}
-                            className="p-1 hover:bg-[#EEEDFE] rounded text-[#534AB7] hover:text-[#4840A0] transition-colors cursor-pointer"
-                            title="Chỉnh sửa KPI Target"
+              {isDataEmpty ? (
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-[#6B6B67] text-xs">
+                    Không tìm thấy dữ liệu hiệu suất của nhân viên nào.
+                  </td>
+                </tr>
+              ) : (
+                teamData.map((row) => {
+                  const ratio = row.target > 0 ? ((row.actual / row.target) * 100).toFixed(0) : "0";
+                  return (
+                    <tr key={row.userId} className="border-b border-[#E8E7E2] last:border-0 hover:bg-[#F8F8F7] transition-colors">
+                      {/* User Profile */}
+                      <td className="p-3 pl-4">
+                        <div className="flex items-center gap-2.5">
+                          <div
+                            className="size-7 rounded-full flex items-center justify-center font-bold text-xs shrink-0"
+                            style={{
+                              background: getAvatarColors(row.userId).bg,
+                              color: getAvatarColors(row.userId).color,
+                            }}
                           >
-                            <Edit2 size={11} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                    {/* Ratio */}
-                    <td className="p-3 text-right tabular-nums" style={{ fontSize: 12 }}>
-                      <span
-                        className="px-2 py-0.5 rounded font-semibold"
-                        style={{
-                          fontSize: 11,
-                          background: Number(ratio) >= 100 ? "#E6F6F0" : "#FDF2E9",
-                          color: Number(ratio) >= 100 ? "#1D9E75" : "#D85A30",
-                        }}
-                      >
-                        {ratio}%
-                      </span>
-                    </td>
-                    {/* Win Rate */}
-                    <td className="p-3 text-[#1A1A18] text-right font-medium tabular-nums" style={{ fontSize: 12 }}>
-                      {row.winRate}%
-                    </td>
-                    {/* Activities */}
-                    <td className="p-3 text-[#6B6B67] text-right tabular-nums" style={{ fontSize: 12 }}>
-                      {row.activities}
-                    </td>
-                    {/* Average Days to Close */}
-                    <td className="p-3 pr-4 text-[#6B6B67] text-right tabular-nums" style={{ fontSize: 12 }}>
-                      {row.avgDaysToClose} ngày
-                    </td>
-                  </tr>
-                );
-              })}
+                            {getInitials(row.name)}
+                          </div>
+                          <span className="text-[#1A1A18] font-medium" style={{ fontSize: 12 }}>
+                            {row.name}
+                          </span>
+                        </div>
+                      </td>
+                      {/* Actual */}
+                      <td className="p-3 text-[#1A1A18] text-right font-medium tabular-nums" style={{ fontSize: 12 }}>
+                        {formatVndShort(row.actual)}
+                      </td>
+                      {/* Target */}
+                      <td className="p-3 text-[#6B6B67] text-right tabular-nums" style={{ fontSize: 12 }}>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <span>{formatVndShort(row.target)}</span>
+                          {isAdminOrManager && (
+                            <button
+                              onClick={() => handleOpenEdit(row.userId, row.name, row.target)}
+                              className="p-1 hover:bg-[#EEEDFE] rounded text-[#534AB7] hover:text-[#4840A0] transition-colors cursor-pointer"
+                              title="Chỉnh sửa KPI Target"
+                            >
+                              <Edit2 size={11} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                      {/* Ratio */}
+                      <td className="p-3 text-right tabular-nums" style={{ fontSize: 12 }}>
+                        <span
+                          className="px-2 py-0.5 rounded font-semibold"
+                          style={{
+                            fontSize: 11,
+                            background: Number(ratio) >= 100 ? "#E6F6F0" : "#FDF2E9",
+                            color: Number(ratio) >= 100 ? "#1D9E75" : "#D85A30",
+                          }}
+                        >
+                          {ratio}%
+                        </span>
+                      </td>
+                      {/* Win Rate */}
+                      <td className="p-3 text-[#1A1A18] text-right font-medium tabular-nums" style={{ fontSize: 12 }}>
+                        {row.winRate}%
+                      </td>
+                      {/* Activities */}
+                      <td className="p-3 text-[#6B6B67] text-right tabular-nums" style={{ fontSize: 12 }}>
+                        {row.activities}
+                      </td>
+                      {/* Average Days to Close */}
+                      <td className="p-3 pr-4 text-[#6B6B67] text-right tabular-nums" style={{ fontSize: 12 }}>
+                        {row.avgDaysToClose} ngày
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

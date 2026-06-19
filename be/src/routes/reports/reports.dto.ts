@@ -19,14 +19,13 @@ export const UpdateKpiTargetSchema = z.object({
 
 export class UpdateKpiTargetDto extends createZodDto(UpdateKpiTargetSchema) {}
 
-// ─── Overview Response DTO ───────────────────────────────────────────────────
 export const OverviewResSchema = z.object({
   kpis: z.object({
-    totalRevenue: z.object({ value: z.string(), delta: z.string(), up: z.boolean() }),
-    closedDeals: z.object({ value: z.string(), delta: z.string(), up: z.boolean(), subtext: z.string() }),
-    winRate: z.object({ value: z.string(), delta: z.string(), up: z.boolean() }),
-    avgDealSize: z.object({ value: z.string(), delta: z.string(), up: z.boolean() }),
-    avgDaysToClose: z.object({ value: z.string(), delta: z.string(), up: z.boolean() }),
+    totalRevenue: z.object({ value: z.number(), delta: z.string(), up: z.boolean() }),
+    closedDeals: z.object({ value: z.number(), delta: z.string(), up: z.boolean() }),
+    winRate: z.object({ value: z.number(), delta: z.string(), up: z.boolean() }),
+    avgDealSize: z.object({ value: z.number(), delta: z.string(), up: z.boolean() }),
+    avgDaysToClose: z.object({ value: z.number(), delta: z.string(), up: z.boolean() }),
   }),
   revenueByMonth: z.array(z.object({
     month: z.string(),
@@ -38,15 +37,20 @@ export const OverviewResSchema = z.object({
     cumActual: z.number(),
     cumForecast: z.number(),
   })),
+  winLossData: z.array(z.object({
+    stage: z.string(),
+    win: z.number(),
+    loss: z.number(),
+  })),
   topDeals: z.array(z.object({
     id: z.string(),
     name: z.string(),
     company: z.string(),
-    owner: z.string(),
-    ownerInitials: z.string(),
-    ownerBg: z.string(),
-    ownerColor: z.string(),
-    value: z.string(),
+    owner: z.object({
+      id: z.string(),
+      name: z.string(),
+    }),
+    value: z.number(),
     closedAt: z.string(),
     stage: z.string(),
   })),
@@ -54,13 +58,9 @@ export const OverviewResSchema = z.object({
 
 export class OverviewResDto extends createZodDto(OverviewResSchema) {}
 
-// ─── Team Performance Response DTO ───────────────────────────────────────────
 export const TeamRepPerformanceSchema = z.object({
   userId: z.string(),
   name: z.string(),
-  initials: z.string(),
-  bg: z.string(),
-  text: z.string(),
   actual: z.number(),
   target: z.number(),
   winRate: z.number(),
@@ -77,7 +77,6 @@ export const FunnelStageSchema = z.object({
   count: z.number(),
   value: z.number(),
   percentage: z.number(),
-  color: z.string(),
 })
 
 export const PipelineAnalysisResSchema = z.object({
@@ -110,7 +109,6 @@ export const ActivitiesReportResSchema = z.object({
   statusDistribution: z.array(z.object({
     name: z.string(),
     value: z.number(),
-    color: z.string(),
   })),
 })
 

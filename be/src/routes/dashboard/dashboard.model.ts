@@ -10,37 +10,33 @@ export const GetDashboardQuerySchema = z.object({
 export type GetDashboardQueryType = z.infer<typeof GetDashboardQuerySchema>
 
 export const MetricTrendSchema = z.object({
-  value: z.string(),
+  value: z.number(),
   positive: z.boolean(),
 })
 
 export const MetricCardSchema = z.object({
   label: z.string(),
-  value: z.string(),
+  value: z.number(),
   trend: MetricTrendSchema.optional(),
   subtext: z.string().optional(),
   progress: z.object({
     current: z.number(),
     target: z.number(),
-    label: z.string(),
   }).optional(),
 })
 
 export const PipelineStageSchema = z.object({
   name: z.string(),
   count: z.number(),
-  value: z.string(),
-  color: z.string(),
+  value: z.number(),
 })
 
 export const LeaderboardRepSchema = z.object({
   rank: z.number(),
-  initials: z.string(),
+  userId: z.string(),
   name: z.string(),
   deals: z.number(),
   revenue: z.number(),
-  avatarBg: z.string(),
-  avatarColor: z.string(),
 })
 
 export const RecentDealSchema = z.object({
@@ -48,13 +44,10 @@ export const RecentDealSchema = z.object({
   title: z.string(),
   company: z.string(),
   stage: z.string(),
-  stageBg: z.string(),
-  stageColor: z.string(),
-  value: z.string(),
+  value: z.number(),
   owner: z.object({
-    initials: z.string(),
-    bg: z.string(),
-    color: z.string(),
+    id: z.string(),
+    name: z.string(),
   }),
   daysAgo: z.number(),
 })
@@ -78,7 +71,7 @@ export const DashboardResSchema = z.object({
   pipelineFunnel: z.object({
     stages: z.array(PipelineStageSchema),
     totalCount: z.number(),
-    totalValue: z.string(),
+    totalValue: z.number(),
   }),
   leaderboard: z.array(LeaderboardRepSchema),
   recentDeals: z.array(RecentDealSchema),
