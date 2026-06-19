@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import {
   Table,
   TableBody,
@@ -23,6 +24,9 @@ interface ContactTableProps {
   isPending?: boolean;
   onEdit: (contact: Contact) => void;
   onAdd?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  fetchNextPage?: () => void;
 }
 
 const TABLE_COLUMNS = [
@@ -41,7 +45,7 @@ const TABLE_COLUMNS = [
 function ContactTableSkeleton() {
   return (
     <>
-      <Table>
+      <Table className="min-w-[1200px]">
         <TableHeader>
           <TableRow className="hover:bg-transparent border-b border-border/60">
             {TABLE_COLUMNS.map((col, idx) => (
@@ -195,13 +199,88 @@ function EmptyIllustration() {
   );
 }
 
+function ScrollFadeRow({
+  children,
+  className,
+  ...props
+}: React.ComponentProps<typeof TableRow>) {
+  const ref = useRef<HTMLTableRowElement>(null);
+  const [isIntersecting, setIsIntersecting] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsIntersecting(entry.isIntersecting);
+      },
+      {
+        rootMargin: "0px 0px -10% 0px", // Hàng ở 10% dưới cùng màn hình sẽ mờ
+        threshold: 0.1,
+      }
+    );
+
+    const currentRef = ref.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, []);
+
+  return (
+    <TableRow
+      ref={ref}
+      className={`transition-all duration-500 ease-in-out transform ${
+        isIntersecting
+          ? "opacity-100 blur-0 translate-y-0 scale-100"
+          : "opacity-30 blur-[1.5px] translate-y-2 scale-[0.99]"
+      } ${className || ""}`}
+      {...props}
+    >
+      {children}
+    </TableRow>
+  );
+}
+
 function ContactTable({
   contacts,
   onDirect,
   isPending,
   onEdit,
   onAdd,
+  hasNextPage,
+  isFetchingNextPage,
+  fetchNextPage,
 }: ContactTableProps) {
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage || !fetchNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   if (isPending && contacts.length === 0) {
     return <ContactTableSkeleton />;
   }
@@ -211,13 +290,15 @@ function ContactTable({
       {contacts && contacts.length > 0 ? (
         /* ── Table ────────────────────────────────────────────────────── */
         <>
-          <Table>
+          <Table className="min-w-[1200px]">
             <TableHeader>
               <TableRow className="hover:bg-transparent border-b border-border/60">
                 {TABLE_COLUMNS.map((col, idx) => (
                   <TableHead
                     key={idx}
-                    className="px-4 py-3 text-muted-foreground uppercase"
+                    className={`px-4 py-3 text-muted-foreground uppercase ${
+                      idx === TABLE_COLUMNS.length - 1 ? "w-[80px]" : ""
+                    }`}
                     style={{
                       fontSize: 11,
                       fontWeight: 600,
@@ -232,7 +313,7 @@ function ContactTable({
 
             <TableBody>
               {contacts.map((contact) => (
-                <TableRow
+                <ScrollFadeRow
                   key={contact.id}
                   className="group border-b border-border/40 hover:bg-muted/30 cursor-pointer"
                 >
@@ -356,7 +437,7 @@ function ContactTable({
                   </TableCell>
 
                   {/* ── Actions (show on row hover) ── */}
-                  <TableCell className="px-3 py-3">
+                  <TableCell className="px-3 py-3 w-[80px]">
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                       <Button
                         variant="ghost"
@@ -384,16 +465,34 @@ function ContactTable({
                       </Button>
                     </div>
                   </TableCell>
-                </TableRow>
+                </ScrollFadeRow>
               ))}
             </TableBody>
-          </Table>
+            </Table>
 
-          {/* ── Footer count ── */}
-          <div
-            className="px-4 py-0.5 border-t border-border/40 flex items-center gap-1.5 text-muted-foreground"
-            style={{ fontSize: 12 }}
-          >
+            {/* ── Infinite Scroll Observer & Indicator ── */}
+            <div ref={observerTarget} className="flex justify-center py-4 border-t border-border/40">
+              {isFetchingNextPage ? (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent animate-[spin_0.6s_linear_infinite]" />
+                  Đang tải thêm liên hệ...
+                </div>
+              ) : hasNextPage ? (
+                <span className="text-xs text-muted-foreground opacity-60">
+                  Cuộn xuống để tải thêm
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground opacity-40">
+                  Đã tải hết danh sách liên hệ ({contacts.length})
+                </span>
+              )}
+            </div>
+
+            {/* ── Footer count ── */}
+            <div
+              className="px-4 py-0.5 border-t border-border/40 flex items-center gap-1.5 text-muted-foreground"
+              style={{ fontSize: 12 }}
+            >
             <div className="flex items-center gap-1.5 min-w-20">
               <Users size={12} className="shrink-0" />
               {contacts.length} liên hệ
