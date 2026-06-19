@@ -11,6 +11,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Generate Prisma client
+RUN npx prisma generate
+
 # Build NestJS app (includes generated Prisma client in dist/generated)
 RUN npm run build
 
@@ -29,6 +32,7 @@ ENV NODE_ENV=production
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/generated ./generated
 COPY package.json ./
 
 EXPOSE 3001

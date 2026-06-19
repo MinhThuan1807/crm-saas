@@ -143,4 +143,97 @@ export class AuthService {
     })
     return user
   }
+    async validateGoogleUser(profile: { provider: string; providerAccountId: string; email: string; name: string }) {
+    const { provider, providerAccountId, email, name } = profile;
+
+    // 1. Kiểm tra xem tài khoản Google này đã được liên kết với User nào chưa
+    const account = await this.prismaService.account.findUnique({
+      where: {
+        provider_providerAccountId: {
+          provider,
+          providerAccountId,
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    if (account) {
+      return account.user;
+    }
+
+    // 2. Nếu chưa có Account, kiểm tra xem đã có User nào đăng ký bằng Email này chưa
+    let user = await this.prismaService.user.findUnique({
+      where: { email },
+    });
+
+    // 3. Nếu trùng khớp Email -> Tự động liên kết tài khoản Google này với User đó
+    if (user) {
+      await this.prismaService.account.create({
+        data: {
+          userId: user.id,
+          provider,
+          providerAccountId,
+        },
+      });
+      return user;
+    }
+
+    // 4. Nếu chưa có User nào tồn tại -> Thực hiện đăng ký mới
+    // 4a. Kiểm tra xem Email có thư mời (Invitation) nào đang chờ không
+    const invitation = await this.prismaService.invitation.findFirst({
+      where: {
+        email,
+        status: 'PENDING',
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    let tenantId: string;
+
+    if (invitation) {
+      // Tham gia Tenant được mời
+      tenantId = invitation.tenantId;
+      
+      // Đánh dấu thư mời đã được chấp nhận
+      await this.prismaService.invitation.update({
+        where: { id: invitation.id },
+        data: { status: 'ACCEPTED' },
+      });
+    } else {
+      // Không có thư mời -> Tạo mới một Tenant
+      const slug = slugify(name + '-' + Math.floor(Math.random() * 1000));
+      const tenant = await this.prismaService.tenant.create({
+        data: {
+          name: `${name}'s Company`,
+          slug,
+        },
+      });
+      tenantId = tenant.id;
+    }
+
+    // 4b. Tạo User mới (password = null)
+    user = await this.prismaService.user.create({
+      data: {
+        email,
+        name,
+        tenantId,
+        password: null, // Không có mật khẩu vì dùng SSO
+        role: invitation ? invitation.role : 'ADMIN', // Nếu tạo tenant mới thì làm ADMIN
+      },
+    });
+
+    // 4c. Tạo liên kết Account
+    await this.prismaService.account.create({
+      data: {
+        userId: user.id,
+        provider,
+        providerAccountId,
+      },
+    });
+
+    return user;
+  }
+
 }
