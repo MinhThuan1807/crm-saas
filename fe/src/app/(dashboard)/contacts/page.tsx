@@ -50,15 +50,6 @@ const ContactsPage = () => {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
-                {/* {isLoading && <p>Loading...</p>} */}
-                {hasNextPage && (
-                  <button
-                    onClick={() => fetchNextPage()}
-                    disabled={isFetchingNextPage}
-                  >
-                    {isFetchingNextPage ? "Đang tải..." : "Tải thêm"}
-                  </button>
-                )}
               </div>
 
               <Button
@@ -91,13 +82,16 @@ const ContactsPage = () => {
           </header>
           {/* ── Main content ─────────────────────────────────────────────────── */}
           <main className="flex-1 overflow-y-auto bg-[#F8F8F7] p-5">
-            <div className="h-full bg-background rounded-xl border border-border/70 overflow-hidden shadow-none">
+            <div className="min-h-full bg-background rounded-xl border border-border/70 overflow-hidden shadow-none">
               <ContactTable
                 contacts={contacts}
                 onDirect={handleDirect}
                 isPending={isLoading}
                 onEdit={(contact) => setDialog({ isOpen: true, contact })}
                 onAdd={() => setDialog({ isOpen: true })}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                fetchNextPage={fetchNextPage}
               />
             </div>
           </main>

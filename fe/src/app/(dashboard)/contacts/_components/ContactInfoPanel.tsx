@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useDeleteContact } from "@/hooks/useContacts";
 import {
   Mail,
   Phone,
@@ -6,18 +9,50 @@ import {
   Calendar,
   ChevronRight,
   Edit2,
+  Trash2,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { StageBadge, type DealStage } from "@/components/StageBage";
 import { GetContactResType } from "@/lib/validations/contacts.scheme";
 import { formatCurrency, getInitials, relativeTime } from "@/lib/helper";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import ContactDialog from "./ContactDialog";
 
 interface ContactInfoPanelProps {
   contact: GetContactResType;
 }
 
 export function ContactInfoPanel({ contact }: ContactInfoPanelProps) {
+  const router = useRouter();
+  const deleteContact = useDeleteContact();
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      await deleteContact.mutateAsync(contact.id);
+      router.push("/contacts");
+    } catch (error) {
+      console.error("Failed to delete contact:", error);
+    }
+  };
   const infoRows = [
     { key: "email", icon: Mail, label: "Email", value: contact.email || "" },
     { key: "phone", icon: Phone, label: "Phone", value: contact.phone || "" },
@@ -62,15 +97,34 @@ export function ContactInfoPanel({ contact }: ContactInfoPanelProps) {
       <div className="px-5 pt-6 pb-5 border-b border-border">
         {/* Edit button */}
         <div className="flex justify-end mb-4">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 gap-1 border-border text-muted-foreground hover:text-foreground"
-            style={{ fontSize: 12 }}
-          >
-            <Edit2 size={11} />
-            Chỉnh sửa
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 gap-1 border-border text-muted-foreground hover:text-foreground cursor-pointer"
+                style={{ fontSize: 12 }}
+              >
+                <Edit2 size={11} />
+                Chỉnh sửa
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)} className="cursor-pointer" style={{ fontSize: 12 }}>
+                <Edit2 size={13} className="mr-1.5" />
+                Chỉnh sửa thông tin
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => setIsDeleteDialogOpen(true)}
+                className="cursor-pointer"
+                style={{ fontSize: 12 }}
+              >
+                <Trash2 size={13} className="mr-1.5" />
+                Xóa liên hệ
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Avatar + name */}
@@ -253,6 +307,27 @@ export function ContactInfoPanel({ contact }: ContactInfoPanelProps) {
           ))}
         </div>
       </div>
+      <ContactDialog
+        contact={contact}
+        isOpen={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+      />
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận xóa liên hệ</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn xóa liên hệ <strong>{contact.name}</strong>? Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="cursor-pointer">Hủy</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleDelete} className="cursor-pointer">
+              Xóa liên hệ
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
