@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt'
 import envConfig from 'src/common/config'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
+import { GoogleStrategy } from './strategies/google.strategy'
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard'
       signOptions: { expiresIn: '60s' },
     }),
   ],
-  providers: [AuthService, AuthRepository, JwtStrategy],
+  providers: [AuthService, AuthRepository, JwtStrategy, GoogleStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}

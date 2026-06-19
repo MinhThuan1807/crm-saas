@@ -61,7 +61,7 @@ model User {
   id           String   @id @default(cuid())
   tenantId     String             // bắt buộc mọi user
   email        String   @unique 
-  password     String
+  password     String?  // optional vì có thể đăng nhập Google
   name         String
   role         Role     @default(SALES_REP)
   createdAt    DateTime @default(now())
@@ -73,10 +73,21 @@ model User {
   activities    Activity[]
   refreshTokens RefreshToken[] 
   kpiTargets    KpiTarget[]
+  accounts      Account[] 
 
   @@index([tenantId])
 }
-  // @@unique([tenantId, email])  // email unique trong cùng tenant
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String   // "google"
+  providerAccountId String   // ID người dùng từ Google
+  createdAt         DateTime @default(now())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
 
 model Contact {
   id        String   @id @default(cuid())

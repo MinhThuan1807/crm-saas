@@ -171,7 +171,7 @@ export default function RegisterPage() {
                   placeholder="Công ty ABC"
                   autoComplete="organization"
                   autoFocus
-                  className={cn("pl-9", errors.companyName && "border-destructive focus-visible:ring-destructive/20")}
+                  className={cn("h-9 pl-9", errors.companyName && "border-destructive focus-visible:ring-destructive/20")}
                   aria-invalid={!!errors.companyName}
                   {...register("companyName")}
                 />
@@ -194,7 +194,7 @@ export default function RegisterPage() {
                   placeholder="Họ và tên"
                   autoComplete="name"
                   autoFocus
-                  className={cn("pl-9", errors.name && "border-destructive focus-visible:ring-destructive/20")}
+                  className={cn("h-9 pl-9", errors.name && "border-destructive focus-visible:ring-destructive/20")}
                   aria-invalid={!!errors.name}
                   {...register("name")}
                 />
@@ -214,7 +214,7 @@ export default function RegisterPage() {
                 type="email"
                 placeholder="ten@congty.vn"
                 autoComplete="email"
-                className={cn(errors.email && "border-destructive focus-visible:ring-destructive/20")}
+                className={cn("h-9", errors.email && "border-destructive focus-visible:ring-destructive/20")}
                 aria-invalid={!!errors.email}
                 {...register("email")}
               />
@@ -233,7 +233,7 @@ export default function RegisterPage() {
                 {...register("password")}
                 placeholder="Tối thiểu 8 ký tự"
                 autoComplete="new-password"
-                className={cn(errors.password && "border-destructive focus-visible:ring-destructive/20")}
+                className={cn("h-9", errors.password && "border-destructive focus-visible:ring-destructive/20")}
                 aria-invalid={!!errors.password}
               />
               <PasswordStrengthMeter password={passwordValue} />
@@ -252,7 +252,7 @@ export default function RegisterPage() {
                 {...register("confirmPassword")}
                 placeholder="Nhập lại mật khẩu"
                 autoComplete="new-password"
-                className={cn(errors.confirmPassword && "border-destructive focus-visible:ring-destructive/20")}
+                className={cn("h-9", errors.confirmPassword && "border-destructive focus-visible:ring-destructive/20")}
                 aria-invalid={!!errors.confirmPassword}
               />
               {errors.confirmPassword && (
@@ -272,7 +272,7 @@ export default function RegisterPage() {
               </button>.
             </p>
 
-            <Button type="submit" size="lg" className="w-full mt-1" disabled={isPending}>
+            <Button type="submit" className="w-full h-9 mt-1" disabled={isPending}>
               {isPending && <Loader2 className="size-4 animate-spin" />}
               {isPending ? "Đang tạo tài khoản..." : "Tạo tài khoản"}
             </Button>

@@ -42,16 +42,6 @@ export function ActivitiesTimeline({
           </div>
         </div>
       ))}
-
-      <div className="flex justify-center mt-6">
-        <button
-          className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg border border-border bg-background text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors cursor-pointer"
-          style={{ fontSize: 12 }}
-        >
-          Tải thêm hoạt động
-          <ChevronRight size={13} />
-        </button>
-      </div>
     </>
   );
 }
