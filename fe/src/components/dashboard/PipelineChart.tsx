@@ -10,26 +10,38 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PipelineStageType } from "@/lib/validations/dashboard.schema";
+import { STAGE_COLORS, formatVndShort } from "@/lib/helper";
 
 const MOCK_STAGES = [
-  { name: "Prospect",   count: 38, value: "820tr", color: "#C4C0F0" },
-  { name: "Qualified",  count: 26, value: "610tr", color: "#9B94E3" },
-  { name: "Proposal",   count: 17, value: "480tr", color: "#7168CC" },
-  { name: "Closed Won", count: 11, value: "340tr", color: "#534AB7" },
+  { name: "Prospect",   count: 38, value: 820000000 },
+  { name: "Qualified",  count: 26, value: 610000000 },
+  { name: "Proposal",   count: 17, value: 480000000 },
+  { name: "Closed Won", count: 11, value: 340000000 },
 ];
 
+function getStageColor(name: string): string {
+  if (name.includes("Prospect")) return STAGE_COLORS.PROSPECT.funnel;
+  if (name.includes("Qualified")) return STAGE_COLORS.QUALIFIED.funnel;
+  if (name.includes("Proposal")) return STAGE_COLORS.PROPOSAL.funnel;
+  if (name.includes("Closed Won") || name.includes("Won")) return STAGE_COLORS.CLOSED_WON.funnel;
+  return STAGE_COLORS.PROSPECT.funnel;
+}
+
 interface PipelineChartProps {
-  stages?: PipelineStageType[];
+  stages?: {
+    name: string;
+    count: number;
+    value: number;
+  }[];
   totalCount?: number;
-  totalValue?: string;
+  totalValue?: number;
   isLoading?: boolean;
 }
 
 export function PipelineChart({
   stages = MOCK_STAGES,
   totalCount = 92,
-  totalValue = "2.25 tỷ",
+  totalValue = 2250000000,
   isLoading = false,
 }: PipelineChartProps) {
   const maxCount = stages.reduce((max, s) => Math.max(max, s.count), 0) || 1;
@@ -90,7 +102,7 @@ export function PipelineChart({
                   <div className="flex items-center gap-2">
                     <div
                       className="size-2 rounded-sm shrink-0"
-                      style={{ background: stage.color }}
+                      style={{ background: getStageColor(stage.name) }}
                     />
                     <span className="text-foreground" style={{ fontSize: 13 }}>
                       {stage.name}
@@ -103,7 +115,7 @@ export function PipelineChart({
                   </div>
                   <div className="flex items-center gap-2.5">
                     <span className="text-xs text-muted-foreground">
-                      {stage.value}
+                      {formatVndShort(stage.value)}
                     </span>
                     <span
                       className="text-foreground tabular-nums w-6 text-right"
@@ -118,7 +130,7 @@ export function PipelineChart({
                 <div className="h-6 bg-muted rounded-md overflow-hidden">
                   <div
                     className="h-full rounded-md transition-all duration-700"
-                    style={{ width: `${widthPct}%`, background: stage.color }}
+                    style={{ width: `${widthPct}%`, background: getStageColor(stage.name) }}
                   />
                 </div>
               </div>
@@ -146,7 +158,7 @@ export function PipelineChart({
               <div key={s.name} className="flex items-center gap-1.5">
                 <div
                   className="size-1.5 rounded-sm shrink-0"
-                  style={{ background: s.color }}
+                  style={{ background: getStageColor(s.name) }}
                 />
                 <span className="text-muted-foreground" style={{ fontSize: 11 }}>
                   {s.name}
@@ -155,7 +167,7 @@ export function PipelineChart({
             ))}
           </div>
           <span className="text-muted-foreground" style={{ fontSize: 11 }}>
-            Tổng: {totalCount} deals · {totalValue}
+            Tổng: {totalCount} deals · {formatVndShort(totalValue)}
           </span>
         </CardFooter>
       )}

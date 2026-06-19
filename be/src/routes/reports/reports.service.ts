@@ -3,56 +3,12 @@ import { ROLE } from 'src/common/constants/role.constanst'
 import { DealStage, ActivityType } from '../../../generated/prisma-client/enums'
 import { UpdateKpiTargetDto } from './reports.dto'
 import { ReportsRepository } from './reports.repo'
-
-const AVATAR_COLORS = [
-  { bg: '#D4F5E4', color: '#1A5C38' }, // Greenish
-  { bg: '#D4E8F5', color: '#1A4C6A' }, // Bluish
-  { bg: '#F5D4D4', color: '#6A1A1A' }, // Reddish
-  { bg: '#FFF0D4', color: '#6A400A' }, // Orangish
-  { bg: '#EEE8FD', color: '#3D2D8A' }, // Purplish
-]
-
 const STAGE_PROBABILITIES = {
   [DealStage.PROSPECT]: 0.1,
   [DealStage.QUALIFIED]: 0.3,
   [DealStage.PROPOSAL]: 0.6,
   [DealStage.CLOSED_WON]: 1.0,
   [DealStage.CLOSED_LOST]: 0.0,
-}
-
-function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/)
-  if (parts.length >= 2) {
-    const first = parts[0][0]
-    const last = parts[parts.length - 1][0]
-    return (first + last).toUpperCase()
-  }
-  return parts[0] ? parts[0][0].toUpperCase() : ''
-}
-
-function getAvatarColors(id: string) {
-  let hash = 0
-  for (let i = 0; i < id.length; i++) {
-    hash = id.charCodeAt(i) + ((hash << 5) - hash)
-  }
-  const index = Math.abs(hash) % AVATAR_COLORS.length
-  return AVATAR_COLORS[index]
-}
-
-function formatVnd(value: number): string {
-  if (value >= 1e9) {
-    const b = value / 1e9
-    return `${Number(b.toFixed(1))} tỷ`
-  }
-  if (value >= 1e6) {
-    const m = value / 1e6
-    return `${Number(m.toFixed(1))}tr`
-  }
-  if (value >= 1e3) {
-    const k = value / 1e3
-    return `${Number(k.toFixed(1))}k`
-  }
-  return `${value}`
 }
 
 function parseDates(startDateStr?: string, endDateStr?: string) {
@@ -104,7 +60,7 @@ export class ReportsService {
     const prevRev = prevWon.reduce((sum, d) => sum + Number(d.value), 0)
     const revDeltaVal = prevRev > 0 ? ((totalRev - prevRev) / prevRev) * 100 : totalRev > 0 ? 100 : 0
     const totalRevenue = {
-      value: formatVnd(totalRev),
+      value: totalRev,
       delta: `${revDeltaVal >= 0 ? '+' : ''}${Math.round(revDeltaVal)}% YoY`,
       up: revDeltaVal >= 0,
     }
@@ -114,10 +70,9 @@ export class ReportsService {
     const prevClosedCount = previousDeals.filter((d) => d.stage === DealStage.CLOSED_WON || d.stage === DealStage.CLOSED_LOST).length
     const closedDeltaVal = currentClosedCount - prevClosedCount
     const closedDeals = {
-      value: `${currentClosedCount}`,
+      value: currentClosedCount,
       delta: `${closedDeltaVal >= 0 ? '+' : ''}${closedDeltaVal}`,
       up: closedDeltaVal >= 0,
-      subtext: 'so với kỳ trước',
     }
 
     // Metric 3: Avg Win Rate
@@ -131,7 +86,7 @@ export class ReportsService {
     const prevWinRateVal = getWinRate(previousDeals)
     const wrDeltaVal = currentWinRateVal - prevWinRateVal
     const winRate = {
-      value: `${currentWinRateVal.toFixed(1)}%`,
+      value: Number(currentWinRateVal.toFixed(1)),
       delta: `${wrDeltaVal >= 0 ? '+' : ''}${wrDeltaVal.toFixed(1)}%`,
       up: wrDeltaVal >= 0,
     }
@@ -141,7 +96,7 @@ export class ReportsService {
     const prevAvgSize = prevWon.length > 0 ? prevWon.reduce((sum, d) => sum + Number(d.value), 0) / prevWon.length : 0
     const sizeDeltaVal = prevAvgSize > 0 ? ((currentAvgSize - prevAvgSize) / prevAvgSize) * 100 : currentAvgSize > 0 ? 100 : 0
     const avgDealSize = {
-      value: formatVnd(currentAvgSize),
+      value: Math.round(currentAvgSize),
       delta: `${sizeDeltaVal >= 0 ? '+' : ''}${Math.round(sizeDeltaVal)}%`,
       up: sizeDeltaVal >= 0,
     }
@@ -160,7 +115,7 @@ export class ReportsService {
     const prevAvgDays = getAvgDaysToClose(previousDeals)
     const daysDeltaVal = currentAvgDays - prevAvgDays
     const avgDaysToClose = {
-      value: `${Math.round(currentAvgDays)} ngày`,
+      value: Math.round(currentAvgDays),
       delta: `${daysDeltaVal <= 0 ? '' : '+'}${Math.round(daysDeltaVal)} ngày`,
       up: daysDeltaVal <= 0,
     }
@@ -190,8 +145,8 @@ export class ReportsService {
 
       return {
         month: m.label,
-        actual: Math.round(actualSum / 1000), // in thousands
-        target: Math.round(targetSum / 1000), // in thousands
+        actual: actualSum, // raw VND
+        target: targetSum, // raw VND
       }
     })
 
@@ -217,8 +172,8 @@ export class ReportsService {
 
       return {
         month: m.label,
-        cumActual: Math.round(cumActual / 1000), // in thousands
-        cumForecast: Math.round(cumForecast / 1000), // in thousands
+        cumActual: cumActual, // raw VND
+        cumForecast: cumForecast, // raw VND
       }
     })
 
@@ -226,18 +181,62 @@ export class ReportsService {
     const topDealsRaw = await this.reportsRepo.findTopWonDeals(tenantId, start, end, userFilter, 6)
 
     const topDeals = topDealsRaw.map((d) => {
-      const colors = getAvatarColors(d.owner.id)
       return {
         id: d.id,
         name: d.title,
         company: d.contact?.company || 'N/A',
-        owner: d.owner.name,
-        ownerInitials: getInitials(d.owner.name),
-        ownerBg: colors.bg,
-        ownerColor: colors.color,
-        value: formatVnd(Number(d.value)),
-        closedAt: d.closeDate ? d.closeDate.toLocaleDateString('vi-VN') : d.createdAt.toLocaleDateString('vi-VN'),
+        owner: {
+          id: d.owner.id,
+          name: d.owner.name,
+        },
+        value: Number(d.value), // raw number
+        closedAt: d.closeDate ? d.closeDate.toISOString() : d.createdAt.toISOString(),
         stage: 'CLOSED_WON',
+      }
+    })
+
+    // Calculate Win/Loss by stage conversion heuristic
+    const winLossStages = [
+      { stage: 'Prospect', winCount: 0, lossCount: 0 },
+      { stage: 'Qualified', winCount: 0, lossCount: 0 },
+      { stage: 'Proposal', winCount: 0, lossCount: 0 },
+      { stage: 'Closed', winCount: 0, lossCount: 0 },
+    ]
+
+    for (const d of currentDeals) {
+      const activitiesList = (d as any).activities || []
+      const actCount = activitiesList.length
+
+      if (d.stage === DealStage.CLOSED_WON) {
+        winLossStages[0].winCount++
+        winLossStages[1].winCount++
+        winLossStages[2].winCount++
+        winLossStages[3].winCount++
+      } else if (d.stage === DealStage.CLOSED_LOST) {
+        if (actCount <= 1) {
+          winLossStages[0].lossCount++
+        } else if (actCount === 2) {
+          winLossStages[0].winCount++
+          winLossStages[1].lossCount++
+        } else if (actCount === 3) {
+          winLossStages[0].winCount++
+          winLossStages[1].winCount++
+          winLossStages[2].lossCount++
+        } else {
+          winLossStages[0].winCount++
+          winLossStages[1].winCount++
+          winLossStages[2].winCount++
+          winLossStages[3].lossCount++
+        }
+      }
+    }
+
+    const winLossData = winLossStages.map((s) => {
+      const total = s.winCount + s.lossCount
+      return {
+        stage: s.stage,
+        win: total > 0 ? Math.round((s.winCount / total) * 100) : 0,
+        loss: total > 0 ? Math.round((s.lossCount / total) * 100) : 0,
       }
     })
 
@@ -251,6 +250,7 @@ export class ReportsService {
       },
       revenueByMonth: monthlyData,
       forecastData: forecastCumulativeData,
+      winLossData,
       topDeals,
     }
   }
@@ -299,16 +299,11 @@ export class ReportsService {
           avgDaysToClose = Math.round(totalDays / closed.length)
         }
 
-        const colors = getAvatarColors(u.id)
-
         return {
           userId: u.id,
           name: u.name,
-          initials: getInitials(u.name),
-          bg: colors.bg,
-          text: colors.color,
-          actual: Math.round(actual / 1000),
-          target: Math.round(totalTarget / 1000),
+          actual: actual, // raw VND
+          target: totalTarget, // raw VND
           winRate,
           activities: activitiesCount,
           avgDaysToClose,
@@ -343,10 +338,10 @@ export class ReportsService {
     const deals = await this.reportsRepo.findAllDeals(tenantId, userFilter)
 
     const funnelStages = [
-      { name: '1. Lead (Prospect)', key: DealStage.PROSPECT, color: '#534AB7' },
-      { name: '2. Contacted (Qualified)', key: DealStage.QUALIFIED, color: '#6C63D3' },
-      { name: '3. Proposal', key: DealStage.PROPOSAL, color: '#877EF2' },
-      { name: '4. Won', key: DealStage.CLOSED_WON, color: '#1D9E75' },
+      { name: '1. Lead (Prospect)', key: DealStage.PROSPECT },
+      { name: '2. Contacted (Qualified)', key: DealStage.QUALIFIED },
+      { name: '3. Proposal', key: DealStage.PROPOSAL },
+      { name: '4. Won', key: DealStage.CLOSED_WON },
     ]
 
     const leadCount = deals.filter((d) => d.stage === DealStage.PROSPECT).length
@@ -381,9 +376,8 @@ export class ReportsService {
       return {
         stage: stage.name,
         count,
-        value: Math.round(value / 1000),
+        value: value, // raw VND
         percentage,
-        color: stage.color,
       }
     })
 
@@ -464,9 +458,9 @@ export class ReportsService {
 
       return {
         month: `T${m}`,
-        actual: isFutureMonth ? undefined : Math.round(cumActual / 1000),
-        forecast: Math.round(cumForecast / 1000),
-        target: cumTarget > 0 ? Math.round(cumTarget / 1000) : undefined,
+        actual: isFutureMonth ? undefined : cumActual,
+        forecast: cumForecast,
+        target: cumTarget > 0 ? cumTarget : undefined,
       }
     })
 
@@ -531,9 +525,9 @@ export class ReportsService {
 
     const totalTasks = doneTasksCount + overdueTasksCount + pendingTasksCount
     const statusDistribution = [
-      { name: 'Đã xong', value: totalTasks > 0 ? Math.round((doneTasksCount / totalTasks) * 100) : 0, color: '#1D9E75' },
-      { name: 'Quá hạn', value: totalTasks > 0 ? Math.round((overdueTasksCount / totalTasks) * 100) : 0, color: '#D85A30' },
-      { name: 'Đang chờ', value: totalTasks > 0 ? Math.round((pendingTasksCount / totalTasks) * 100) : 0, color: '#FBBF24' },
+      { name: 'Đã xong', value: totalTasks > 0 ? Math.round((doneTasksCount / totalTasks) * 100) : 0 },
+      { name: 'Quá hạn', value: totalTasks > 0 ? Math.round((overdueTasksCount / totalTasks) * 100) : 0 },
+      { name: 'Đang chờ', value: totalTasks > 0 ? Math.round((pendingTasksCount / totalTasks) * 100) : 0 },
     ]
 
     return {

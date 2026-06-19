@@ -6,7 +6,9 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip,
   PieChart, Pie, Cell,
 } from "recharts";
+import { Activity, CheckSquare } from "lucide-react";
 import { ChartCard } from "./ChartCard";
+import { EmptyState } from "./EmptyState";
 import { reportsService } from "@/services/reports.service";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -33,6 +35,12 @@ const LEGEND = [
   { color: "#AFA9EC", name: "Meetings" },
   { color: "#1D9E75", name: "Tasks" },
 ];
+
+const STATUS_COLORS: Record<string, string> = {
+  "Đã xong": "#1D9E75",
+  "Quá hạn": "#D85A30",
+  "Đang chờ": "#FBBF24",
+};
 
 interface ActivityReportTabProps {
   startDate?: string;
@@ -68,6 +76,9 @@ export function ActivityReportTab({ startDate, endDate }: ActivityReportTabProps
   const overduePercentItem = data.statusDistribution.find(d => d.name === "Quá hạn");
   const overduePercent = overduePercentItem ? overduePercentItem.value : 0;
 
+  const isTrendEmpty = !data.trend || data.trend.length === 0 || (totalCalls === 0 && totalMeetings === 0 && totalTasks === 0);
+  const isStatusEmpty = !data.statusDistribution || data.statusDistribution.length === 0 || data.statusDistribution.every(d => d.value === 0);
+
   return (
     <div className="flex flex-col gap-5">
       {/* Row 1: KPI Cards */}
@@ -102,28 +113,39 @@ export function ActivityReportTab({ startDate, endDate }: ActivityReportTabProps
             title="Xu hướng hoạt động theo tháng"
             subtitle="Phân bố các loại cuộc gọi, email, họp mặt và nhiệm vụ"
             action={
-              <div className="flex items-center gap-3 mr-1">
-                {LEGEND.map((l) => (
-                  <div key={l.name} className="flex items-center gap-1">
-                    <div className="size-2.5 rounded-sm shrink-0" style={{ background: l.color }} />
-                    <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>{l.name}</span>
-                  </div>
-                ))}
-              </div>
+              !isTrendEmpty && (
+                <div className="flex items-center gap-3 mr-1">
+                  {LEGEND.map((l) => (
+                    <div key={l.name} className="flex items-center gap-1">
+                      <div className="size-2.5 rounded-sm shrink-0" style={{ background: l.color }} />
+                      <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>{l.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )
             }
           >
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={data.trend} margin={{ top: 10, right: 16, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} width={30} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="Calls" stackId="activities" name="Calls" fill="#534AB7" />
-                <Bar dataKey="Emails" stackId="activities" name="Emails" fill="#7F77DD" />
-                <Bar dataKey="Meetings" stackId="activities" name="Meetings" fill="#AFA9EC" />
-                <Bar dataKey="Tasks" stackId="activities" name="Tasks" fill="#1D9E75" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {isTrendEmpty ? (
+              <EmptyState
+                icon={Activity}
+                title="Chưa có hoạt động"
+                description="Chưa ghi nhận hoạt động (Call, Email, Meeting) nào trong khoảng thời gian này."
+                height={240}
+              />
+            ) : (
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={data.trend} margin={{ top: 10, right: 16, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} width={30} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="Calls" stackId="activities" name="Calls" fill="#534AB7" />
+                  <Bar dataKey="Emails" stackId="activities" name="Emails" fill="#7F77DD" />
+                  <Bar dataKey="Meetings" stackId="activities" name="Meetings" fill="#AFA9EC" />
+                  <Bar dataKey="Tasks" stackId="activities" name="Tasks" fill="#1D9E75" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </ChartCard>
         </div>
 
@@ -132,39 +154,48 @@ export function ActivityReportTab({ startDate, endDate }: ActivityReportTabProps
           title="Trạng thái nhiệm vụ"
           subtitle="Tỷ lệ hoàn thành công việc được giao"
         >
-          <div className="flex flex-col items-center gap-2" style={{ height: 240 }}>
-            <ResponsiveContainer width="100%" height={150}>
-              <PieChart>
-                <Pie
-                  data={data.statusDistribution}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={68}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {data.statusDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+          {isStatusEmpty ? (
+            <EmptyState
+              icon={CheckSquare}
+              title="Chưa có nhiệm vụ"
+              description="Không có nhiệm vụ nào được lên lịch hoặc hoàn thành trong khoảng thời gian này."
+              height={240}
+            />
+          ) : (
+            <div className="flex flex-col items-center gap-2" style={{ height: 240 }}>
+              <ResponsiveContainer width="100%" height={150}>
+                <PieChart>
+                  <Pie
+                    data={data.statusDistribution}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={68}
+                    paddingAngle={3}
+                    dataKey="value"
+                  >
+                    {data.statusDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.name] || "#6B6B67"} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
 
-            {/* Custom status legend labels */}
-            <div className="w-full grid grid-cols-3 gap-1 mt-1">
-              {data.statusDistribution.map((d) => (
-                <div key={d.name} className="flex flex-col items-center text-center">
-                  <div className="flex items-center gap-1 mb-0.5">
-                    <div className="size-2 rounded-full shrink-0" style={{ background: d.color }} />
-                    <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>{d.name}</span>
+              {/* Custom status legend labels */}
+              <div className="w-full grid grid-cols-3 gap-1 mt-1">
+                {data.statusDistribution.map((d) => (
+                  <div key={d.name} className="flex flex-col items-center text-center">
+                    <div className="flex items-center gap-1 mb-0.5">
+                      <div className="size-2 rounded-full shrink-0" style={{ background: STATUS_COLORS[d.name] || "#6B6B67" }} />
+                      <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>{d.name}</span>
+                    </div>
+                    <span className="text-[#1A1A18] font-bold" style={{ fontSize: 12 }}>{d.value}%</span>
                   </div>
-                  <span className="text-[#1A1A18] font-bold" style={{ fontSize: 12 }}>{d.value}%</span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </ChartCard>
       </div>
     </div>

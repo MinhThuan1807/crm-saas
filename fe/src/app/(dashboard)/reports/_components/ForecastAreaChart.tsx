@@ -3,7 +3,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip,
 } from "recharts";
 import { ChartCard } from "./ChartCard";
-import { fmtTr } from "./reportsData";
+import { formatVndShort } from "@/lib/helper";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -14,7 +14,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <div key={p.dataKey} className="flex items-center gap-2 mb-0.5">
           <span className="size-2 rounded-full shrink-0" style={{ background: p.color ?? p.stroke }} />
           <span className="text-[#6B6B67]">{p.name}:</span>
-          <span className="text-[#1A1A18]" style={{ fontWeight: 500 }}>{fmtTr(p.value)}</span>
+          <span className="text-[#1A1A18]" style={{ fontWeight: 500 }}>{formatVndShort(p.value)}</span>
         </div>
       ))}
     </div>
@@ -29,7 +29,12 @@ interface ForecastAreaChartProps {
   }[];
 }
 
+import { LineChart } from "lucide-react";
+import { EmptyState } from "./EmptyState";
+
 export function ForecastAreaChart({ data = [] }: ForecastAreaChartProps) {
+  const isDataEmpty = !data || data.length === 0 || data.every(d => d.cumActual === 0 && d.cumForecast === 0);
+
   const lastItem = data[data.length - 1];
   const percentDiff = lastItem && lastItem.cumForecast > 0
     ? ((lastItem.cumActual - lastItem.cumForecast) / lastItem.cumForecast) * 100
@@ -47,7 +52,7 @@ export function ForecastAreaChart({ data = [] }: ForecastAreaChartProps) {
       title="Forecast vs Thực tế"
       subtitle="Doanh thu lũy kế"
       action={
-        data.length > 0 ? (
+        !isDataEmpty && data.length > 0 ? (
           <span
             className="px-2 py-0.5 rounded-full text-white mr-1"
             style={{
@@ -61,8 +66,16 @@ export function ForecastAreaChart({ data = [] }: ForecastAreaChartProps) {
         ) : null
       }
     >
-      <ResponsiveContainer width="100%" height={220}>
-        <AreaChart data={data} margin={{ top: 5, right: 16, left: 0, bottom: 5 }}>
+      {isDataEmpty ? (
+        <EmptyState
+          icon={LineChart}
+          title="Chưa có dự báo doanh thu"
+          description="Chưa có dữ liệu tích lũy thực tế và dự báo chốt hợp đồng trong khoảng thời gian này."
+          height={220}
+        />
+      ) : (
+        <ResponsiveContainer width="100%" height={220}>
+          <AreaChart data={data} margin={{ top: 5, right: 16, left: 0, bottom: 5 }}>
           <defs>
             <linearGradient id="rpt-fva-actual" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%"  stopColor="#534AB7" stopOpacity={0.22} />
@@ -75,7 +88,7 @@ export function ForecastAreaChart({ data = [] }: ForecastAreaChartProps) {
           </defs>
           <CartesianGrid key="fva-grid"  strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
           <XAxis         key="fva-xaxis" dataKey="month" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
-          <YAxis         key="fva-yaxis" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={fmtTr} width={48} domain={[0, yDomainMax]} />
+          <YAxis         key="fva-yaxis" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={formatVndShort} width={48} domain={[0, yDomainMax]} />
           <Tooltip       key="fva-tt"    content={<CustomTooltip />} />
           <Area
             key="fva-forecast"
@@ -98,6 +111,7 @@ export function ForecastAreaChart({ data = [] }: ForecastAreaChartProps) {
           />
         </AreaChart>
       </ResponsiveContainer>
+      )}
     </ChartCard>
   );
 }

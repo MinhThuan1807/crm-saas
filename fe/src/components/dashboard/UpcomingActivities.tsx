@@ -12,14 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-
-import { UpcomingActivityType } from "@/lib/validations/dashboard.schema";
+import { formatDateVi } from "@/lib/helper";
 
 type ActivityType = "call" | "email" | "meeting" | "note";
 
 interface Activity {
   id: string;
-  type: ActivityType;
+  type: string;
   title: string;
   contact: string;
   company: string;
@@ -29,43 +28,43 @@ interface Activity {
 const MOCK_ACTIVITIES: Activity[] = [
   {
     id: "a1",
-    type: "call",
+    type: "CALL",
     title: "Gọi điện theo dõi deal",
     contact: "Nguyễn Thị Bích",
     company: "Tập đoàn DEF",
-    time: "Hôm nay 14:00",
+    time: new Date(new Date().setHours(14, 0, 0, 0)).toISOString(),
   },
   {
     id: "a2",
-    type: "meeting",
+    type: "MEETING",
     title: "Họp demo sản phẩm",
     contact: "Trần Văn Nam",
     company: "Ngân hàng JKL",
-    time: "Hôm nay 15:30",
+    time: new Date(new Date().setHours(15, 30, 0, 0)).toISOString(),
   },
   {
     id: "a3",
-    type: "email",
+    type: "EMAIL",
     title: "Gửi báo giá cập nhật",
     contact: "Phạm Thị Lan",
     company: "Cty CP PQR",
-    time: "Ngày mai 09:00",
+    time: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString(),
   },
   {
     id: "a4",
-    type: "meeting",
+    type: "MEETING",
     title: "Thương lượng hợp đồng",
     contact: "Lê Đức Hùng",
     company: "Tập đoàn MNO",
-    time: "Ngày mai 14:00",
+    time: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString(),
   },
   {
     id: "a5",
-    type: "call",
+    type: "CALL",
     title: "Chăm sóc sau ký hợp đồng",
     contact: "Vũ Thị Hoa",
     company: "Cty TNHH VWX",
-    time: "24/03 10:30",
+    time: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString(),
   },
 ];
 
@@ -80,7 +79,7 @@ const typeConfig: Record<
 };
 
 interface UpcomingActivitiesProps {
-  activities?: UpcomingActivityType[];
+  activities?: Activity[];
   isLoading?: boolean;
 }
 
@@ -131,9 +130,10 @@ export function UpcomingActivities({ activities = MOCK_ACTIVITIES, isLoading = f
       ) : (
         <CardContent className="p-0 flex-1">
           {activities.map((act, i) => {
-            const config = typeConfig[act.type as ActivityType] || typeConfig.note;
+            const config = typeConfig[act.type.toLowerCase() as ActivityType] || typeConfig.note;
             const Icon = config.icon;
-            const isToday = act.time.startsWith("Hôm nay");
+            const formattedTime = formatDateVi(act.time);
+            const isToday = formattedTime.startsWith("Hôm nay");
 
             return (
               <div
@@ -177,7 +177,7 @@ export function UpcomingActivities({ activities = MOCK_ACTIVITIES, isLoading = f
                     fontWeight: isToday ? 500 : 400,
                   }}
                 >
-                  {act.time}
+                  {formattedTime}
                 </span>
               </div>
             );

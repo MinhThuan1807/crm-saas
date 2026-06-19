@@ -11,21 +11,27 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LeaderboardRepType } from "@/lib/validations/dashboard.schema";
+import { getInitials, getAvatarColors, formatVndShort } from "@/lib/helper";
 
 const MOCK_REPS = [
-  { rank: 1, initials: "TH", name: "Trần Thị Hương", deals: 12, revenue: 420, avatarBg: "#D4F5E4", avatarColor: "#1A5C38" },
-  { rank: 2, initials: "NQ", name: "Nguyễn Quang",   deals: 9,  revenue: 315, avatarBg: "#D4E8F5", avatarColor: "#1A4C6A" },
-  { rank: 3, initials: "PL", name: "Phạm Thị Lan",   deals: 8,  revenue: 280, avatarBg: "#F5D4D4", avatarColor: "#6A1A1A" },
-  { rank: 4, initials: "VD", name: "Vũ Đức Minh",    deals: 6,  revenue: 195, avatarBg: "#FFF0D4", avatarColor: "#6A400A" },
-  { rank: 5, initials: "LT", name: "Lê Thị Thu",     deals: 5,  revenue: 140, avatarBg: "#EEE8FD", avatarColor: "#3D2D8A" },
+  { rank: 1, userId: "u1", name: "Trần Thị Hương", deals: 12, revenue: 420000000 },
+  { rank: 2, userId: "u2", name: "Nguyễn Quang",   deals: 9,  revenue: 315000000 },
+  { rank: 3, userId: "u3", name: "Phạm Thị Lan",   deals: 8,  revenue: 280000000 },
+  { rank: 4, userId: "u4", name: "Vũ Đức Minh",    deals: 6,  revenue: 195000000 },
+  { rank: 5, userId: "u5", name: "Lê Thị Thu",     deals: 5,  revenue: 140000000 },
 ];
 
 const rankLabel = (r: number) =>
   r === 1 ? "🥇" : r === 2 ? "🥈" : r === 3 ? "🥉" : String(r);
 
 interface LeaderboardProps {
-  reps?: LeaderboardRepType[];
+  reps?: {
+    rank: number;
+    userId: string;
+    name: string;
+    deals: number;
+    revenue: number;
+  }[];
   isLoading?: boolean;
 }
 
@@ -100,13 +106,13 @@ export function Leaderboard({ reps = MOCK_REPS, isLoading = false }: Leaderboard
                   <AvatarFallback
                     className="border-0"
                     style={{
-                      background: rep.avatarBg,
-                      color: rep.avatarColor,
+                      background: getAvatarColors(rep.userId).bg,
+                      color: getAvatarColors(rep.userId).color,
                       fontSize: 10,
                       fontWeight: 600,
                     }}
                   >
-                    {rep.initials}
+                    {getInitials(rep.name)}
                   </AvatarFallback>
                 </Avatar>
 
@@ -147,7 +153,7 @@ export function Leaderboard({ reps = MOCK_REPS, isLoading = false }: Leaderboard
                     color: isFirst ? "#534AB7" : "#1A1A18",
                   }}
                 >
-                  {rep.revenue}tr
+                  {formatVndShort(rep.revenue)}
                 </span>
               </div>
             );

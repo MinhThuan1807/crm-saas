@@ -6,7 +6,7 @@ export interface DateParams {
 }
 
 export interface KpiVal {
-  value: string;
+  value: number;
   delta: string;
   up: boolean;
   subtext?: string;
@@ -30,15 +30,20 @@ export interface OverviewRes {
     cumActual: number;
     cumForecast: number;
   }[];
+  winLossData: {
+    stage: string;
+    win: number;
+    loss: number;
+  }[];
   topDeals: {
     id: string;
     name: string;
     company: string;
-    owner: string;
-    ownerInitials: string;
-    ownerBg: string;
-    ownerColor: string;
-    value: string;
+    owner: {
+      id: string;
+      name: string;
+    };
+    value: number;
     closedAt: string;
     stage: string;
   }[];
@@ -47,9 +52,6 @@ export interface OverviewRes {
 export interface TeamRepPerformance {
   userId: string;
   name: string;
-  initials: string;
-  bg: string;
-  text: string;
   actual: number;
   target: number;
   winRate: number;
@@ -92,7 +94,6 @@ export interface ActivitiesReportRes {
   statusDistribution: {
     name: string;
     value: number;
-    color: string;
   }[];
 }
 

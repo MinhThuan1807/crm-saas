@@ -208,7 +208,7 @@ const LoginPage = () => {
           </div>
         </div>
 
-        {/* SSO hint */}
+        {/* SSO hint
         <p className="mt-4 text-center text-[#9B9B96]" style={{ fontSize: 12 }}>
           Tổ chức của bạn dùng SSO?{" "}
           <button
@@ -218,7 +218,8 @@ const LoginPage = () => {
           >
             Đăng nhập với SSO
           </button>
-        </p>
+        </p> */}
+        
       </div>
 
       {/* Footer */}

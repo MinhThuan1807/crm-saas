@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { getInitials, getAvatarColors, formatVndShort, formatDate } from "@/lib/helper";
 
 type Filter = "all" | "won" | "lost";
 
@@ -14,11 +15,11 @@ export interface TopDeal {
   id: string;
   name: string;
   company: string;
-  owner: string;
-  ownerInitials: string;
-  ownerBg: string;
-  ownerColor: string;
-  value: string;
+  owner: {
+    id: string;
+    name: string;
+  };
+  value: number;
   closedAt: string;
   stage: string;
 }
@@ -133,14 +134,19 @@ export function TopDealsTable({ deals = [] }: TopDealsTableProps) {
                     <div className="flex items-center gap-2">
                       <Avatar className="size-6 shrink-0">
                         <AvatarFallback
-                          style={{ background: deal.ownerBg, color: deal.ownerColor, fontSize: 8, fontWeight: 700 }}
+                          style={{
+                            background: getAvatarColors(deal.owner.id).bg,
+                            color: getAvatarColors(deal.owner.id).color,
+                            fontSize: 8,
+                            fontWeight: 700,
+                          }}
                           className="border-0"
                         >
-                          {deal.ownerInitials}
+                          {getInitials(deal.owner.name)}
                         </AvatarFallback>
                       </Avatar>
                       <span className="text-[#1A1A18] whitespace-nowrap" style={{ fontSize: 12 }}>
-                        {deal.owner}
+                        {deal.owner.name}
                       </span>
                     </div>
                   </td>
@@ -148,13 +154,13 @@ export function TopDealsTable({ deals = [] }: TopDealsTableProps) {
                   {/* Value */}
                   <td className="px-5 py-3">
                     <span className="text-[#1A1A18] tabular-nums" style={{ fontSize: 12, fontWeight: 600 }}>
-                      {deal.value}
+                      {formatVndShort(deal.value)}
                     </span>
                   </td>
 
                   {/* Close date */}
                   <td className="px-5 py-3">
-                    <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>{deal.closedAt}</span>
+                    <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>{formatDate(deal.closedAt)}</span>
                   </td>
 
                   {/* Stage */}
