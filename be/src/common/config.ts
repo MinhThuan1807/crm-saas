@@ -34,6 +34,10 @@ const ConfigSchema = z.object({
   REDIS_TLS: z.string().optional(),
   RESEND_API_KEY: z.string().optional(),
   RESEND_FROM_EMAIL: z.string().optional(),
+
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECRET: z.string(),
+  GOOGLE_CALLBACK_URL: z.string(),
 }).superRefine((data, ctx) => {
   if (data.AI_PROVIDER === 'openai' && !data.OPENAI_API_KEY) {
     ctx.addIssue({
