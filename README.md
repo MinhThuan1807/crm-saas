@@ -1,4 +1,4 @@
-# CRM SaaS - Hệ thống Quản lý Khách hàng Thông minh cho SMEs
+# CRM SaaS - Intelligent Customer Management System for SMEs
 
 <!-- Badges section -->
 <div align="center">
@@ -17,56 +17,56 @@
 
 ---
 
-Hệ thống quản lý quan hệ khách hàng (CRM) dưới dạng phần mềm dịch vụ (SaaS) đa doanh nghiệp (Multi-tenant), được thiết kế tối ưu hóa quy trình bán hàng qua Sales Pipeline (Kanban Board), quản lý công việc và tích hợp sâu trí tuệ nhân tạo (Generative AI) linh hoạt qua OpenAI & Groq Cloud nhằm tự động hóa các tác vụ chăm sóc khách hàng hàng ngày cho doanh nghiệp vừa và nhỏ (SMEs).
+A multi-tenant Customer Relationship Management (CRM) SaaS platform, designed to optimize the sales process through a Sales Pipeline (Kanban Board), task management, and deep Generative AI integration (via OpenAI & Groq Cloud) to automate everyday customer-care tasks for small and medium-sized enterprises (SMEs).
 
-**Video Demo:**  [https://youtu.be/JAUMLhuh9cM](https://youtu.be/JAUMLhuh9cM)
-🚀 **Link Live Demo:** [https://codelaicuocdoi.io.vn](https://codelaicuocdoi.io.vn)
+**Demo Video:** [https://youtu.be/JAUMLhuh9cM](https://youtu.be/JAUMLhuh9cM)
+🚀 **Live Demo:** [https://codelaicuocdoi.io.vn](https://codelaicuocdoi.io.vn)
 <br>
-👥 **Tài khoản chạy thử nghiệm:**
-*   **Tenant 1:** `admin@abc.com` / Mật khẩu: `Password123!`
-*   **Sale tenant 1:** `sales@abc.com` / Mật khẩu: `Password123!`
-*   **Tenant 2:** `admin1@abc.com` / Mật khẩu: `Password123!`
+👥 **Test accounts:**
+*   **Tenant 1:** `admin@abc.com` / Password: `Password123!`
+*   **Sales rep, tenant 1:** `sales@abc.com` / Password: `Password123!`
+*   **Tenant 2:** `admin1@abc.com` / Password: `Password123!`
 
 ---
 
-## 📌 Tổng Quan Dự Án & Mục Tiêu
+## 📌 Project Overview & Goals
 
-### 1. Đối tượng sử dụng
-*   **Các doanh nghiệp vừa và nhỏ (SMEs):** Đang tìm kiếm giải pháp chuyển đổi số quy trình kinh doanh với chi phí tối ưu và dễ dàng triển khai.
-*   **Đội ngũ Sales & Chăm sóc khách hàng:** Cần công cụ trực quan để quản lý khách hàng tiềm năng, theo dõi các thương vụ (Deals) và quản lý công việc hàng ngày.
-*   **Nhà quản lý & Ban giám đốc:** Cần số liệu báo cáo doanh thu, hiệu suất làm việc của nhân viên và phân tích phễu bán hàng theo thời gian thực để đưa ra quyết định kinh doanh.
+### 1. Target Users
+*   **Small and Medium Enterprises (SMEs):** Looking for a digital transformation solution for their business processes with optimized cost and easy deployment.
+*   **Sales & Customer Care Teams:** Need an intuitive tool to manage leads, track deals, and handle daily tasks.
+*   **Managers & Executives:** Need real-time revenue reports, staff performance metrics, and sales-funnel analytics to support business decisions.
 
-### 2. Mục tiêu dự án
-*   **Tăng tỷ lệ chuyển đổi:** Giúp sales không bỏ sót cơ hội thông qua phễu bán hàng (pipeline) kéo thả trực quan và hệ thống nhắc nhở thông minh.
-*   **Tự động hóa bằng AI:** Giảm bớt thời gian ghi chép thủ công. AI sẽ tự động phân tích biên bản họp để trích xuất công việc cần làm, viết email follow-up và tóm tắt thông tin quan trọng bằng mô hình OpenAI hoặc Llama 3 (qua Groq).
-*   **Xây dựng kiến trúc SaaS chuẩn mực:** Thiết kế hệ thống đa doanh nghiệp (Multi-Tenant) an toàn, hiệu năng cao và có khả năng cô lập dữ liệu tuyệt đối giữa các tổ chức.
+### 2. Project Goals
+*   **Increase conversion rate:** Help sales reps avoid missing opportunities through a visual drag-and-drop pipeline and a smart reminder system.
+*   **Automate with AI:** Reduce manual note-taking time. AI automatically analyzes meeting notes to extract action items, draft follow-up emails, and summarize key information using OpenAI or Llama 3 (via Groq).
+*   **Build a standard SaaS architecture:** Design a secure, high-performance multi-tenant system with complete data isolation between organizations.
 
 ---
 
-## 📸 Hình Ảnh & Giao Diện Dự Án
+## 📸 Screenshots & Interface
 
-*Dưới đây là một số giao diện tiêu biểu của hệ thống:*
+*Below are some representative screens of the system:*
 
-| **Dashboard Phân Tích** | **Báo Cáo & Thống Kê** |
+| **Analytics Dashboard** | **Reports & Statistics** |
 | --- | --- |
-| ![Dashboard](assets/dashboard.jpg) | ![Báo Cáo](assets/reports.jpg) |
-| *Biểu đồ thống kê doanh thu và tổng quan hoạt động kinh doanh.* | *Phân tích chi tiết phễu bán hàng và báo cáo hiệu suất.* |
+| ![Dashboard](assets/dashboard.jpg) | ![Reports](assets/reports.jpg) |
+| *Revenue charts and a business activity overview.* | *Detailed sales-funnel analysis and performance reports.* |
 
-| **Kanban Board quản lý Deal Pipeline** | **AI Meeting Brief & Action Items** |
+| **Kanban Board for Deal Pipeline** | **AI Meeting Brief & Action Items** |
 | --- | --- |
 | ![Kanban Board](assets/pipeline.jpg) | ![AI Integration](assets/AI-intergation.jpg) |
-| *Kéo thả mượt mà để cập nhật trạng thái các cơ hội bán hàng.* | *AI tự động phân tích ghi chú cuộc họp và đề xuất danh sách công việc.* |
+| *Smooth drag-and-drop to update deal stages.* | *AI automatically analyzes meeting notes and suggests action items.* |
 
-| **Cấu hình Phân quyền & Multi-Tenant** |
+| **Permissions & Multi-Tenant Configuration** |
 | --- |
 | ![Tenant Settings](assets/tenant%20isolation.jpg) |
-| *Quản lý phân quyền chặt chẽ giữa các doanh nghiệp độc lập.* |
+| *Strict permission management between independent organizations.* |
 
 ---
 
-## 🛠️ Kiến Trúc Luồng Dữ Liệu (Application Data Flow)
+## 🛠️ Application Data Flow Architecture
 
-Dự án được triển khai theo mô hình Client-Server hiện đại, sử dụng cơ chế hàng đợi xử lý bất đồng bộ (Queue) cho các tác vụ nặng liên quan đến Trí tuệ nhân tạo (AI):
+The project is built on a modern client-server model, using an asynchronous job queue for heavy AI-related tasks:
 
 ```mermaid
 graph TD
@@ -86,19 +86,19 @@ graph TD
 
 ---
 
-## ☁️ Kiến Trúc Triển Khai Hệ Thống (Production Deployment Architecture)
+## ☁️ Production Deployment Architecture
 
-Hệ thống được thiết kế và triển khai trên môi trường Production với sự kết hợp tối ưu giữa đám mây **AWS (Amazon Web Services)**, nền tảng **Vercel** và cơ sở dữ liệu Redis Serverless của **Upstash**, giúp hệ thống đạt hiệu suất cao, tiết kiệm chi phí và vận hành ổn định:
+The system is designed and deployed in production using a combination of **AWS (Amazon Web Services)**, the **Vercel** platform, and **Upstash**'s serverless Redis database, achieving high performance, cost efficiency, and stable operation:
 
 ```mermaid
 graph TD
-    User[Người dùng / Trình duyệt] -->|1. Truy cập Tên miền Custom| DNS[DNS Tenten]
+    User[User / Browser] -->|1. Access Custom Domain| DNS[DNS - Tenten]
     
-    %% Phân luồng Frontend
+    %% Frontend routing
     DNS -->|2. Route Frontend| Vercel[Vercel CDN / Edge Network]
     Vercel -->|3. Serve UI| FE_App[Next.js Frontend on Vercel]
     
-    %% Phân luồng Backend
+    %% Backend routing
     DNS -->|2. Route Backend API| ALB[Application Load Balancer + ACM SSL]
     
     subgraph AWS_Cloud [AWS Cloud VPC]
@@ -107,7 +107,7 @@ graph TD
             NAT[NAT Gateway]
         end
 
-        subgraph Private_Subnet [Private Subnet - Cô lập hoàn toàn]
+        subgraph Private_Subnet [Private Subnet - Fully Isolated]
             subgraph ECS_Cluster [ECS Container Service]
                 BE_Tasks[NestJS API Tasks]
                 Worker_Tasks[NestJS Worker Tasks]
@@ -117,172 +117,171 @@ graph TD
         end
     end
 
-    %% Mối quan hệ với Docker Image
+    %% Relationship with Docker images
     ECR[Amazon ECR - Registry] -.->|Pull Images| ECS_Cluster
 
-    %% Luồng API và Workers
+    %% API and worker flow
     ALB -->|3. Route API & SSE| BE_Tasks
-    BE_Tasks -->|4. Lưu/Đọc dữ liệu| RDS
-    Worker_Tasks -->|4. Lưu/Đọc dữ liệu| RDS
+    BE_Tasks -->|4. Read/Write Data| RDS
+    Worker_Tasks -->|4. Read/Write Data| RDS
 
-    %% Kết nối Redis Serverless Upstash
-    BE_Tasks -->|5. Đẩy Task vào Queue| Upstash[(Upstash Serverless Redis)]
-    Worker_Tasks -->|6. Lấy Task ra xử lý| Upstash
+    %% Upstash serverless Redis connection
+    BE_Tasks -->|5. Push Task to Queue| Upstash[(Upstash Serverless Redis)]
+    Worker_Tasks -->|6. Pull Task for Processing| Upstash
 
-    %% Kết nối API bên ngoài
-    Worker_Tasks -->|7. Gọi LLM APIs qua NAT| NAT
-    NAT -->|HTTPS Outside| Groq[Groq API Cloud]
-    NAT -->|HTTPS Outside| OpenAI[OpenAI API Cloud]
+    %% External API connections
+    Worker_Tasks -->|7. Call LLM APIs via NAT| NAT
+    NAT -->|HTTPS Outbound| Groq[Groq API Cloud]
+    NAT -->|HTTPS Outbound| OpenAI[OpenAI API Cloud]
 ```
 
-### Chi tiết các thành phần hạ tầng:
+### Infrastructure Components in Detail
 
-*   **Tên miền & Chứng chỉ bảo mật (Tenten DNS & AWS ACM):** Tên miền chính được quản lý bởi nhà cung cấp **Tenten**, cấu hình trỏ bản ghi A/CNAME về Vercel (cho Frontend) và ALB (cho Backend). Chứng chỉ SSL/TLS được cấu hình và tự động gia hạn thông qua **AWS Certificate Manager (ACM)** đính kèm vào Application Load Balancer để đảm bảo mọi kết nối API đều qua giao thức HTTPS bảo mật.
-*   **Frontend (Vercel):** Phân hệ Frontend Next.js được triển khai trực tiếp trên **Vercel** để tận dụng hệ thống Global CDN/Edge Network cực kỳ mạnh mẽ, giúp tối ưu hóa thời gian phản hồi (TTFB) và tốc độ tải trang toàn cầu.
-*   **Container Registry (Amazon ECR):** Lưu trữ các phiên bản Docker Image của Backend (`be`) và Background Worker được build từ CI/CD pipeline.
-*   **Backend & Workers (Amazon ECS):** 
-    *   Sử dụng **Amazon ECS** để quản lý các container chạy ứng dụng NestJS API và các tiến trình worker xử lý tác vụ AI ngầm.
-    *   Hạ tầng được cô lập trong **Private Subnet** để tăng cường tính bảo mật, ngăn chặn mọi xâm nhập trực tiếp từ internet.
-*   **Cơ sở dữ liệu (Amazon RDS PostgreSQL):** Lưu trữ cơ sở dữ liệu quan hệ PostgreSQL của hệ thống SaaS đa doanh nghiệp, đảm bảo hiệu năng đọc/ghi mạnh mẽ và an toàn dữ liệu.
-*   **Hàng đợi & Caching (Upstash Serverless Redis):** Thay vì tự vận hành cụm ElastiCache tốn kém tài nguyên chạy liên tục, dự án tối ưu chi phí bằng cách sử dụng **Upstash Redis (Serverless)** bên ngoài VPC. Điều này giúp hệ thống quản lý Message Queue (BullMQ) linh hoạt theo cơ chế Serverless (Pay-as-you-go) mà vẫn đảm bảo tốc độ phản hồi cực nhanh (low-latency).
-*   **NAT Gateway:** Cung cấp kết nối internet một chiều đi ra ngoài cho các ECS tasks trong Private Subnet gọi đến các dịch vụ bên ngoài như Groq API, OpenAI API hay Upstash Redis, trong khi chặn đứng mọi chiều truy cập từ ngoài internet đi thẳng vào container.
+*   **Domain & SSL Certificate (Tenten DNS & AWS ACM):** The primary domain is managed by **Tenten**, with A/CNAME records pointing to Vercel (for the frontend) and the ALB (for the backend). SSL/TLS certificates are configured and auto-renewed through **AWS Certificate Manager (ACM)**, attached to the Application Load Balancer to ensure every API connection goes through secure HTTPS.
+*   **Frontend (Vercel):** The Next.js frontend is deployed directly on **Vercel** to leverage its powerful global CDN/Edge Network, optimizing time-to-first-byte (TTFB) and global page-load speed.
+*   **Container Registry (Amazon ECR):** Stores Docker image versions for the backend (`be`) and the background worker, built by the CI/CD pipeline.
+*   **Backend & Workers (Amazon ECS):**
+    *   Uses **Amazon ECS** to manage containers running the NestJS API and background worker processes that handle AI tasks.
+    *   Infrastructure is isolated in a **Private Subnet** to enhance security and block direct internet access.
+*   **Database (Amazon RDS PostgreSQL):** Stores the relational PostgreSQL database for the multi-tenant SaaS system, ensuring strong read/write performance and data safety.
+*   **Queue & Caching (Upstash Serverless Redis):** Instead of running a self-managed, always-on ElastiCache cluster, the project optimizes cost by using **Upstash Redis (Serverless)** outside the VPC. This enables flexible BullMQ message-queue management on a pay-as-you-go serverless model while maintaining very low latency.
+*   **NAT Gateway:** Provides one-way outbound internet access for ECS tasks in the Private Subnet to reach external services such as the Groq API, OpenAI API, or Upstash Redis, while blocking all inbound traffic from the internet directly into the containers.
 
 ---
 
-## 🛠️ Tech Stack Chi Tiết
+## 🛠️ Detailed Tech Stack
 
-Dự án được phân tách rõ ràng thành hai phân hệ Frontend và Backend:
+The project is clearly split into two subsystems: Frontend and Backend.
 
 ### 1. Frontend ([/fe])
-*   **Core Framework:** React 19 & Next.js 16 (App Router) - Tối ưu hóa SEO, SSR/SSG và trải nghiệm tải trang cực nhanh.
-*   **Styling & UI:** Tailwind CSS v4 & Tailwind Animate CSS cho giao diện hiện đại và các hiệu ứng chuyển động mượt mà.
-*   **UI Components:** Shadcn UI & Radix UI đảm bảo tính đồng bộ và thẩm mỹ cao theo chuẩn thiết kế premium.
-*   **State Management:** Zustand - Quản lý trạng thái client gọn nhẹ và tối ưu hiệu năng.
-*   **Data Fetching & Caching:** React Query (TanStack Query v5) giúp đồng bộ hóa dữ liệu từ server, tự động re-fetch và cache thông minh.
+*   **Core Framework:** React 19 & Next.js 16 (App Router) - optimized for SEO, SSR/SSG, and a very fast page-load experience.
+*   **Styling & UI:** Tailwind CSS v4 & Tailwind Animate CSS for a modern interface with smooth animations.
+*   **UI Components:** Shadcn UI & Radix UI for consistency and a premium design standard.
+*   **State Management:** Zustand - lightweight, performant client-side state management.
+*   **Data Fetching & Caching:** React Query (TanStack Query v5) for syncing data from the server, with automatic re-fetching and smart caching.
 *   **Visualizations & Drag & Drop:**
-    *   Recharts: Vẽ các biểu đồ thống kê doanh thu, hiệu suất nhóm và phễu bán hàng.
-    *   `@dnd-kit`: Xử lý tương tác kéo thả mượt mà trên Kanban Board quản lý thương vụ (Deal Pipeline).
-*   **Validation:** Zod kết hợp với React Hook Form.
+    *   Recharts: renders revenue, team-performance, and sales-funnel charts.
+    *   `@dnd-kit`: handles smooth drag-and-drop interactions on the deal-pipeline Kanban board.
+*   **Validation:** Zod combined with React Hook Form.
 
 ### 2. Backend ([/be])
-*   **Core Framework:** NestJS 11 (Node.js framework hướng đối tượng sử dụng TypeScript) giúp cấu trúc code rõ ràng, tính module hóa cao và dễ bảo trì.
-*   **Database & ORM:** PostgreSQL kết hợp Prisma ORM v7 (sử dụng `@prisma/adapter-pg`).
-*   **Authentication & Security:** Passport JWT cho cơ chế xác thực an toàn và phân quyền cô lập dữ liệu giữa các Tenant.
-*   **Background Jobs & Queues:** BullMQ & Bull (chạy trên nền Redis) dùng để xử lý bất đồng bộ các tác vụ nặng (gọi OpenAI API) nhằm giải phóng tài nguyên cho luồng xử lý chính.
-*   **Real-time Communication:** Server-Sent Events (SSE) để truyền phát trạng thái xử lý của AI từ worker tới frontend theo thời gian thực.
-*   **AI Integration:** Hỗ trợ cơ chế chuyển đổi linh hoạt linh hoạt (Multi-provider) thông qua OpenAI SDK:
-    *   **OpenAI Cloud:** Sử dụng mô hình `gpt-4o-mini` cho các tác vụ cần phân tích logic sâu sắc.
-    *   **Groq Cloud:** Tích hợp API của **Groq** sử dụng mô hình mã nguồn mở siêu tốc `llama-3.3-70b-versatile` để tăng tốc độ phân tích lên gấp nhiều lần với chi phí tối ưu.
+*   **Core Framework:** NestJS 11 (an object-oriented Node.js framework using TypeScript), providing a clear code structure, high modularity, and easy maintenance.
+*   **Database & ORM:** PostgreSQL combined with Prisma ORM v7 (using `@prisma/adapter-pg`).
+*   **Authentication & Security:** Passport JWT for secure authentication and isolated permission handling between tenants.
+*   **Background Jobs & Queues:** BullMQ & Bull (running on Redis) for asynchronously processing heavy tasks (calling the OpenAI API), freeing up resources on the main processing thread.
+*   **Real-time Communication:** Server-Sent Events (SSE) to stream AI processing status from the worker to the frontend in real time.
+*   **AI Integration:** Supports flexible multi-provider switching via the OpenAI SDK:
+    *   **OpenAI Cloud:** Uses the `gpt-4o-mini` model for tasks requiring deeper logical analysis.
+    *   **Groq Cloud:** Integrates the **Groq** API using the ultra-fast open-source model `llama-3.3-70b-versatile`, multiplying analysis speed while keeping costs optimized.
 
 ---
 
-## 🧠 Giải Pháp Cho Các Bài Toán Kỹ Thuật (Key Challenges & Solutions)
+## 🧠 Key Technical Challenges & Solutions
 
-### 1. Cô Lập Dữ Liệu Trong Mô Hình Đa Doanh Nghiệp (Multi-Tenant Data Isolation)
-*   **Thách thức:** Trong mô hình SaaS dùng chung một Database (Shared Schema), việc rò rỉ dữ liệu giữa Tenant A và Tenant B là lỗi nghiêm trọng.
-*   **Giải pháp:** Mọi truy vấn cơ sở dữ liệu đều được lọc qua một lớp trung gian (Tenant Context Interceptor/Guard). Khi client gửi request kèm JWT token, hệ thống phân tích `tenantId` và đính kèm điều kiện này vào mọi câu lệnh truy vấn Prisma ORM. Điều này đảm bảo mỗi Tenant chỉ có thể thao tác với dữ liệu thuộc về tổ chức của mình.
+### 1. Data Isolation in the Multi-Tenant Model
+*   **Challenge:** In a shared-schema SaaS model, data leakage between Tenant A and Tenant B is a critical bug.
+*   **Solution:** Every database query passes through an intermediate layer (Tenant Context Interceptor/Guard). When a client sends a request with a JWT token, the system extracts the `tenantId` and attaches this condition to every Prisma ORM query. This ensures each tenant can only operate on data belonging to its own organization.
 
-### 2. Xử Lý Tác Vụ AI Không Làm Nghẽn Hệ Thống (Asynchronous Job Processing)
-*   **Thách thức:** Việc phân tích biên bản cuộc họp bằng OpenAI/Groq API có thể tốn từ vài giây tới nửa phút. Nếu gọi trực tiếp đồng bộ, Server sẽ bị treo luồng xử lý (blocking) và trình duyệt có thể bị quá thời gian chờ (timeout).
-*   **Giải pháp:** Hệ thống sử dụng **BullMQ + Redis** để chuyển tác vụ AI thành các Job chạy ngầm (Background Job). Khi nhận yêu cầu, API trả về HTTP `202 Accepted` ngay lập tức để giải phóng client. Background Worker sẽ lấy job ra xử lý độc lập. Khi hoàn thành, worker lưu dữ liệu và kích hoạt cơ chế thông báo **Server-Sent Events (SSE)** để cập nhật giao diện người dùng theo thời gian thực.
-*   **Tích hợp Groq API:** Bằng cách thiết lập `AI_PROVIDER=groq`, hệ thống chuyển luồng gọi API sang cổng Groq Cloud API endpoint (`https://api.groq.com/openai/v1`). Với mô hình Llama-3.3-70b có tốc độ phản hồi cực nhanh, trải nghiệm người dùng đối với các tác vụ AI gần như tức thời so với các mô hình truyền thống.
+### 2. Asynchronous AI Job Processing Without Blocking the System
+*   **Challenge:** Analyzing meeting notes via the OpenAI/Groq API can take anywhere from a few seconds to half a minute. Calling it synchronously would block the server's processing thread, and the browser could time out.
+*   **Solution:** The system uses **BullMQ + Redis** to turn AI tasks into background jobs. Upon receiving a request, the API immediately returns an HTTP `202 Accepted` to free up the client. A background worker then picks up the job and processes it independently. Once finished, the worker saves the result and triggers a **Server-Sent Events (SSE)** notification to update the UI in real time.
+*   **Groq API Integration:** By setting `AI_PROVIDER=groq`, the system routes API calls to the Groq Cloud API endpoint (`https://api.groq.com/openai/v1`). With the ultra-fast Llama-3.3-70b model, the user experience for AI tasks feels nearly instant compared to traditional models.
 
 ---
 
-## 📁 Cấu Trúc Dự Án
+## 📁 Project Structure
 
 ```text
 crm-sass/
-├── fe/                  # Phân hệ Frontend (Next.js & React 19)
+├── fe/                  # Frontend subsystem (Next.js & React 19)
 │   ├── src/
-│   │   ├── app/         # App Router (Dashboard, Pipeline, Reports, v.v.)
-│   │   ├── components/  # Các UI Component tái sử dụng (Shadcn UI)
+│   │   ├── app/         # App Router (Dashboard, Pipeline, Reports, etc.)
+│   │   ├── components/  # Reusable UI components (Shadcn UI)
 │   │   ├── hooks/       # Custom React Hooks (useAuth, data-fetching...)
-│   │   ├── lib/         # Tiện ích dùng chung & Zod Schemas
-│   │   └── store/       # Zustand Store quản lý Client-side State
-├── be/                  # Phân hệ Backend (NestJS 11)
+│   │   ├── lib/         # Shared utilities & Zod schemas
+│   │   └── store/       # Zustand store for client-side state
+├── be/                  # Backend subsystem (NestJS 11)
 │   ├── src/
-│   │   ├── routes/      # Các module API (Deals, Tasks, AI, Tenants...)
-│   │   ├── common/      # Guards, Interceptors, Decorators dùng chung
-│   │   └── main.ts      # Khởi động ứng dụng NestJS
+│   │   ├── routes/      # API modules (Deals, Tasks, AI, Tenants...)
+│   │   ├── common/      # Shared guards, interceptors, decorators
+│   │   └── main.ts      # NestJS application bootstrap
 ```
 
 ---
 
-## 🚀 Hướng Dẫn Cài Đặt & Chạy Thử (Setup Guide)
+## 🚀 Setup Guide
 
-### 📋 Yêu cầu hệ thống
-*   **Node.js** v20.19.0 trở lên
-*   **Docker** (để khởi chạy PostgreSQL & Redis nhanh chóng) hoặc cài đặt trực tiếp trên máy.
+### 📋 System Requirements
+*   **Node.js** v20.19.0 or higher
+*   **Docker** (to quickly spin up PostgreSQL & Redis) or install them directly on your machine.
 
-### Bước 1: Khởi chạy PostgreSQL & Redis bằng Docker
-Để thiết lập cơ sở dữ liệu và hàng đợi nhanh nhất, hãy chạy các lệnh sau:
+### Step 1: Start PostgreSQL & Redis with Docker
+To set up the database and queue quickly, run the following commands:
 ```bash
-# Khởi chạy PostgreSQL Container
+# Start the PostgreSQL container
 docker run --name crm-postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
 
-# Khởi chạy Redis Container (Dùng cho BullMQ Queue)
+# Start the Redis container (used for the BullMQ queue)
 docker run --name crm-redis -p 6379:6379 -d redis
 ```
 
-### Bước 2: Thiết lập Backend ([/be])
-1. Di chuyển vào thư mục backend và cài đặt thư viện:
+### Step 2: Backend Setup ([/be])
+1. Move into the backend directory and install dependencies:
    ```bash
    cd be
    npm install
    ```
-2. Tạo file cấu hình môi trường `.env`:
+2. Create the `.env` configuration file:
    ```bash
    cp .env.example .env
    ```
-   *Cập nhật các biến số trong file `.env`:*
+   *Update the variables in the `.env` file:*
    ```ini
    DATABASE_URL="postgresql://postgres:postgres@localhost:5432/crm_saas?schema=public"
    REDIS_HOST="localhost"
    REDIS_PORT=6379
    
-   # Cấu hình AI Provider (openai hoặc groq)
-   AI_PROVIDER="groq" # hoặc "openai"
+   # AI provider configuration (openai or groq)
+   AI_PROVIDER="groq" # or "openai"
    
-   # Nếu dùng OpenAI
+   # If using OpenAI
    OPENAI_API_KEY="your-openai-api-key"
    OPENAI_MODEL="gpt-4o-mini"
    
-   # Nếu dùng Groq
+   # If using Groq
    GROQ_API_KEY="your-groq-api-key"
    GROQ_MODEL="llama-3.3-70b-versatile"
    ```
-3. Thực hiện đồng bộ Database Schema và tạo dữ liệu mẫu (Seed Data):
+3. Run the database schema sync and seed sample data:
    ```bash
    npx prisma migrate dev
    npx prisma db seed
    ```
-4. Chạy Backend ở chế độ Development:
+4. Run the backend in development mode:
    ```bash
    npm run start:dev
    ```
-   *Backend sẽ khởi chạy tại cổng [http://localhost:3001](http://localhost:3001) (hoặc cổng được cấu hình).*
+   *The backend will start on port [http://localhost:3001](http://localhost:3001) (or your configured port).*
 
-### Bước 3: Thiết lập Frontend ([/fe])
-1. Di chuyển vào thư mục frontend và cài đặt thư viện:
+### Step 3: Frontend Setup ([/fe])
+1. Move into the frontend directory and install dependencies:
    ```bash
    cd ../fe
    npm install
    ```
-2. Tạo file cấu hình môi trường `.env.local`:
+2. Create the `.env.local` configuration file:
    ```bash
    cp .env.example .env.local
    ```
-   *Cấu hình `NEXT_PUBLIC_API_URL` trỏ về API Backend của bạn (ví dụ: http://localhost:3001).*
-3. Chạy ứng dụng Frontend:
+   *Set `NEXT_PUBLIC_API_URL` to point to your backend API (e.g. http://localhost:3001).*
+3. Run the frontend application:
    ```bash
    npm run dev
    ```
-   *Mở trình duyệt truy cập [http://localhost:3000](http://localhost:3000) để trải nghiệm ứng dụng.*
+   *Open your browser at [http://localhost:3000](http://localhost:3000) to use the app.*
 
 ---
 
-## 📝 Bản Quyền & Giấy Phép
-Dự án được phân phối dưới giấy phép **MIT License**. Bạn có thể tự do clone và phát triển thêm.  
-*Liên hệ hỗ trợ hoặc đóng góp ý kiến qua email: `nguyenthuan05.work@gmail.com`*
-
+## 📝 License
+This project is distributed under the **MIT License**. Feel free to clone and extend it.
+*For support or feedback, contact: `nguyenthuan05.work@gmail.com`*
