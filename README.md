@@ -19,11 +19,13 @@
 
 Hệ thống quản lý quan hệ khách hàng (CRM) dưới dạng phần mềm dịch vụ (SaaS) đa doanh nghiệp (Multi-tenant), được thiết kế tối ưu hóa quy trình bán hàng qua Sales Pipeline (Kanban Board), quản lý công việc và tích hợp sâu trí tuệ nhân tạo (Generative AI) linh hoạt qua OpenAI & Groq Cloud nhằm tự động hóa các tác vụ chăm sóc khách hàng hàng ngày cho doanh nghiệp vừa và nhỏ (SMEs).
 
+**Video Demo:**  [https://youtu.be/JAUMLhuh9cM](https://youtu.be/JAUMLhuh9cM)
 🚀 **Link Live Demo:** [https://codelaicuocdoi.io.vn](https://codelaicuocdoi.io.vn)
 <br>
 👥 **Tài khoản chạy thử nghiệm:**
-*   **Tenant 1 (Công ty Công nghệ):** `admin@abc.com` / Mật khẩu: `Password123!`
-*   **Tenant 2 (Công ty Bán lẻ):** `admin1@abc.com` / Mật khẩu: `Password123!`
+*   **Tenant 1:** `admin@abc.com` / Mật khẩu: `Password123!`
+*   **Sale tenant 1:** `sales@abc.com` / Mật khẩu: `Password123!`
+*   **Tenant 2:** `admin1@abc.com` / Mật khẩu: `Password123!`
 
 ---
 
