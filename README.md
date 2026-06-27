@@ -20,7 +20,6 @@
 A multi-tenant Customer Relationship Management (CRM) SaaS platform, designed to optimize the sales process through a Sales Pipeline (Kanban Board), task management, and deep Generative AI integration (via OpenAI & Groq Cloud) to automate everyday customer-care tasks for small and medium-sized enterprises (SMEs).
 
 **Demo Video:** [https://youtu.be/JAUMLhuh9cM](https://youtu.be/JAUMLhuh9cM)
-🚀 **Live Demo:** [https://codelaicuocdoi.io.vn](https://codelaicuocdoi.io.vn)
 <br>
 👥 **Test accounts:**
 *   **Tenant 1:** `admin@abc.com` / Password: `Password123!`
