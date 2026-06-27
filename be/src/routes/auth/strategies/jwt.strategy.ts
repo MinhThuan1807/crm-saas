@@ -3,13 +3,13 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import envConfig from 'src/common/config';
+import { AccessTokenPayloadCreate } from 'src/common/types/jwt.type';
 
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
-      // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       jwtFromRequest: ExtractJwt.fromExtractors([
         (req) => req?.cookies?.['accessToken'] ?? null,
       ]),
@@ -18,8 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { userId: number; role: string; tenantId: number }) {
-    // console.log('JWT Payload:', payload) 
+  async validate(payload: AccessTokenPayloadCreate) {
     return { userId: payload.userId, role: payload.role, tenantId: payload.tenantId };
   }
 }

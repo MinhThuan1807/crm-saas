@@ -18,17 +18,12 @@ export class ContactsService {
         limit,
         search
       }, userContext);
-      // 3. Tính hasNextPage
+
       const hasNextPage = contacts.length > limit;
-
       const data = hasNextPage ? contacts.slice(0, -1) : contacts;
-      // slice(0, -1) bỏ phần tử cuối (phần tử thừa)
-
-      // 4. Lấy cursor tiếp theo
       const nextCursor = hasNextPage ? data[data.length - 1].id : null
 
       const pagination = {nextCursor, hasNextPage}
-
       return {
         data,
         pagination
@@ -38,7 +33,7 @@ export class ContactsService {
   async getContactById(contactId: string, tenantId: string, userContext?: { userId: string; role: string }) {
     const contact =  await this.contactRepository.findOne(contactId, tenantId, userContext);
     if (!contact) {
-      throw new NotFoundException('Hợp đồng không tồn tại');
+      throw new NotFoundException('Liên hệ không tồn tại');
     }
     return contact;
   }
@@ -52,7 +47,7 @@ export class ContactsService {
   async update(contactId: string, tenantId: string, body: Partial<CreateContactBodyType>, userContext?: { userId: string; role: string }) {
     const exits = await this.contactRepository.findOne(contactId, tenantId, userContext);
     if (!exits) {
-      throw new NotFoundException('Hợp đồng không tồn tại');
+      throw new NotFoundException('Liên hệ không tồn tại');
     }
     const result = await this.contactRepository.update(contactId, tenantId, body);
     await this.redisService.invalidateTenantCache(tenantId)
@@ -62,7 +57,7 @@ export class ContactsService {
   async delete(contactId: string, tenantId: string, userContext?: { userId: string; role: string }) {
     const exits = await this.contactRepository.findOne(contactId, tenantId, userContext);
     if (!exits) {
-      throw new NotFoundException('Hợp đồng không tồn tại');
+      throw new NotFoundException('Liên hệ không tồn tại');
     }
     const result = await this.contactRepository.delete(contactId, tenantId)
     await this.redisService.invalidateTenantCache(tenantId)
@@ -72,7 +67,7 @@ export class ContactsService {
   async restore(contactId: string, tenantId: string, userContext?: { userId: string; role: string }) {
     const exits = await this.contactRepository.findDeleted(contactId, tenantId, userContext);
     if (!exits) {
-      throw new NotFoundException('Hợp đồng không tồn tại');
+      throw new NotFoundException('Liên hệ không tồn tại');
     }
     const result = await this.contactRepository.restore(contactId, tenantId)
     await this.redisService.invalidateTenantCache(tenantId)

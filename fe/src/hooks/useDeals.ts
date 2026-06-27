@@ -49,8 +49,6 @@ export const useGetPipeline = () => {
       setError(null);
     }
   }, [query.data]); // eslint-disable-line react-hooks/exhaustive-deps
-  // ^ bỏ setPipeline/setError khỏi deps — chúng là stable Zustand actions
-  //   nhưng TypeScript/ESLint không biết điều đó
 
   useEffect(() => {
     setLoading(query.isLoading);

@@ -55,7 +55,8 @@ pids
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-/generated/prisma-client
+/generated/
+/src/generated/
 
 # Ignore markdown files that are used for problem description and solution explanation in the project documentation
 Problem.md

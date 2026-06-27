@@ -1,19 +1,199 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma-client"
-  // moduleFormat  = "cjs"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// ── Enums ────────────────────────────────────────────
+model Tenant {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  plan        String       @default("free")
+  createdAt   DateTime     @default(now())
+  activities  Activity[]
+  contacts    Contact[]
+  deals       Deal[]
+  invitations Invitation[]
+  kpiTargets  KpiTarget[]
+  users       User[]
+}
+
+model User {
+  id            String         @id @default(cuid())
+  tenantId      String
+  email         String         @unique
+  name          String
+  role          Role           @default(SALES_REP)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  password      String?
+  accounts      Account[]
+  activities    Activity[]
+  ownedContacts Contact[]      @relation("ContactOwner")
+  ownedDeals    Deal[]         @relation("DealOwner")
+  kpiTargets    KpiTarget[]
+  refreshTokens RefreshToken[]
+  tenant        Tenant         @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  createdAt         DateTime @default(now())
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Contact {
+  id         String     @id @default(cuid())
+  tenantId   String
+  name       String
+  email      String?
+  phone      String?
+  company    String?
+  position   String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  deletedAt  DateTime?
+  ownerId    String
+  activities Activity[]
+  owner      User       @relation("ContactOwner", fields: [ownerId], references: [id])
+  tenant     Tenant     @relation(fields: [tenantId], references: [id])
+  deals      Deal[]
+
+  @@index([tenantId])
+  @@index([tenantId, ownerId])
+  @@index([tenantId, name])
+}
+
+model Deal {
+  id            String         @id @default(cuid())
+  tenantId      String
+  contactId     String
+  ownerId       String
+  title         String
+  value         Decimal        @default(0)
+  stage         DealStage      @default(PROSPECT)
+  closeDate     DateTime?
+  note          String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?
+  activities    Activity[]
+  aiSuggestions AiSuggestion[]
+  contact       Contact        @relation(fields: [contactId], references: [id])
+  owner         User           @relation("DealOwner", fields: [ownerId], references: [id])
+  tenant        Tenant         @relation(fields: [tenantId], references: [id])
+  tasks         Task[]
+
+  @@index([tenantId])
+  @@index([tenantId, stage])
+  @@index([tenantId, ownerId])
+}
+
+model Activity {
+  id        String       @id @default(cuid())
+  tenantId  String
+  contactId String?
+  dealId    String?
+  userId    String
+  type      ActivityType
+  note      String
+  date      DateTime     @default(now())
+  title     String?
+  contact   Contact?     @relation(fields: [contactId], references: [id])
+  deal      Deal?        @relation(fields: [dealId], references: [id])
+  tenant    Tenant       @relation(fields: [tenantId], references: [id])
+  user      User         @relation(fields: [userId], references: [id])
+
+  @@index([tenantId, contactId])
+  @@index([tenantId, dealId])
+}
+
+model Task {
+  id        String    @id @default(cuid())
+  dealId    String
+  title     String
+  done      Boolean   @default(false)
+  dueDate   DateTime?
+  createdAt DateTime  @default(now())
+  tenantId  String
+  deal      Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, dealId])
+}
+
+model AiSuggestion {
+  id         String           @id @default(cuid())
+  dealId     String
+  type       AiSuggestionType
+  content    String
+  sourceNote String?
+  createdAt  DateTime         @default(now())
+  jobId      String
+  tenantId   String
+  deal       Deal             @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, dealId])
+  @@index([tenantId, jobId])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Invitation {
+  id        String           @id @default(cuid())
+  tenantId  String
+  email     String
+  role      Role             @default(SALES_REP)
+  token     String           @unique
+  status    InvitationStatus @default(PENDING)
+  expiresAt DateTime
+  createdAt DateTime         @default(now())
+  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@index([token])
+}
+
+model KpiTarget {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String
+  target    Decimal  @default(0)
+  month     Int
+  year      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId, month, year])
+  @@index([tenantId, userId])
+}
+
 enum Role {
   ADMIN
   MANAGER
@@ -40,205 +220,10 @@ enum AiSuggestionType {
   EMAIL_DRAFT
   SUMMARY
 }
-// ── Models ───────────────────────────────────────────
-
-model Tenant {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique   // vd: "cong-ty-abc"
-  plan      String   @default("free")
-  createdAt DateTime @default(now())
-
-  users       User[]
-  contacts    Contact[]
-  deals       Deal[]
-  activities  Activity[]
-  invitations Invitation[]
-  kpiTargets  KpiTarget[]
-}
-
-model User {
-  id           String   @id @default(cuid())
-  tenantId     String             // bắt buộc mọi user
-  email        String   @unique 
-  password     String?  // optional vì có thể đăng nhập Google
-  name         String
-  role         Role     @default(SALES_REP)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt // tự động cập nhật khi record thay đổi
-
-  tenant        Tenant         @relation(fields: [tenantId], references: [id])
-  ownedDeals    Deal[]         @relation("DealOwner")
-  ownedContacts Contact[]      @relation("ContactOwner")
-  activities    Activity[]
-  refreshTokens RefreshToken[] 
-  kpiTargets    KpiTarget[]
-  accounts      Account[] 
-
-  @@index([tenantId])
-}
-
-model Account {
-  id                String   @id @default(cuid())
-  userId            String
-  provider          String   // "google"
-  providerAccountId String   // ID người dùng từ Google
-  createdAt         DateTime @default(now())
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@unique([provider, providerAccountId])
-  @@index([userId])
-}
-
-model Contact {
-  id        String   @id @default(cuid())
-  tenantId  String
-  ownerId   String
-  name      String
-  email     String?            // ? = optional
-  phone     String?            
-  company   String?
-  position  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime? // soft delete
-
-  tenant     Tenant     @relation(fields: [tenantId], references: [id])
-  owner      User       @relation("ContactOwner", fields: [ownerId], references: [id])
-  deals      Deal[]
-  activities Activity[]
-
-  @@index([tenantId])
-  @@index([tenantId, ownerId])
-  @@index([tenantId, name])  // tìm kiếm theo tên nhanh
-}
-
-model Deal {
-  id          String     @id @default(cuid())
-  tenantId    String
-  contactId   String
-  ownerId     String
-  title       String
-  value       Decimal    @default(0)
-  stage       DealStage  @default(PROSPECT)
-  closeDate   DateTime?
-  note        String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  deletedAt   DateTime?  // soft delete
-
-  tenant        Tenant          @relation(fields: [tenantId], references: [id])
-  contact       Contact         @relation(fields: [contactId], references: [id])
-  owner         User            @relation("DealOwner", fields: [ownerId], references: [id])
-  tasks         Task[]
-  aiSuggestions AiSuggestion[]
-  activities    Activity[]
-
-  @@index([tenantId])
-  @@index([tenantId, stage])  // query kanban board nhanh
-  @@index([tenantId, ownerId])
-}
-
-model Activity {
-  id        String       @id @default(cuid())
-  tenantId  String
-  contactId String?
-  dealId    String?
-  userId    String
-  title     String?
-  type      ActivityType
-  note      String
-  date      DateTime     @default(now())
-
-  tenant  Tenant   @relation(fields: [tenantId], references: [id])
-  contact Contact? @relation(fields: [contactId], references: [id])
-  deal    Deal?    @relation(fields: [dealId], references: [id])
-  user    User     @relation(fields: [userId], references: [id])
-
-  @@index([tenantId, contactId])
-  @@index([tenantId, dealId])
-}
-
-model Task {
-  id        String   @id @default(cuid())
-  tenantId  String
-  dealId    String
-  title     String
-  done      Boolean  @default(false)
-  dueDate   DateTime?
-  createdAt DateTime @default(now())
-
-  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
-
-  @@index([tenantId])
-  @@index([tenantId, dealId])
-}
-
-model AiSuggestion {
-  id        String           @id @default(cuid())
-  tenantId  String
-  jobId     String           // ID trả về từ hệ thống AI (OpenAI, etc.) để tracking
-  dealId    String
-  type      AiSuggestionType
-  content   String           // JSON string hoặc plain text
-  sourceNote String?         // meeting note gốc
-  createdAt DateTime         @default(now())
-
-  deal Deal @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  @@index([tenantId])
-  @@index([tenantId, dealId])
-  @@index([tenantId, jobId])
-}
-
-model RefreshToken {
-  id        String   @id @default(cuid())
-  userId    String
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
 
 enum InvitationStatus {
   PENDING
   ACCEPTED
   EXPIRED
   REVOKED
-}
-
-model Invitation {
-  id        String           @id @default(cuid())
-  tenantId  String
-  email     String
-  role      Role             @default(SALES_REP)
-  token     String           @unique
-  status    InvitationStatus @default(PENDING)
-  expiresAt DateTime
-  createdAt DateTime         @default(now())
-
-  tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  @@unique([tenantId, email])
-  @@index([tenantId])
-  @@index([token])
-}
-
-model KpiTarget {
-  id        String   @id @default(cuid())
-  tenantId  String
-  userId    String
-  target    Decimal  @default(0)
-  month     Int      // 1 to 12
-  year      Int      // e.g. 2026
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
-  @@unique([tenantId, userId, month, year])
-  @@index([tenantId, userId])
 }
