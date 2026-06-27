@@ -141,3 +141,7 @@ vite.config.ts.timestamp-*
 # Operation Guide
 aws-deploy-guide.md
 prisma-migration-guide.md
+interview-prep.md
+
+# Kiro
+.kiro/
