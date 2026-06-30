@@ -379,8 +379,8 @@ function ContactTable({
                   </TableCell>
 
                   {/* ── Tags ── */}
-                  <TableCell className="px-4 py-3">
-                    <div className="flex gap-1 flex-wrap">
+                  {/* <TableCell className="px-4 py-3"> */}
+                    {/* <div className="flex gap-1 flex-wrap"> */}
                       {/* {contact.tags.map((tag, i) => (
                             <span
                               key={tag}
@@ -396,8 +396,8 @@ function ContactTable({
                               {tag}
                             </span>
                           ))} */}
-                    </div>
-                  </TableCell>
+                    {/* </div> */}
+                  {/* </TableCell> */}
 
                   {/* ── Deals ── */}
                   <TableCell
