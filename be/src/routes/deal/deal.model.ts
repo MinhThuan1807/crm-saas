@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { zIsoDatetime, zDate } from 'src/common/utils/zod.util'
 
 // export const DealStageEnum = z.enum(['PROSPECT', 'QUALIFIED', 'PROPOSAL', 'CLOSED_WON', 'CLOSED_LOST'])
 
@@ -26,11 +27,11 @@ export const DealBaseSchema = z.object({
     DealStageConst.CLOSED_WON,
     DealStageConst.CLOSED_LOST,
   ]),
-  closeDate: z.date().nullable(),
+  closeDate: zDate.nullable(),
   note: z.string().nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  deletedAt: z.date().nullable(),
+  createdAt: zDate,
+  updatedAt: zDate,
+  deletedAt: zDate.nullable(),
 })
 // ─────────────────────────────────────────
 // CREATE — POST /deals
@@ -45,7 +46,7 @@ export const CreateDealBodySchema = DealBaseSchema.pick({
   note: true,
 })
   .extend({
-    closeDate: z.coerce.date().nullable().optional(),
+    closeDate: zIsoDatetime.nullable().optional(),
   })
   .strict()
 
@@ -63,7 +64,7 @@ export const UpdateDealBodySchema = z
     title: z.string().min(1).max(200).optional(),
     ownerId: z.string().optional(),
     value: z.coerce.number().nonnegative().optional(),
-    closeDate: z.coerce.date().nullable().optional(),
+    closeDate: zIsoDatetime.nullable().optional(),
     note: z.string().nullable().optional(),
   })
   .strict()
@@ -114,8 +115,8 @@ export const GetDealResSchema = DealBaseSchema.omit({ deletedAt: true }).extend(
       id: z.string(),
       title: z.string(),
       done: z.boolean(),
-      dueDate: z.coerce.date().nullable(),
-      createdAt: z.coerce.date(),
+      dueDate: zDate.nullable(),
+      createdAt: zDate,
     }),
   ),
   activities: z.array(
@@ -124,7 +125,7 @@ export const GetDealResSchema = DealBaseSchema.omit({ deletedAt: true }).extend(
       type: z.string(),
       title: z.string().nullable(),
       note: z.string().nullable(),
-      date: z.coerce.date(),
+      date: zDate,
     }),
   ),
   aiSuggestions: z.array(
@@ -132,7 +133,7 @@ export const GetDealResSchema = DealBaseSchema.omit({ deletedAt: true }).extend(
       id: z.string(),
       type: z.string(),
       content: z.string(),
-      createdAt: z.coerce.date(),
+      createdAt: zDate,
     }),
   ),
 })

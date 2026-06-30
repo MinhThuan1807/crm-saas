@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common'
+import { ApiTags, ApiOkResponse } from '@nestjs/swagger'
 import { ZodSerializerDto } from 'nestjs-zod'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard'
 import { CurrentUser } from 'src/common/decorators/current-user.decorator'
@@ -16,6 +17,7 @@ import {
 } from './activities.dto'
 
 // ─── 1. CONTACT ACTIVITIES ────────────────────────────────────────────────────
+@ApiTags('Activities - Contact')
 @Controller('contacts/:contactId/activities')
 @UseGuards(JwtAuthGuard)
 export class ContactActivitiesController {
@@ -23,6 +25,7 @@ export class ContactActivitiesController {
 
   // POST /contacts/:contactId/activities
   @Post()
+  @ApiOkResponse({ type: ActivityResDto })
   @ZodSerializerDto(ActivityResDto)
   createActivity(
     @CurrentUser() user: AccessTokenPayload,
@@ -34,6 +37,7 @@ export class ContactActivitiesController {
 
   // GET /contacts/:contactId/activities
   @Get()
+  @ApiOkResponse({ type: GetActivitiesResDto })
   @ZodSerializerDto(GetActivitiesResDto)
   getActivities(@CurrentUser() user: AccessTokenPayload, @Param('contactId') contactId: string) {
     return this.activitiesService.getByContact(user.tenantId, contactId, { userId: user.userId, role: user.role })
@@ -41,6 +45,7 @@ export class ContactActivitiesController {
 }
 
 // ─── 2. DEAL ACTIVITIES ───────────────────────────────────────────────────────
+@ApiTags('Activities - Deal')
 @Controller('deals/:dealId/activities')
 @UseGuards(JwtAuthGuard)
 export class DealActivitiesController {
@@ -48,6 +53,7 @@ export class DealActivitiesController {
 
   // POST /deals/:dealId/activities
   @Post()
+  @ApiOkResponse({ type: ActivityResDto })
   @ZodSerializerDto(ActivityResDto)
   createActivity(
     @CurrentUser() user: AccessTokenPayload,
@@ -59,6 +65,7 @@ export class DealActivitiesController {
 
   // GET /deals/:dealId/activities
   @Get()
+  @ApiOkResponse({ type: GetActivitiesResDto })
   @ZodSerializerDto(GetActivitiesResDto)
   getActivities(@CurrentUser() user: AccessTokenPayload, @Param('dealId') dealId: string) {
     return this.activitiesService.getByDeal(user.tenantId, dealId, { userId: user.userId, role: user.role })
@@ -66,6 +73,7 @@ export class DealActivitiesController {
 }
 
 // ─── 3. GLOBAL ACTIVITIES ─────────────────────────────────────────────────────
+@ApiTags('Activities')
 @Controller('activities')
 @UseGuards(JwtAuthGuard)
 export class ActivitiesController {
@@ -74,6 +82,7 @@ export class ActivitiesController {
   // GET /activities?page=1&limit=20&type=CALL&search=...&contactId=...&dealId=...
   // Khai báo trước PATCH/DELETE :id để NestJS match đúng
   @Get()
+  @ApiOkResponse({ type: GetActivitiesPaginatedResDto })
   @ZodSerializerDto(GetActivitiesPaginatedResDto)
   getAll(@CurrentUser() user: AccessTokenPayload, @Query() query: GetActivitiesQueryDto) {
     return this.activitiesService.getAll(user.tenantId, query, { userId: user.userId, role: user.role })
@@ -81,6 +90,7 @@ export class ActivitiesController {
 
   // PATCH /activities/:id
   @Patch(':id')
+  @ApiOkResponse({ type: ActivityResDto })
   @ZodSerializerDto(ActivityResDto)
   updateActivity(
     @CurrentUser() user: AccessTokenPayload,
@@ -92,6 +102,7 @@ export class ActivitiesController {
 
   // DELETE /activities/:id
   @Delete(':id')
+  @ApiOkResponse({ type: MessageDto })
   @ZodSerializerDto(MessageDto)
   deleteActivity(@CurrentUser() user: AccessTokenPayload, @Param('id') activityId: string) {
     return this.activitiesService.deleteActivity(activityId, user.tenantId, { userId: user.userId, role: user.role })

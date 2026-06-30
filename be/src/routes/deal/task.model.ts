@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { zIsoDatetime } from 'src/common/utils/zod.util'
 
 export const TaskBaseSchema = z.object({
   id: z.string(),
@@ -6,15 +7,15 @@ export const TaskBaseSchema = z.object({
   dealId: z.string(),
   title: z.string().min(1, 'Tiêu đề không được để trống').max(200),
   done: z.boolean().default(false),
-  dueDate: z.coerce.date().nullable().optional(),
-  createdAt: z.date(),
+  dueDate: zIsoDatetime.nullable().optional(),
+  createdAt: zIsoDatetime,
 })
 
 // CREATE
 export const CreateTaskBodySchema = TaskBaseSchema.pick({
   title: true,
 }).extend({
-  dueDate: z.coerce.date().nullable().optional(),
+  dueDate: zIsoDatetime.nullable().optional(),
 }).strict()
 
 // CREATE BULK
@@ -26,7 +27,7 @@ export const CreateTasksBulkBodySchema = z.object({
 export const UpdateTaskBodySchema = z.object({
   title: z.string().min(1, 'Tiêu đề không được để trống').max(200).optional(),
   done: z.boolean().optional(),
-  dueDate: z.coerce.date().nullable().optional(),
+  dueDate: zIsoDatetime.nullable().optional(),
 }).strict().refine((data) => Object.keys(data).length > 0, {
   message: 'Ít nhất phải có một trường được cập nhật',
 })

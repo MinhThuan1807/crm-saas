@@ -1,4 +1,5 @@
 import { Controller, Get, Patch, Delete, Body, Param, UseGuards } from "@nestjs/common";
+import { ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
 import { JwtAuthGuard } from "src/common/guards/jwt-auth.guard";
 import { RolesGuard } from "src/common/guards/roles.guard";
@@ -9,6 +10,7 @@ import { UsersService } from "./users.service";
 import { UpdateUserDto } from "./users.dto";
 
 @UseGuards(JwtAuthGuard)
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

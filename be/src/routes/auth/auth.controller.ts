@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, UseGuards, Req, Res } from '@nestjs/common'
+import { ApiTags, ApiOkResponse } from '@nestjs/swagger'
 import { Response, Request } from 'express'
 import { ZodSerializerDto } from 'nestjs-zod'
 import {
@@ -23,17 +24,20 @@ import { AuthGuard } from '@nestjs/passport'
 
 // COOKIE_OPTIONS moved to auth.constants to avoid circular imports
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @ApiOkResponse({ type: RegisterResDto })
   @ZodSerializerDto(RegisterResDto)
   register(@Body() body: RegisterBodyDto) {
     return this.authService.register(body)
   }
 
   @Post('login')
+  @ApiOkResponse({ type: MessageDto })
   @ZodSerializerDto(MessageDto)
   async login(@Body() body: LoginBodyDto, @Res({ passthrough: true }) res: Response) {
     const { accessToken, refreshToken } = await this.authService.login(body)
@@ -52,6 +56,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @ApiOkResponse({ type: MessageDto })
   @ZodSerializerDto(MessageDto)
   logout(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
     const refreshToken = req.cookies['refreshToken']
@@ -64,6 +69,7 @@ export class AuthController {
   }
 
   @Post('refresh-token')
+  @ApiOkResponse({ type: MessageDto })
   @ZodSerializerDto(MessageDto)
   async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies.refreshToken

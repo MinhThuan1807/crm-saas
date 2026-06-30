@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { zIsoDatetime } from 'src/common/utils/zod.util'
 
 // ─── ACTIVITY TYPE CONSTANT ───────────────────────────────────────────────────
 export const ActivityTypeConst = {
@@ -28,7 +29,7 @@ export const ActivityBaseSchema = z.object({
   title: z.string().nullable(),
   type: ActivityTypeEnum,
   note: z.string(),
-  date: z.coerce.date(),
+  date: zIsoDatetime,
   user: z.object({
     id: z.string(),
     name: z.string(),
@@ -57,7 +58,7 @@ export const CreateActivityForContactBodySchema = z
     type: ActivityTypeEnum,
     title: z.string().optional().nullable(),
     note: z.string().min(1, 'Nội dung không được để trống'),
-    date: z.coerce.date().optional(),
+    date: zIsoDatetime.optional(),
   })
   .strict()
 
@@ -70,7 +71,7 @@ export const CreateActivityForDealBodySchema = z
     type: ActivityTypeEnum,
     title: z.string().optional().nullable(),
     note: z.string().min(1, 'Nội dung không được để trống'),
-    date: z.coerce.date().optional(),
+    date: zIsoDatetime.optional(),
     contactId: z.string().optional(), // optional — có thể gắn thêm contact
   })
   .strict()
@@ -84,7 +85,7 @@ export const UpdateActivityBodySchema = z
     type: ActivityTypeEnum.optional(),
     title: z.string().optional().nullable(),
     note: z.string().min(1).optional(),
-    date: z.coerce.date().optional(),
+    date: zIsoDatetime.optional(),
   })
   .strict()
   .refine((data) => Object.keys(data).length > 0, {

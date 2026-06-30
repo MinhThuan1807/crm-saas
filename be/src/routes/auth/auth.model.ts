@@ -1,5 +1,6 @@
 import { ROLE } from "src/common/constants/role.constanst";
 import z from "zod";
+import { zDate } from "src/common/utils/zod.util";
 
 export const UserBaseSchema = z.object({
   id: z.string(),
@@ -7,8 +8,8 @@ export const UserBaseSchema = z.object({
   email: z.string(),
   name: z.string(),
   role: z.enum([ROLE.ADMIN, ROLE.MANAGER, ROLE.SALES_REP]),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: zDate,
+  updatedAt: zDate,
 })
 
 export type UserType = z.infer<typeof UserBaseSchema>;
