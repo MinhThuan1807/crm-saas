@@ -11,6 +11,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common'
+import { ApiTags, ApiOkResponse } from '@nestjs/swagger'
 import { AnalyzeDealBodyType, CreateDealBodyType, DealStageType, UpdateDealBodyType } from './deal.model'
 import { DealService } from './deal.service'
 import { ZodSerializerDto } from 'nestjs-zod'
@@ -38,6 +39,7 @@ import { Res } from '@nestjs/common'
 import { Response } from 'express'
 
 @UseGuards(JwtAuthGuard)
+@ApiTags('Deals')
 @Controller('deals')
 export class DealController {
   constructor(
@@ -46,24 +48,28 @@ export class DealController {
   ) {}
 
   @Post()
+  @ApiOkResponse({ type: CreateDealResDto })
   @ZodSerializerDto(CreateDealResDto)
   create(@Body() body: CreateDealBodyType, @CurrentUser() user: AccessTokenPayload) {
     return this.dealService.create(user.tenantId, { ...body }, { userId: user.userId, role: user.role })
   }
 
   @Get('pipeline')
+  @ApiOkResponse({ type: GetDealsPipelineResDto })
   @ZodSerializerDto(GetDealsPipelineResDto)
   getPipeline(@CurrentUser() user: AccessTokenPayload) {
     return this.dealService.getPipleline(user.tenantId, { userId: user.userId, role: user.role })
   }
 
   @Get(':id')
+  @ApiOkResponse({ type: GetDealResDto })
   @ZodSerializerDto(GetDealResDto)
   getDealById(@Param('id') dealId: string, @CurrentUser() user: AccessTokenPayload) {
     return this.dealService.getDealById(dealId, user.tenantId, { userId: user.userId, role: user.role })
   }
 
   @Patch(':id/stage')
+  @ApiOkResponse({ type: UpdateDealResDto })
   @ZodSerializerDto(UpdateDealResDto)
   updateStage(
     @Param('id') dealId: string,
@@ -74,12 +80,14 @@ export class DealController {
   }
 
   @Patch(':id')
+  @ApiOkResponse({ type: UpdateDealResDto })
   @ZodSerializerDto(UpdateDealResDto)
   update(@Param('id') dealId: string, @CurrentUser() user: AccessTokenPayload, @Body() body: UpdateDealBodyType) {
     return this.dealService.update(dealId, user.tenantId, body, { userId: user.userId, role: user.role })
   }
 
   @Delete(':id')
+  @ApiOkResponse({ type: MessageDto })
   @ZodSerializerDto(MessageDto)
   delete(@Param('id') dealId: string, @CurrentUser() user: AccessTokenPayload) {
     return this.dealService.delete(dealId, user.tenantId, { userId: user.userId, role: user.role })
@@ -116,6 +124,7 @@ export class DealController {
   }
 
   @Post(':id/tasks')
+  @ApiOkResponse({ type: TaskResDto })
   @ZodSerializerDto(TaskResDto)
   async createTask(
     @Param('id') dealId: string,
@@ -135,6 +144,7 @@ export class DealController {
   }
 
   @Patch(':id/tasks/:taskId')
+  @ApiOkResponse({ type: TaskResDto })
   @ZodSerializerDto(TaskResDto)
   async updateTask(
     @Param('id') dealId: string,

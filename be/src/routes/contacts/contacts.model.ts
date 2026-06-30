@@ -1,4 +1,5 @@
 import z from "zod";
+import { zIsoDatetime } from "src/common/utils/zod.util";
 
 // ─────────────────────────────────────────
 // BASE SCHEMAS — Không dùng trực tiếp làm Res/Body
@@ -11,9 +12,9 @@ const ContactBaseSchema = z.object({
   phone:     z.string().optional(),
   company:   z.string().optional(),
   position:  z.string().optional(),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-  deletedAt: z.coerce.date().nullable(),
+  createdAt: zIsoDatetime,
+  updatedAt: zIsoDatetime,
+  deletedAt: zIsoDatetime.nullable(),
 })
 
 // ─────────────────────────────────────────
@@ -60,7 +61,7 @@ export const GetContactResSchema = ContactBaseSchema
       id:   z.string(),
       type: z.string(),
       note: z.string(),
-      date: z.coerce.date(),
+      date: zIsoDatetime,
     })),
   })
 
@@ -78,7 +79,7 @@ export const GetContactWithDealsActivitiesResSchema = ContactBaseSchema.omit({
   activities: z.array(
     z.object({
       id: z.string(),
-      date: z.coerce.date(),
+      date: zIsoDatetime,
     }),
   ),
 });

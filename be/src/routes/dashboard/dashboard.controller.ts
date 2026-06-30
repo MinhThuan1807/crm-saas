@@ -1,4 +1,5 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common'
+import { ApiTags, ApiOkResponse } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard'
 import { CurrentUser } from 'src/common/decorators/current-user.decorator'
 import { AccessTokenPayload } from 'src/common/types/jwt.type'
@@ -7,11 +8,13 @@ import { DashboardService } from './dashboard.service'
 import { GetDashboardQueryDto, DashboardResDto } from './dashboard.dto'
 
 @UseGuards(JwtAuthGuard)
+@ApiTags('Dashboard')
 @Controller('dashboard')
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
   @Get()
+  @ApiOkResponse({ type: DashboardResDto })
   @ZodSerializerDto(DashboardResDto)
   getDashboardData(
     @Query() query: GetDashboardQueryDto,
