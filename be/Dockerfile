@@ -11,11 +11,17 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Prisma 7: prisma.config.ts reads DATABASE_URL at generate time.
+# Pass a dummy URL so the build doesn't fail — real URL is injected at runtime via env_file.
+ARG DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+ENV DATABASE_URL=$DATABASE_URL
+
 # Generate Prisma client
 RUN npx prisma generate
 
 # Build NestJS app (includes generated Prisma client in dist/generated)
 RUN npm run build
+
 
 
 FROM node:22-slim AS prod-deps
