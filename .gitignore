@@ -142,6 +142,7 @@ vite.config.ts.timestamp-*
 aws-deploy-guide.md
 prisma-migration-guide.md
 interview-prep.md
+sefl-deploy.md
 
 # Kiro
 .kiro/
