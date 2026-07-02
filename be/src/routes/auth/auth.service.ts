@@ -55,7 +55,7 @@ export class AuthService {
     const user = await this.authRepository.findUserByEmail(body.email)
 
     if (!user) {
-      throw new UnauthorizedException('Email hoặc mật khẩu không đúng')
+      throw new UnauthorizedException('Email không tồn tại!')
     }
 
     const isPasswordValid = await this.hashingService.compare(body.password, user.password)
@@ -98,15 +98,21 @@ export class AuthService {
   }
 
   async refreshToken(refreshToken: string, res: ExpressResponse) {
-    console.log("refresh-Token calling")
-    const { userId } = await this.tokenService.verifyRefreshToken(refreshToken)
-    console.log('=== verify OK, userId:', userId)
+    if(!refreshToken) {
+      throw new UnauthorizedException("Không tìm thấy refresh token")
+    }
 
-    const storedToken = await this.redisService.get(`auth:refresh:${refreshToken}`)
-    console.log("=== stored token from Redis:", storedToken)
+    let userId: string;
+     try {
+      const decoded = await this.tokenService.verifyRefreshToken(refreshToken);
+      userId = decoded.userId;
+    } catch (err) {
+      throw new UnauthorizedException('Refresh token không hợp lệ hoặc đã hết hạn');
+    }
 
+   const storedToken = await this.redisService.get(`auth:refresh:${refreshToken}`);
     if (!storedToken) {
-      throw new UnauthorizedException('Invalid refresh token')
+      throw new UnauthorizedException('Refresh token không tồn tại trong phiên làm việc');
     }
 
     await this.redisService.delete(`auth:refresh:${refreshToken}`)
@@ -127,7 +133,7 @@ export class AuthService {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
     })
 
-    return { message: 'Refreshed successfully' }
+    return { message: 'Refresh token thành công' }
   }
 
   async getProfile(userId: string) {

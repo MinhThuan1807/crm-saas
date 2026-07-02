@@ -10,6 +10,11 @@ const TARGET_REVENUE_VND = process.env.MONTHLY_REVENUE_TARGET
   ? parseInt(process.env.MONTHLY_REVENUE_TARGET, 10)
   : 500000000
 
+/**
+ * Tính khoảng thời gian hiện tại và trước đó dựa trên chu kỳ
+ * @param period - 'week' | 'month' | 'quarter'
+ * @returns {{current: {start: Date, end: Date}, previous: {start: Date, end: Date}}}
+ */
 function getPeriodRanges(period: DashboardPeriodType) {
   const now = new Date()
   const currentStart = new Date(now)

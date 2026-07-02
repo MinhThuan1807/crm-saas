@@ -14,7 +14,7 @@ import { RegisterBodyType } from "@/lib/validations/auth.schema";
 import { useRouter} from "next/navigation";
 import { RegisterBodySchema } from '@/lib/validations/auth.schema';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SalesFlowLogo } from "../login/page";
+import { SalesFlowLogo } from "@/components/SalesFlowLogo";
 import { useRegister } from "@/hooks/useAuth";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
