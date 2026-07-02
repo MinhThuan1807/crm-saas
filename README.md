@@ -287,7 +287,7 @@ docker run --name crm-redis -p 6379:6379 -d redis
 
 The system provides interactive and visual API documentation via **Swagger (OpenAPI)** to support development and integration workflows.
 
-*   **Access URL:** `[https://api.codelaicuocdoi.io.vn/api-docs](https://api.codelaicuocdoi.io.vn/api-docs)` (or the corresponding port configured for your backend).
+*   **Access URL:** [https://api.codelaicuocdoi.io.vn/api-docs](https://api.codelaicuocdoi.io.vn/api-docs) (or the corresponding port configured for your backend).
 *   **Key Highlights:**
     *   **Auto-generated Schemas:** Data schemas are automatically generated from Zod DTOs via the `nestjs-zod` plugin.
     *   **Authentication Support:** Supports storing and submitting tokens directly via Cookie (`accessToken`) and Header (`Bearer Auth`). Sessions persist across page reloads thanks to the `persistAuthorization` setting.
