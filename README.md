@@ -20,6 +20,7 @@
 A multi-tenant Customer Relationship Management (CRM) SaaS platform, designed to optimize the sales process through a Sales Pipeline (Kanban Board), task management, and deep Generative AI integration (via OpenAI & Groq Cloud) to automate everyday customer-care tasks for small and medium-sized enterprises (SMEs).
 
 **Demo Video:** [https://youtu.be/JAUMLhuh9cM](https://youtu.be/JAUMLhuh9cM)
+**Live Demo:** [https://codelaicuocdoi.io.vn](https://codelaicuocdoi.io.vn)
 <br>
 👥 **Test accounts:**
 *   **Tenant 1:** `admin@abc.com` / Password: `Password123!`
@@ -286,7 +287,7 @@ docker run --name crm-redis -p 6379:6379 -d redis
 
 The system provides interactive and visual API documentation via **Swagger (OpenAPI)** to support development and integration workflows.
 
-*   **Access URL:** `https://codelaicuocdoi.io.vn/api-docs` (or the corresponding port configured for your backend).
+*   **Access URL:** `[https://api.codelaicuocdoi.io.vn/api-docs](https://api.codelaicuocdoi.io.vn/api-docs)` (or the corresponding port configured for your backend).
 *   **Key Highlights:**
     *   **Auto-generated Schemas:** Data schemas are automatically generated from Zod DTOs via the `nestjs-zod` plugin.
     *   **Authentication Support:** Supports storing and submitting tokens directly via Cookie (`accessToken`) and Header (`Bearer Auth`). Sessions persist across page reloads thanks to the `persistAuthorization` setting.
