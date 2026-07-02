@@ -1,0 +1,27 @@
+name: Deploy Backend to VPS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'be/**'
+      - 'docker-compose.yml'
+
+  jobs:
+    deploy:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Deploy to VPS via SSH
+          uses: appleboy/ssh-action@v1.0.3
+          with:
+            host: ${{ secrets.VPS_HOST }}
+            username: root
+            key: ${{ secrets.VPS_SSH_KEY }}
+            script: |
+              cd /var/www/crm-saas
+              git pull origin main
+              docker compose build --no-cache backend
+              docker compose up -d --force-recreate backend
+              docker compose exec -T backend npx prisma migrate deploy
+              docker image prune -f
+              echo "✅ Backend deployed!"
