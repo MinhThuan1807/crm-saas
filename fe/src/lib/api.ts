@@ -46,8 +46,13 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as RetryConfig | undefined;
 
-    // Không phải lỗi 401 hoặc không có config → reject bình thường
-    if (!originalRequest || error.response?.status !== 401) {
+    // Không phải lỗi 401, không có config, hoặc là request login/register -> reject bình thường
+    if (
+      !originalRequest ||
+      error.response?.status !== 401 ||
+      originalRequest.url?.includes("auth/login") ||
+      originalRequest.url?.includes("auth/register")
+    ) {
       return Promise.reject(error);
     }
 

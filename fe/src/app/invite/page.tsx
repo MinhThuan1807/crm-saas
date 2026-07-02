@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { invitationsService } from "@/services/invitations.service";
 import { toast } from "sonner";
-import { SalesFlowLogo } from "../(auth)/login/page";
+import { SalesFlowLogo } from "@/components/SalesFlowLogo";
 
 function InviteContent() {
   const router = useRouter();

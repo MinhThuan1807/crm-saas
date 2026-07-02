@@ -5,6 +5,7 @@ const isProduction = envConfig.NODE_ENV === 'production'
 export const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: isProduction,
-  sameSite: isProduction ? ('none' as const) : ('lax' as const),
+  sameSite: 'lax' as const,
   path: '/',
+  domain: isProduction ? '.codelaicuocdoi.io.vn' : undefined
 }
