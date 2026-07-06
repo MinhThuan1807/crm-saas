@@ -11,13 +11,9 @@ export class ContactsService {
   ) {}
 
   async getAllContacts(tenantId: string, query: GetContactsQueryType, userContext?: { userId: string; role: string }) {
-      const { cursor, limit, search } = query;
+      const { limit } = query;
 
-      const contacts = await this.contactRepository.findAll(tenantId, {
-        cursor,
-        limit,
-        search
-      }, userContext);
+      const contacts = await this.contactRepository.findAll(tenantId, query, userContext);
 
       const hasNextPage = contacts.length > limit;
       const data = hasNextPage ? contacts.slice(0, -1) : contacts;

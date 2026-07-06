@@ -248,8 +248,8 @@ export type KpiTargetWhereInput = {
   year?: Prisma.IntFilter<"KpiTarget"> | number
   createdAt?: Prisma.DateTimeFilter<"KpiTarget"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"KpiTarget"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type KpiTargetOrderByWithRelationInput = {
@@ -261,8 +261,8 @@ export type KpiTargetOrderByWithRelationInput = {
   year?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  user?: Prisma.UserOrderByWithRelationInput
   tenant?: Prisma.TenantOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type KpiTargetWhereUniqueInput = Prisma.AtLeast<{
@@ -278,8 +278,8 @@ export type KpiTargetWhereUniqueInput = Prisma.AtLeast<{
   year?: Prisma.IntFilter<"KpiTarget"> | number
   createdAt?: Prisma.DateTimeFilter<"KpiTarget"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"KpiTarget"> | Date | string
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "tenantId_userId_month_year">
 
 export type KpiTargetOrderByWithAggregationInput = {
@@ -319,8 +319,8 @@ export type KpiTargetCreateInput = {
   year: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutKpiTargetsInput
   tenant: Prisma.TenantCreateNestedOneWithoutKpiTargetsInput
+  user: Prisma.UserCreateNestedOneWithoutKpiTargetsInput
 }
 
 export type KpiTargetUncheckedCreateInput = {
@@ -341,8 +341,8 @@ export type KpiTargetUpdateInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutKpiTargetsNestedInput
   tenant?: Prisma.TenantUpdateOneRequiredWithoutKpiTargetsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutKpiTargetsNestedInput
 }
 
 export type KpiTargetUncheckedUpdateInput = {
@@ -738,8 +738,8 @@ export type KpiTargetSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   year?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kpiTarget"]>
 
 export type KpiTargetSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -751,8 +751,8 @@ export type KpiTargetSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   year?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kpiTarget"]>
 
 export type KpiTargetSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -764,8 +764,8 @@ export type KpiTargetSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   year?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["kpiTarget"]>
 
 export type KpiTargetSelectScalar = {
@@ -781,23 +781,23 @@ export type KpiTargetSelectScalar = {
 
 export type KpiTargetOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "userId" | "target" | "month" | "year" | "createdAt" | "updatedAt", ExtArgs["result"]["kpiTarget"]>
 export type KpiTargetInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type KpiTargetIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type KpiTargetIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $KpiTargetPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "KpiTarget"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
     tenant: Prisma.$TenantPayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1202,8 +1202,8 @@ readonly fields: KpiTargetFieldRefs;
  */
 export interface Prisma__KpiTargetClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   tenant<T extends Prisma.TenantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TenantDefaultArgs<ExtArgs>>): Prisma.Prisma__TenantClient<runtime.Types.Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

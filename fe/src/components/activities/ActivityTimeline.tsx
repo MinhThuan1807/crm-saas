@@ -6,7 +6,7 @@ import {
   ActivityItem
 } from "@/lib/validations/activities.scheme";
 import LogActivityForm from "./LogActivityForm";
-import { relativeTime } from "@/lib/helper";
+import { relativeTime, formatDate } from "@/lib/helper";
 
 export type ActivityTab = ActivityType;
 
@@ -86,6 +86,7 @@ export default function ActivityTimeline({
             item.note.length > 100 && !isExpanded
               ? item.note.slice(0, 100) + "…"
               : item.note;
+          const isFuture = item.date ? new Date(item.date).getTime() > Date.now() : false;
 
           return (
             <div key={item.id} className="flex gap-3 relative">
@@ -118,18 +119,19 @@ export default function ActivityTimeline({
                       style={{ fontSize: 11 }}
                     >
                       <Clock size={10} />
-                      {relativeTime(item.date)}
+                      {isFuture ? formatDate(item.date) : relativeTime(item.date)}
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5">
                     {item.date && (
                       <span
-                        className="px-2 py-0.5 rounded-full"
+                        className="px-2 py-0.5 rounded-full border"
                         style={{
                           fontSize: 10,
                           fontWeight: 500,
-                          color: "#3B6D11",
-                          background: "#E8F5E0",
+                          color: isFuture ? "#854F0B" : "#3B6D11",
+                          background: isFuture ? "#FEF3E2" : "#E8F5E0",
+                          borderColor: isFuture ? "#FED7AA" : "#D9F99D",
                         }}
                       >
                         {relativeTime(item.date)}

@@ -28,33 +28,33 @@ export type UserMinAggregateOutputType = {
   id: string | null
   tenantId: string | null
   email: string | null
-  password: string | null
   name: string | null
   role: $Enums.Role | null
   createdAt: Date | null
   updatedAt: Date | null
+  password: string | null
 }
 
 export type UserMaxAggregateOutputType = {
   id: string | null
   tenantId: string | null
   email: string | null
-  password: string | null
   name: string | null
   role: $Enums.Role | null
   createdAt: Date | null
   updatedAt: Date | null
+  password: string | null
 }
 
 export type UserCountAggregateOutputType = {
   id: number
   tenantId: number
   email: number
-  password: number
   name: number
   role: number
   createdAt: number
   updatedAt: number
+  password: number
   _all: number
 }
 
@@ -63,33 +63,33 @@ export type UserMinAggregateInputType = {
   id?: true
   tenantId?: true
   email?: true
-  password?: true
   name?: true
   role?: true
   createdAt?: true
   updatedAt?: true
+  password?: true
 }
 
 export type UserMaxAggregateInputType = {
   id?: true
   tenantId?: true
   email?: true
-  password?: true
   name?: true
   role?: true
   createdAt?: true
   updatedAt?: true
+  password?: true
 }
 
 export type UserCountAggregateInputType = {
   id?: true
   tenantId?: true
   email?: true
-  password?: true
   name?: true
   role?: true
   createdAt?: true
   updatedAt?: true
+  password?: true
   _all?: true
 }
 
@@ -169,11 +169,11 @@ export type UserGroupByOutputType = {
   id: string
   tenantId: string
   email: string
-  password: string | null
   name: string
   role: $Enums.Role
   createdAt: Date
   updatedAt: Date
+  password: string | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -201,36 +201,36 @@ export type UserWhereInput = {
   id?: Prisma.StringFilter<"User"> | string
   tenantId?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
-  password?: Prisma.StringNullableFilter<"User"> | string | null
   name?: Prisma.StringFilter<"User"> | string
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
-  ownedDeals?: Prisma.DealListRelationFilter
-  ownedContacts?: Prisma.ContactListRelationFilter
-  activities?: Prisma.ActivityListRelationFilter
-  refreshTokens?: Prisma.RefreshTokenListRelationFilter
-  kpiTargets?: Prisma.KpiTargetListRelationFilter
+  password?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
+  activities?: Prisma.ActivityListRelationFilter
+  ownedContacts?: Prisma.ContactListRelationFilter
+  ownedDeals?: Prisma.DealListRelationFilter
+  kpiTargets?: Prisma.KpiTargetListRelationFilter
+  refreshTokens?: Prisma.RefreshTokenListRelationFilter
+  tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  tenant?: Prisma.TenantOrderByWithRelationInput
-  ownedDeals?: Prisma.DealOrderByRelationAggregateInput
-  ownedContacts?: Prisma.ContactOrderByRelationAggregateInput
-  activities?: Prisma.ActivityOrderByRelationAggregateInput
-  refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
-  kpiTargets?: Prisma.KpiTargetOrderByRelationAggregateInput
+  password?: Prisma.SortOrderInput | Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
+  activities?: Prisma.ActivityOrderByRelationAggregateInput
+  ownedContacts?: Prisma.ContactOrderByRelationAggregateInput
+  ownedDeals?: Prisma.DealOrderByRelationAggregateInput
+  kpiTargets?: Prisma.KpiTargetOrderByRelationAggregateInput
+  refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
+  tenant?: Prisma.TenantOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -240,29 +240,29 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   tenantId?: Prisma.StringFilter<"User"> | string
-  password?: Prisma.StringNullableFilter<"User"> | string | null
   name?: Prisma.StringFilter<"User"> | string
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
-  ownedDeals?: Prisma.DealListRelationFilter
-  ownedContacts?: Prisma.ContactListRelationFilter
-  activities?: Prisma.ActivityListRelationFilter
-  refreshTokens?: Prisma.RefreshTokenListRelationFilter
-  kpiTargets?: Prisma.KpiTargetListRelationFilter
+  password?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
+  activities?: Prisma.ActivityListRelationFilter
+  ownedContacts?: Prisma.ContactListRelationFilter
+  ownedDeals?: Prisma.DealListRelationFilter
+  kpiTargets?: Prisma.KpiTargetListRelationFilter
+  refreshTokens?: Prisma.RefreshTokenListRelationFilter
+  tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrderInput | Prisma.SortOrder
   name?: Prisma.SortOrder
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  password?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -275,111 +275,111 @@ export type UserScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"User"> | string
   tenantId?: Prisma.StringWithAggregatesFilter<"User"> | string
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
-  password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   name?: Prisma.StringWithAggregatesFilter<"User"> | string
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
   id?: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
-  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
-  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
-  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
-  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: string
   tenantId: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
-  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
-  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
-  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
-  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
-  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
-  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
-  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
-  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
-  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
-  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
   id?: string
   tenantId: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
+  password?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserListRelationFilter = {
@@ -396,33 +396,33 @@ export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrder
   name?: Prisma.SortOrder
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  password?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrder
   name?: Prisma.SortOrder
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  password?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  password?: Prisma.SortOrder
   name?: Prisma.SortOrder
   role?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  password?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -472,12 +472,12 @@ export type UserUncheckedUpdateManyWithoutTenantNestedInput = {
   deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type EnumRoleFieldUpdateOperationsInput = {
   set?: $Enums.Role
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type UserCreateNestedOneWithoutAccountsInput = {
@@ -567,33 +567,33 @@ export type UserUpdateOneRequiredWithoutKpiTargetsNestedInput = {
 export type UserCreateWithoutTenantInput = {
   id?: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
-  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
-  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
-  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTenantInput = {
   id?: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
-  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
-  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
-  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTenantInput = {
@@ -629,43 +629,43 @@ export type UserScalarWhereInput = {
   id?: Prisma.StringFilter<"User"> | string
   tenantId?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
-  password?: Prisma.StringNullableFilter<"User"> | string | null
   name?: Prisma.StringFilter<"User"> | string
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  password?: Prisma.StringNullableFilter<"User"> | string | null
 }
 
 export type UserCreateWithoutAccountsInput = {
   id?: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
-  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
-  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
+  password?: string | null
   activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
   kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
   id?: string
   tenantId: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
-  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
+  password?: string | null
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
   kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -687,65 +687,65 @@ export type UserUpdateToOneWithWhereWithoutAccountsInput = {
 export type UserUpdateWithoutAccountsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
-  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
-  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
   kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
-  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
   kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOwnedContactsInput = {
   id?: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
-  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
-  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
-  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
+  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
 }
 
 export type UserUncheckedCreateWithoutOwnedContactsInput = {
   id?: string
   tenantId: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
-  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
-  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
+  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOwnedContactsInput = {
@@ -767,65 +767,65 @@ export type UserUpdateToOneWithWhereWithoutOwnedContactsInput = {
 export type UserUpdateWithoutOwnedContactsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
-  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
-  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
-  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
+  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedContactsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
-  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
-  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
+  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOwnedDealsInput = {
   id?: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
-  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
-  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
-  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
 }
 
 export type UserUncheckedCreateWithoutOwnedDealsInput = {
   id?: string
   tenantId: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
-  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
-  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOwnedDealsInput = {
@@ -847,65 +847,65 @@ export type UserUpdateToOneWithWhereWithoutOwnedDealsInput = {
 export type UserUpdateWithoutOwnedDealsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
-  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
-  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
-  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedDealsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
-  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
-  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutActivitiesInput = {
   id?: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
-  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
-  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
-  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
-  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
 }
 
 export type UserUncheckedCreateWithoutActivitiesInput = {
   id?: string
   tenantId: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
-  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
-  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutActivitiesInput = {
@@ -927,65 +927,65 @@ export type UserUpdateToOneWithWhereWithoutActivitiesInput = {
 export type UserUpdateWithoutActivitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
-  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
-  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
-  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
-  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutActivitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
-  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
-  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRefreshTokensInput = {
   id?: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
-  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
-  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
-  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
-  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
 }
 
 export type UserUncheckedCreateWithoutRefreshTokensInput = {
   id?: string
   tenantId: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
-  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
-  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
-  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRefreshTokensInput = {
@@ -1007,65 +1007,65 @@ export type UserUpdateToOneWithWhereWithoutRefreshTokensInput = {
 export type UserUpdateWithoutRefreshTokensInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
-  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
-  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
-  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
-  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
-  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
-  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
-  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutKpiTargetsInput = {
   id?: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
-  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
-  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
-  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
 }
 
 export type UserUncheckedCreateWithoutKpiTargetsInput = {
   id?: string
   tenantId: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
-  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
-  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
-  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutKpiTargetsInput = {
@@ -1087,85 +1087,85 @@ export type UserUpdateToOneWithWhereWithoutKpiTargetsInput = {
 export type UserUpdateWithoutKpiTargetsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
-  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
-  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
-  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
 }
 
 export type UserUncheckedUpdateWithoutKpiTargetsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
-  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
-  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyTenantInput = {
   id?: string
   email: string
-  password?: string | null
   name: string
   role?: $Enums.Role
   createdAt?: Date | string
   updatedAt?: Date | string
+  password?: string | null
 }
 
 export type UserUpdateWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
-  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
-  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
-  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
-  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
-  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
-  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
-  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   name?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1174,21 +1174,21 @@ export type UserUncheckedUpdateManyWithoutTenantInput = {
  */
 
 export type UserCountOutputType = {
-  ownedDeals: number
-  ownedContacts: number
-  activities: number
-  refreshTokens: number
-  kpiTargets: number
   accounts: number
+  activities: number
+  ownedContacts: number
+  ownedDeals: number
+  kpiTargets: number
+  refreshTokens: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  ownedDeals?: boolean | UserCountOutputTypeCountOwnedDealsArgs
-  ownedContacts?: boolean | UserCountOutputTypeCountOwnedContactsArgs
-  activities?: boolean | UserCountOutputTypeCountActivitiesArgs
-  refreshTokens?: boolean | UserCountOutputTypeCountRefreshTokensArgs
-  kpiTargets?: boolean | UserCountOutputTypeCountKpiTargetsArgs
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
+  activities?: boolean | UserCountOutputTypeCountActivitiesArgs
+  ownedContacts?: boolean | UserCountOutputTypeCountOwnedContactsArgs
+  ownedDeals?: boolean | UserCountOutputTypeCountOwnedDealsArgs
+  kpiTargets?: boolean | UserCountOutputTypeCountKpiTargetsArgs
+  refreshTokens?: boolean | UserCountOutputTypeCountRefreshTokensArgs
 }
 
 /**
@@ -1204,15 +1204,8 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountOwnedDealsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.DealWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountOwnedContactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ContactWhereInput
+export type UserCountOutputTypeCountAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AccountWhereInput
 }
 
 /**
@@ -1225,8 +1218,15 @@ export type UserCountOutputTypeCountActivitiesArgs<ExtArgs extends runtime.Types
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountRefreshTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.RefreshTokenWhereInput
+export type UserCountOutputTypeCountOwnedContactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContactWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountOwnedDealsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DealWhereInput
 }
 
 /**
@@ -1239,8 +1239,8 @@ export type UserCountOutputTypeCountKpiTargetsArgs<ExtArgs extends runtime.Types
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AccountWhereInput
+export type UserCountOutputTypeCountRefreshTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RefreshTokenWhereInput
 }
 
 
@@ -1248,18 +1248,18 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   tenantId?: boolean
   email?: boolean
-  password?: boolean
   name?: boolean
   role?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
-  ownedDeals?: boolean | Prisma.User$ownedDealsArgs<ExtArgs>
-  ownedContacts?: boolean | Prisma.User$ownedContactsArgs<ExtArgs>
-  activities?: boolean | Prisma.User$activitiesArgs<ExtArgs>
-  refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
-  kpiTargets?: boolean | Prisma.User$kpiTargetsArgs<ExtArgs>
+  password?: boolean
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
+  activities?: boolean | Prisma.User$activitiesArgs<ExtArgs>
+  ownedContacts?: boolean | Prisma.User$ownedContactsArgs<ExtArgs>
+  ownedDeals?: boolean | Prisma.User$ownedDealsArgs<ExtArgs>
+  kpiTargets?: boolean | Prisma.User$kpiTargetsArgs<ExtArgs>
+  refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1267,11 +1267,11 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   tenantId?: boolean
   email?: boolean
-  password?: boolean
   name?: boolean
   role?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  password?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1279,11 +1279,11 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   tenantId?: boolean
   email?: boolean
-  password?: boolean
   name?: boolean
   role?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  password?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1291,22 +1291,22 @@ export type UserSelectScalar = {
   id?: boolean
   tenantId?: boolean
   email?: boolean
-  password?: boolean
   name?: boolean
   role?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  password?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "email" | "password" | "name" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "email" | "name" | "role" | "createdAt" | "updatedAt" | "password", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
-  ownedDeals?: boolean | Prisma.User$ownedDealsArgs<ExtArgs>
-  ownedContacts?: boolean | Prisma.User$ownedContactsArgs<ExtArgs>
-  activities?: boolean | Prisma.User$activitiesArgs<ExtArgs>
-  refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
-  kpiTargets?: boolean | Prisma.User$kpiTargetsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
+  activities?: boolean | Prisma.User$activitiesArgs<ExtArgs>
+  ownedContacts?: boolean | Prisma.User$ownedContactsArgs<ExtArgs>
+  ownedDeals?: boolean | Prisma.User$ownedDealsArgs<ExtArgs>
+  kpiTargets?: boolean | Prisma.User$kpiTargetsArgs<ExtArgs>
+  refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1319,23 +1319,23 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    tenant: Prisma.$TenantPayload<ExtArgs>
-    ownedDeals: Prisma.$DealPayload<ExtArgs>[]
-    ownedContacts: Prisma.$ContactPayload<ExtArgs>[]
-    activities: Prisma.$ActivityPayload<ExtArgs>[]
-    refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
-    kpiTargets: Prisma.$KpiTargetPayload<ExtArgs>[]
     accounts: Prisma.$AccountPayload<ExtArgs>[]
+    activities: Prisma.$ActivityPayload<ExtArgs>[]
+    ownedContacts: Prisma.$ContactPayload<ExtArgs>[]
+    ownedDeals: Prisma.$DealPayload<ExtArgs>[]
+    kpiTargets: Prisma.$KpiTargetPayload<ExtArgs>[]
+    refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
+    tenant: Prisma.$TenantPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     tenantId: string
     email: string
-    password: string | null
     name: string
     role: $Enums.Role
     createdAt: Date
     updatedAt: Date
+    password: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1730,13 +1730,13 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  tenant<T extends Prisma.TenantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TenantDefaultArgs<ExtArgs>>): Prisma.Prisma__TenantClient<runtime.Types.Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  ownedDeals<T extends Prisma.User$ownedDealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownedDealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  ownedContacts<T extends Prisma.User$ownedContactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownedContactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  activities<T extends Prisma.User$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  refreshTokens<T extends Prisma.User$refreshTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  kpiTargets<T extends Prisma.User$kpiTargetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$kpiTargetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KpiTargetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  activities<T extends Prisma.User$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ownedContacts<T extends Prisma.User$ownedContactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownedContactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ownedDeals<T extends Prisma.User$ownedDealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownedDealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  kpiTargets<T extends Prisma.User$kpiTargetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$kpiTargetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KpiTargetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  refreshTokens<T extends Prisma.User$refreshTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tenant<T extends Prisma.TenantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TenantDefaultArgs<ExtArgs>>): Prisma.Prisma__TenantClient<runtime.Types.Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1769,11 +1769,11 @@ export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'String'>
   readonly tenantId: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
-  readonly password: Prisma.FieldRef<"User", 'String'>
   readonly name: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'Role'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly password: Prisma.FieldRef<"User", 'String'>
 }
     
 
@@ -2175,51 +2175,27 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.ownedDeals
+ * User.accounts
  */
-export type User$ownedDealsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$accountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Deal
+   * Select specific fields to fetch from the Account
    */
-  select?: Prisma.DealSelect<ExtArgs> | null
+  select?: Prisma.AccountSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Deal
+   * Omit specific fields from the Account
    */
-  omit?: Prisma.DealOmit<ExtArgs> | null
+  omit?: Prisma.AccountOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.DealInclude<ExtArgs> | null
-  where?: Prisma.DealWhereInput
-  orderBy?: Prisma.DealOrderByWithRelationInput | Prisma.DealOrderByWithRelationInput[]
-  cursor?: Prisma.DealWhereUniqueInput
+  include?: Prisma.AccountInclude<ExtArgs> | null
+  where?: Prisma.AccountWhereInput
+  orderBy?: Prisma.AccountOrderByWithRelationInput | Prisma.AccountOrderByWithRelationInput[]
+  cursor?: Prisma.AccountWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.DealScalarFieldEnum | Prisma.DealScalarFieldEnum[]
-}
-
-/**
- * User.ownedContacts
- */
-export type User$ownedContactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Contact
-   */
-  select?: Prisma.ContactSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Contact
-   */
-  omit?: Prisma.ContactOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ContactInclude<ExtArgs> | null
-  where?: Prisma.ContactWhereInput
-  orderBy?: Prisma.ContactOrderByWithRelationInput | Prisma.ContactOrderByWithRelationInput[]
-  cursor?: Prisma.ContactWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ContactScalarFieldEnum | Prisma.ContactScalarFieldEnum[]
+  distinct?: Prisma.AccountScalarFieldEnum | Prisma.AccountScalarFieldEnum[]
 }
 
 /**
@@ -2247,27 +2223,51 @@ export type User$activitiesArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
- * User.refreshTokens
+ * User.ownedContacts
  */
-export type User$refreshTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$ownedContactsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the RefreshToken
+   * Select specific fields to fetch from the Contact
    */
-  select?: Prisma.RefreshTokenSelect<ExtArgs> | null
+  select?: Prisma.ContactSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the RefreshToken
+   * Omit specific fields from the Contact
    */
-  omit?: Prisma.RefreshTokenOmit<ExtArgs> | null
+  omit?: Prisma.ContactOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.RefreshTokenInclude<ExtArgs> | null
-  where?: Prisma.RefreshTokenWhereInput
-  orderBy?: Prisma.RefreshTokenOrderByWithRelationInput | Prisma.RefreshTokenOrderByWithRelationInput[]
-  cursor?: Prisma.RefreshTokenWhereUniqueInput
+  include?: Prisma.ContactInclude<ExtArgs> | null
+  where?: Prisma.ContactWhereInput
+  orderBy?: Prisma.ContactOrderByWithRelationInput | Prisma.ContactOrderByWithRelationInput[]
+  cursor?: Prisma.ContactWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.RefreshTokenScalarFieldEnum | Prisma.RefreshTokenScalarFieldEnum[]
+  distinct?: Prisma.ContactScalarFieldEnum | Prisma.ContactScalarFieldEnum[]
+}
+
+/**
+ * User.ownedDeals
+ */
+export type User$ownedDealsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Deal
+   */
+  select?: Prisma.DealSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Deal
+   */
+  omit?: Prisma.DealOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DealInclude<ExtArgs> | null
+  where?: Prisma.DealWhereInput
+  orderBy?: Prisma.DealOrderByWithRelationInput | Prisma.DealOrderByWithRelationInput[]
+  cursor?: Prisma.DealWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DealScalarFieldEnum | Prisma.DealScalarFieldEnum[]
 }
 
 /**
@@ -2295,27 +2295,27 @@ export type User$kpiTargetsArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
- * User.accounts
+ * User.refreshTokens
  */
-export type User$accountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$refreshTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Account
+   * Select specific fields to fetch from the RefreshToken
    */
-  select?: Prisma.AccountSelect<ExtArgs> | null
+  select?: Prisma.RefreshTokenSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Account
+   * Omit specific fields from the RefreshToken
    */
-  omit?: Prisma.AccountOmit<ExtArgs> | null
+  omit?: Prisma.RefreshTokenOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.AccountInclude<ExtArgs> | null
-  where?: Prisma.AccountWhereInput
-  orderBy?: Prisma.AccountOrderByWithRelationInput | Prisma.AccountOrderByWithRelationInput[]
-  cursor?: Prisma.AccountWhereUniqueInput
+  include?: Prisma.RefreshTokenInclude<ExtArgs> | null
+  where?: Prisma.RefreshTokenWhereInput
+  orderBy?: Prisma.RefreshTokenOrderByWithRelationInput | Prisma.RefreshTokenOrderByWithRelationInput[]
+  cursor?: Prisma.RefreshTokenWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.AccountScalarFieldEnum | Prisma.AccountScalarFieldEnum[]
+  distinct?: Prisma.RefreshTokenScalarFieldEnum | Prisma.RefreshTokenScalarFieldEnum[]
 }
 
 /**

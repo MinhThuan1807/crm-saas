@@ -17,6 +17,7 @@ export class ContactsRepository {
         phone: data.phone ?? null,
         company: data.company ?? null,
         position: data.position ?? null,
+        tags: data.tags ?? []
       },
     })
   }
@@ -28,6 +29,11 @@ export class ContactsRepository {
         tenantId,
         deletedAt: null,
         ...(isSalesRep && { ownerId: userContext.userId }),
+        ...(query.tag && {
+          tags: {
+            has: query.tag,
+          },
+        }),
         OR: query.search
           ? [
               { name: { contains: query.search, mode: 'insensitive' } },

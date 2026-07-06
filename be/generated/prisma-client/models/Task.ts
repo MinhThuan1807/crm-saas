@@ -26,64 +26,64 @@ export type AggregateTask = {
 
 export type TaskMinAggregateOutputType = {
   id: string | null
-  tenantId: string | null
   dealId: string | null
   title: string | null
   done: boolean | null
   dueDate: Date | null
   createdAt: Date | null
+  tenantId: string | null
 }
 
 export type TaskMaxAggregateOutputType = {
   id: string | null
-  tenantId: string | null
   dealId: string | null
   title: string | null
   done: boolean | null
   dueDate: Date | null
   createdAt: Date | null
+  tenantId: string | null
 }
 
 export type TaskCountAggregateOutputType = {
   id: number
-  tenantId: number
   dealId: number
   title: number
   done: number
   dueDate: number
   createdAt: number
+  tenantId: number
   _all: number
 }
 
 
 export type TaskMinAggregateInputType = {
   id?: true
-  tenantId?: true
   dealId?: true
   title?: true
   done?: true
   dueDate?: true
   createdAt?: true
+  tenantId?: true
 }
 
 export type TaskMaxAggregateInputType = {
   id?: true
-  tenantId?: true
   dealId?: true
   title?: true
   done?: true
   dueDate?: true
   createdAt?: true
+  tenantId?: true
 }
 
 export type TaskCountAggregateInputType = {
   id?: true
-  tenantId?: true
   dealId?: true
   title?: true
   done?: true
   dueDate?: true
   createdAt?: true
+  tenantId?: true
   _all?: true
 }
 
@@ -161,12 +161,12 @@ export type TaskGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type TaskGroupByOutputType = {
   id: string
-  tenantId: string
   dealId: string
   title: string
   done: boolean
   dueDate: Date | null
   createdAt: Date
+  tenantId: string
   _count: TaskCountAggregateOutputType | null
   _min: TaskMinAggregateOutputType | null
   _max: TaskMaxAggregateOutputType | null
@@ -192,23 +192,23 @@ export type TaskWhereInput = {
   OR?: Prisma.TaskWhereInput[]
   NOT?: Prisma.TaskWhereInput | Prisma.TaskWhereInput[]
   id?: Prisma.StringFilter<"Task"> | string
-  tenantId?: Prisma.StringFilter<"Task"> | string
   dealId?: Prisma.StringFilter<"Task"> | string
   title?: Prisma.StringFilter<"Task"> | string
   done?: Prisma.BoolFilter<"Task"> | boolean
   dueDate?: Prisma.DateTimeNullableFilter<"Task"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Task"> | Date | string
+  tenantId?: Prisma.StringFilter<"Task"> | string
   deal?: Prisma.XOR<Prisma.DealScalarRelationFilter, Prisma.DealWhereInput>
 }
 
 export type TaskOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  tenantId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   done?: Prisma.SortOrder
   dueDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
   deal?: Prisma.DealOrderByWithRelationInput
 }
 
@@ -217,23 +217,23 @@ export type TaskWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.TaskWhereInput | Prisma.TaskWhereInput[]
   OR?: Prisma.TaskWhereInput[]
   NOT?: Prisma.TaskWhereInput | Prisma.TaskWhereInput[]
-  tenantId?: Prisma.StringFilter<"Task"> | string
   dealId?: Prisma.StringFilter<"Task"> | string
   title?: Prisma.StringFilter<"Task"> | string
   done?: Prisma.BoolFilter<"Task"> | boolean
   dueDate?: Prisma.DateTimeNullableFilter<"Task"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Task"> | Date | string
+  tenantId?: Prisma.StringFilter<"Task"> | string
   deal?: Prisma.XOR<Prisma.DealScalarRelationFilter, Prisma.DealWhereInput>
 }, "id">
 
 export type TaskOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  tenantId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   done?: Prisma.SortOrder
   dueDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
   _count?: Prisma.TaskCountOrderByAggregateInput
   _max?: Prisma.TaskMaxOrderByAggregateInput
   _min?: Prisma.TaskMinOrderByAggregateInput
@@ -244,81 +244,81 @@ export type TaskScalarWhereWithAggregatesInput = {
   OR?: Prisma.TaskScalarWhereWithAggregatesInput[]
   NOT?: Prisma.TaskScalarWhereWithAggregatesInput | Prisma.TaskScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Task"> | string
-  tenantId?: Prisma.StringWithAggregatesFilter<"Task"> | string
   dealId?: Prisma.StringWithAggregatesFilter<"Task"> | string
   title?: Prisma.StringWithAggregatesFilter<"Task"> | string
   done?: Prisma.BoolWithAggregatesFilter<"Task"> | boolean
   dueDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Task"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Task"> | Date | string
+  tenantId?: Prisma.StringWithAggregatesFilter<"Task"> | string
 }
 
 export type TaskCreateInput = {
   id?: string
-  tenantId: string
   title: string
   done?: boolean
   dueDate?: Date | string | null
   createdAt?: Date | string
+  tenantId: string
   deal: Prisma.DealCreateNestedOneWithoutTasksInput
 }
 
 export type TaskUncheckedCreateInput = {
   id?: string
-  tenantId: string
   dealId: string
   title: string
   done?: boolean
   dueDate?: Date | string | null
   createdAt?: Date | string
+  tenantId: string
 }
 
 export type TaskUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   done?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   deal?: Prisma.DealUpdateOneRequiredWithoutTasksNestedInput
 }
 
 export type TaskUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   dealId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   done?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TaskCreateManyInput = {
   id?: string
-  tenantId: string
   dealId: string
   title: string
   done?: boolean
   dueDate?: Date | string | null
   createdAt?: Date | string
+  tenantId: string
 }
 
 export type TaskUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   done?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TaskUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   dealId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   done?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TaskListRelationFilter = {
@@ -333,32 +333,32 @@ export type TaskOrderByRelationAggregateInput = {
 
 export type TaskCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  tenantId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   done?: Prisma.SortOrder
   dueDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
 }
 
 export type TaskMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  tenantId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   done?: Prisma.SortOrder
   dueDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
 }
 
 export type TaskMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  tenantId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   done?: Prisma.SortOrder
   dueDate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  tenantId?: Prisma.SortOrder
 }
 
 export type TaskCreateNestedManyWithoutDealInput = {
@@ -409,20 +409,20 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type TaskCreateWithoutDealInput = {
   id?: string
-  tenantId: string
   title: string
   done?: boolean
   dueDate?: Date | string | null
   createdAt?: Date | string
+  tenantId: string
 }
 
 export type TaskUncheckedCreateWithoutDealInput = {
   id?: string
-  tenantId: string
   title: string
   done?: boolean
   dueDate?: Date | string | null
   createdAt?: Date | string
+  tenantId: string
 }
 
 export type TaskCreateOrConnectWithoutDealInput = {
@@ -456,96 +456,96 @@ export type TaskScalarWhereInput = {
   OR?: Prisma.TaskScalarWhereInput[]
   NOT?: Prisma.TaskScalarWhereInput | Prisma.TaskScalarWhereInput[]
   id?: Prisma.StringFilter<"Task"> | string
-  tenantId?: Prisma.StringFilter<"Task"> | string
   dealId?: Prisma.StringFilter<"Task"> | string
   title?: Prisma.StringFilter<"Task"> | string
   done?: Prisma.BoolFilter<"Task"> | boolean
   dueDate?: Prisma.DateTimeNullableFilter<"Task"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Task"> | Date | string
+  tenantId?: Prisma.StringFilter<"Task"> | string
 }
 
 export type TaskCreateManyDealInput = {
   id?: string
-  tenantId: string
   title: string
   done?: boolean
   dueDate?: Date | string | null
   createdAt?: Date | string
+  tenantId: string
 }
 
 export type TaskUpdateWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   done?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TaskUncheckedUpdateWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   done?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type TaskUncheckedUpdateManyWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   done?: Prisma.BoolFieldUpdateOperationsInput | boolean
   dueDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
 
 export type TaskSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  tenantId?: boolean
   dealId?: boolean
   title?: boolean
   done?: boolean
   dueDate?: boolean
   createdAt?: boolean
+  tenantId?: boolean
   deal?: boolean | Prisma.DealDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["task"]>
 
 export type TaskSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  tenantId?: boolean
   dealId?: boolean
   title?: boolean
   done?: boolean
   dueDate?: boolean
   createdAt?: boolean
+  tenantId?: boolean
   deal?: boolean | Prisma.DealDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["task"]>
 
 export type TaskSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  tenantId?: boolean
   dealId?: boolean
   title?: boolean
   done?: boolean
   dueDate?: boolean
   createdAt?: boolean
+  tenantId?: boolean
   deal?: boolean | Prisma.DealDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["task"]>
 
 export type TaskSelectScalar = {
   id?: boolean
-  tenantId?: boolean
   dealId?: boolean
   title?: boolean
   done?: boolean
   dueDate?: boolean
   createdAt?: boolean
+  tenantId?: boolean
 }
 
-export type TaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "dealId" | "title" | "done" | "dueDate" | "createdAt", ExtArgs["result"]["task"]>
+export type TaskOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "dealId" | "title" | "done" | "dueDate" | "createdAt" | "tenantId", ExtArgs["result"]["task"]>
 export type TaskInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   deal?: boolean | Prisma.DealDefaultArgs<ExtArgs>
 }
@@ -563,12 +563,12 @@ export type $TaskPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    tenantId: string
     dealId: string
     title: string
     done: boolean
     dueDate: Date | null
     createdAt: Date
+    tenantId: string
   }, ExtArgs["result"]["task"]>
   composites: {}
 }
@@ -994,12 +994,12 @@ export interface Prisma__TaskClient<T, Null = never, ExtArgs extends runtime.Typ
  */
 export interface TaskFieldRefs {
   readonly id: Prisma.FieldRef<"Task", 'String'>
-  readonly tenantId: Prisma.FieldRef<"Task", 'String'>
   readonly dealId: Prisma.FieldRef<"Task", 'String'>
   readonly title: Prisma.FieldRef<"Task", 'String'>
   readonly done: Prisma.FieldRef<"Task", 'Boolean'>
   readonly dueDate: Prisma.FieldRef<"Task", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Task", 'DateTime'>
+  readonly tenantId: Prisma.FieldRef<"Task", 'String'>
 }
     
 

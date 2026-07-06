@@ -1282,11 +1282,11 @@ export const UserScalarFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
   email: 'email',
-  password: 'password',
   name: 'name',
   role: 'role',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  password: 'password'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -1306,15 +1306,16 @@ export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeo
 export const ContactScalarFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
-  ownerId: 'ownerId',
   name: 'name',
   email: 'email',
   phone: 'phone',
   company: 'company',
   position: 'position',
+  tags: 'tags',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  deletedAt: 'deletedAt',
+  ownerId: 'ownerId'
 } as const
 
 export type ContactScalarFieldEnum = (typeof ContactScalarFieldEnum)[keyof typeof ContactScalarFieldEnum]
@@ -1344,10 +1345,10 @@ export const ActivityScalarFieldEnum = {
   contactId: 'contactId',
   dealId: 'dealId',
   userId: 'userId',
-  title: 'title',
   type: 'type',
   note: 'note',
-  date: 'date'
+  date: 'date',
+  title: 'title'
 } as const
 
 export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typeof ActivityScalarFieldEnum]
@@ -1355,12 +1356,12 @@ export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typ
 
 export const TaskScalarFieldEnum = {
   id: 'id',
-  tenantId: 'tenantId',
   dealId: 'dealId',
   title: 'title',
   done: 'done',
   dueDate: 'dueDate',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  tenantId: 'tenantId'
 } as const
 
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
@@ -1368,13 +1369,13 @@ export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof Task
 
 export const AiSuggestionScalarFieldEnum = {
   id: 'id',
-  tenantId: 'tenantId',
-  jobId: 'jobId',
   dealId: 'dealId',
   type: 'type',
   content: 'content',
   sourceNote: 'sourceNote',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  jobId: 'jobId',
+  tenantId: 'tenantId'
 } as const
 
 export type AiSuggestionScalarFieldEnum = (typeof AiSuggestionScalarFieldEnum)[keyof typeof AiSuggestionScalarFieldEnum]

@@ -30,10 +30,10 @@ export type ActivityMinAggregateOutputType = {
   contactId: string | null
   dealId: string | null
   userId: string | null
-  title: string | null
   type: $Enums.ActivityType | null
   note: string | null
   date: Date | null
+  title: string | null
 }
 
 export type ActivityMaxAggregateOutputType = {
@@ -42,10 +42,10 @@ export type ActivityMaxAggregateOutputType = {
   contactId: string | null
   dealId: string | null
   userId: string | null
-  title: string | null
   type: $Enums.ActivityType | null
   note: string | null
   date: Date | null
+  title: string | null
 }
 
 export type ActivityCountAggregateOutputType = {
@@ -54,10 +54,10 @@ export type ActivityCountAggregateOutputType = {
   contactId: number
   dealId: number
   userId: number
-  title: number
   type: number
   note: number
   date: number
+  title: number
   _all: number
 }
 
@@ -68,10 +68,10 @@ export type ActivityMinAggregateInputType = {
   contactId?: true
   dealId?: true
   userId?: true
-  title?: true
   type?: true
   note?: true
   date?: true
+  title?: true
 }
 
 export type ActivityMaxAggregateInputType = {
@@ -80,10 +80,10 @@ export type ActivityMaxAggregateInputType = {
   contactId?: true
   dealId?: true
   userId?: true
-  title?: true
   type?: true
   note?: true
   date?: true
+  title?: true
 }
 
 export type ActivityCountAggregateInputType = {
@@ -92,10 +92,10 @@ export type ActivityCountAggregateInputType = {
   contactId?: true
   dealId?: true
   userId?: true
-  title?: true
   type?: true
   note?: true
   date?: true
+  title?: true
   _all?: true
 }
 
@@ -177,10 +177,10 @@ export type ActivityGroupByOutputType = {
   contactId: string | null
   dealId: string | null
   userId: string
-  title: string | null
   type: $Enums.ActivityType
   note: string
   date: Date
+  title: string | null
   _count: ActivityCountAggregateOutputType | null
   _min: ActivityMinAggregateOutputType | null
   _max: ActivityMaxAggregateOutputType | null
@@ -210,13 +210,13 @@ export type ActivityWhereInput = {
   contactId?: Prisma.StringNullableFilter<"Activity"> | string | null
   dealId?: Prisma.StringNullableFilter<"Activity"> | string | null
   userId?: Prisma.StringFilter<"Activity"> | string
-  title?: Prisma.StringNullableFilter<"Activity"> | string | null
   type?: Prisma.EnumActivityTypeFilter<"Activity"> | $Enums.ActivityType
   note?: Prisma.StringFilter<"Activity"> | string
   date?: Prisma.DateTimeFilter<"Activity"> | Date | string
-  tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
+  title?: Prisma.StringNullableFilter<"Activity"> | string | null
   contact?: Prisma.XOR<Prisma.ContactNullableScalarRelationFilter, Prisma.ContactWhereInput> | null
   deal?: Prisma.XOR<Prisma.DealNullableScalarRelationFilter, Prisma.DealWhereInput> | null
+  tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -226,13 +226,13 @@ export type ActivityOrderByWithRelationInput = {
   contactId?: Prisma.SortOrderInput | Prisma.SortOrder
   dealId?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
-  title?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   note?: Prisma.SortOrder
   date?: Prisma.SortOrder
-  tenant?: Prisma.TenantOrderByWithRelationInput
+  title?: Prisma.SortOrderInput | Prisma.SortOrder
   contact?: Prisma.ContactOrderByWithRelationInput
   deal?: Prisma.DealOrderByWithRelationInput
+  tenant?: Prisma.TenantOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -245,13 +245,13 @@ export type ActivityWhereUniqueInput = Prisma.AtLeast<{
   contactId?: Prisma.StringNullableFilter<"Activity"> | string | null
   dealId?: Prisma.StringNullableFilter<"Activity"> | string | null
   userId?: Prisma.StringFilter<"Activity"> | string
-  title?: Prisma.StringNullableFilter<"Activity"> | string | null
   type?: Prisma.EnumActivityTypeFilter<"Activity"> | $Enums.ActivityType
   note?: Prisma.StringFilter<"Activity"> | string
   date?: Prisma.DateTimeFilter<"Activity"> | Date | string
-  tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
+  title?: Prisma.StringNullableFilter<"Activity"> | string | null
   contact?: Prisma.XOR<Prisma.ContactNullableScalarRelationFilter, Prisma.ContactWhereInput> | null
   deal?: Prisma.XOR<Prisma.DealNullableScalarRelationFilter, Prisma.DealWhereInput> | null
+  tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
@@ -261,10 +261,10 @@ export type ActivityOrderByWithAggregationInput = {
   contactId?: Prisma.SortOrderInput | Prisma.SortOrder
   dealId?: Prisma.SortOrderInput | Prisma.SortOrder
   userId?: Prisma.SortOrder
-  title?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   note?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  title?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ActivityCountOrderByAggregateInput
   _max?: Prisma.ActivityMaxOrderByAggregateInput
   _min?: Prisma.ActivityMinOrderByAggregateInput
@@ -279,21 +279,21 @@ export type ActivityScalarWhereWithAggregatesInput = {
   contactId?: Prisma.StringNullableWithAggregatesFilter<"Activity"> | string | null
   dealId?: Prisma.StringNullableWithAggregatesFilter<"Activity"> | string | null
   userId?: Prisma.StringWithAggregatesFilter<"Activity"> | string
-  title?: Prisma.StringNullableWithAggregatesFilter<"Activity"> | string | null
   type?: Prisma.EnumActivityTypeWithAggregatesFilter<"Activity"> | $Enums.ActivityType
   note?: Prisma.StringWithAggregatesFilter<"Activity"> | string
   date?: Prisma.DateTimeWithAggregatesFilter<"Activity"> | Date | string
+  title?: Prisma.StringNullableWithAggregatesFilter<"Activity"> | string | null
 }
 
 export type ActivityCreateInput = {
   id?: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
-  tenant: Prisma.TenantCreateNestedOneWithoutActivitiesInput
+  title?: string | null
   contact?: Prisma.ContactCreateNestedOneWithoutActivitiesInput
   deal?: Prisma.DealCreateNestedOneWithoutActivitiesInput
+  tenant: Prisma.TenantCreateNestedOneWithoutActivitiesInput
   user: Prisma.UserCreateNestedOneWithoutActivitiesInput
 }
 
@@ -303,21 +303,21 @@ export type ActivityUncheckedCreateInput = {
   contactId?: string | null
   dealId?: string | null
   userId: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
+  title?: string | null
 }
 
 export type ActivityUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutActivitiesNestedInput
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contact?: Prisma.ContactUpdateOneWithoutActivitiesNestedInput
   deal?: Prisma.DealUpdateOneWithoutActivitiesNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutActivitiesNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutActivitiesNestedInput
 }
 
@@ -327,10 +327,10 @@ export type ActivityUncheckedUpdateInput = {
   contactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ActivityCreateManyInput = {
@@ -339,18 +339,18 @@ export type ActivityCreateManyInput = {
   contactId?: string | null
   dealId?: string | null
   userId: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
+  title?: string | null
 }
 
 export type ActivityUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ActivityUncheckedUpdateManyInput = {
@@ -359,10 +359,10 @@ export type ActivityUncheckedUpdateManyInput = {
   contactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ActivityListRelationFilter = {
@@ -381,10 +381,10 @@ export type ActivityCountOrderByAggregateInput = {
   contactId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  title?: Prisma.SortOrder
   type?: Prisma.SortOrder
   note?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  title?: Prisma.SortOrder
 }
 
 export type ActivityMaxOrderByAggregateInput = {
@@ -393,10 +393,10 @@ export type ActivityMaxOrderByAggregateInput = {
   contactId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  title?: Prisma.SortOrder
   type?: Prisma.SortOrder
   note?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  title?: Prisma.SortOrder
 }
 
 export type ActivityMinOrderByAggregateInput = {
@@ -405,10 +405,10 @@ export type ActivityMinOrderByAggregateInput = {
   contactId?: Prisma.SortOrder
   dealId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
-  title?: Prisma.SortOrder
   type?: Prisma.SortOrder
   note?: Prisma.SortOrder
   date?: Prisma.SortOrder
+  title?: Prisma.SortOrder
 }
 
 export type ActivityCreateNestedManyWithoutTenantInput = {
@@ -585,10 +585,10 @@ export type EnumActivityTypeFieldUpdateOperationsInput = {
 
 export type ActivityCreateWithoutTenantInput = {
   id?: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
+  title?: string | null
   contact?: Prisma.ContactCreateNestedOneWithoutActivitiesInput
   deal?: Prisma.DealCreateNestedOneWithoutActivitiesInput
   user: Prisma.UserCreateNestedOneWithoutActivitiesInput
@@ -599,10 +599,10 @@ export type ActivityUncheckedCreateWithoutTenantInput = {
   contactId?: string | null
   dealId?: string | null
   userId: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
+  title?: string | null
 }
 
 export type ActivityCreateOrConnectWithoutTenantInput = {
@@ -640,21 +640,21 @@ export type ActivityScalarWhereInput = {
   contactId?: Prisma.StringNullableFilter<"Activity"> | string | null
   dealId?: Prisma.StringNullableFilter<"Activity"> | string | null
   userId?: Prisma.StringFilter<"Activity"> | string
-  title?: Prisma.StringNullableFilter<"Activity"> | string | null
   type?: Prisma.EnumActivityTypeFilter<"Activity"> | $Enums.ActivityType
   note?: Prisma.StringFilter<"Activity"> | string
   date?: Prisma.DateTimeFilter<"Activity"> | Date | string
+  title?: Prisma.StringNullableFilter<"Activity"> | string | null
 }
 
 export type ActivityCreateWithoutUserInput = {
   id?: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
-  tenant: Prisma.TenantCreateNestedOneWithoutActivitiesInput
+  title?: string | null
   contact?: Prisma.ContactCreateNestedOneWithoutActivitiesInput
   deal?: Prisma.DealCreateNestedOneWithoutActivitiesInput
+  tenant: Prisma.TenantCreateNestedOneWithoutActivitiesInput
 }
 
 export type ActivityUncheckedCreateWithoutUserInput = {
@@ -662,10 +662,10 @@ export type ActivityUncheckedCreateWithoutUserInput = {
   tenantId: string
   contactId?: string | null
   dealId?: string | null
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
+  title?: string | null
 }
 
 export type ActivityCreateOrConnectWithoutUserInput = {
@@ -696,12 +696,12 @@ export type ActivityUpdateManyWithWhereWithoutUserInput = {
 
 export type ActivityCreateWithoutContactInput = {
   id?: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
-  tenant: Prisma.TenantCreateNestedOneWithoutActivitiesInput
+  title?: string | null
   deal?: Prisma.DealCreateNestedOneWithoutActivitiesInput
+  tenant: Prisma.TenantCreateNestedOneWithoutActivitiesInput
   user: Prisma.UserCreateNestedOneWithoutActivitiesInput
 }
 
@@ -710,10 +710,10 @@ export type ActivityUncheckedCreateWithoutContactInput = {
   tenantId: string
   dealId?: string | null
   userId: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
+  title?: string | null
 }
 
 export type ActivityCreateOrConnectWithoutContactInput = {
@@ -744,12 +744,12 @@ export type ActivityUpdateManyWithWhereWithoutContactInput = {
 
 export type ActivityCreateWithoutDealInput = {
   id?: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
-  tenant: Prisma.TenantCreateNestedOneWithoutActivitiesInput
+  title?: string | null
   contact?: Prisma.ContactCreateNestedOneWithoutActivitiesInput
+  tenant: Prisma.TenantCreateNestedOneWithoutActivitiesInput
   user: Prisma.UserCreateNestedOneWithoutActivitiesInput
 }
 
@@ -758,10 +758,10 @@ export type ActivityUncheckedCreateWithoutDealInput = {
   tenantId: string
   contactId?: string | null
   userId: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
+  title?: string | null
 }
 
 export type ActivityCreateOrConnectWithoutDealInput = {
@@ -795,18 +795,18 @@ export type ActivityCreateManyTenantInput = {
   contactId?: string | null
   dealId?: string | null
   userId: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
+  title?: string | null
 }
 
 export type ActivityUpdateWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contact?: Prisma.ContactUpdateOneWithoutActivitiesNestedInput
   deal?: Prisma.DealUpdateOneWithoutActivitiesNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutActivitiesNestedInput
@@ -817,10 +817,10 @@ export type ActivityUncheckedUpdateWithoutTenantInput = {
   contactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ActivityUncheckedUpdateManyWithoutTenantInput = {
@@ -828,10 +828,10 @@ export type ActivityUncheckedUpdateManyWithoutTenantInput = {
   contactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ActivityCreateManyUserInput = {
@@ -839,21 +839,21 @@ export type ActivityCreateManyUserInput = {
   tenantId: string
   contactId?: string | null
   dealId?: string | null
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
+  title?: string | null
 }
 
 export type ActivityUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutActivitiesNestedInput
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contact?: Prisma.ContactUpdateOneWithoutActivitiesNestedInput
   deal?: Prisma.DealUpdateOneWithoutActivitiesNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutActivitiesNestedInput
 }
 
 export type ActivityUncheckedUpdateWithoutUserInput = {
@@ -861,10 +861,10 @@ export type ActivityUncheckedUpdateWithoutUserInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   contactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ActivityUncheckedUpdateManyWithoutUserInput = {
@@ -872,10 +872,10 @@ export type ActivityUncheckedUpdateManyWithoutUserInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   contactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ActivityCreateManyContactInput = {
@@ -883,20 +883,20 @@ export type ActivityCreateManyContactInput = {
   tenantId: string
   dealId?: string | null
   userId: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
+  title?: string | null
 }
 
 export type ActivityUpdateWithoutContactInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutActivitiesNestedInput
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   deal?: Prisma.DealUpdateOneWithoutActivitiesNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutActivitiesNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutActivitiesNestedInput
 }
 
@@ -905,10 +905,10 @@ export type ActivityUncheckedUpdateWithoutContactInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ActivityUncheckedUpdateManyWithoutContactInput = {
@@ -916,10 +916,10 @@ export type ActivityUncheckedUpdateManyWithoutContactInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ActivityCreateManyDealInput = {
@@ -927,20 +927,20 @@ export type ActivityCreateManyDealInput = {
   tenantId: string
   contactId?: string | null
   userId: string
-  title?: string | null
   type: $Enums.ActivityType
   note: string
   date?: Date | string
+  title?: string | null
 }
 
 export type ActivityUpdateWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutActivitiesNestedInput
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contact?: Prisma.ContactUpdateOneWithoutActivitiesNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutActivitiesNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutActivitiesNestedInput
 }
 
@@ -949,10 +949,10 @@ export type ActivityUncheckedUpdateWithoutDealInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   contactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ActivityUncheckedUpdateManyWithoutDealInput = {
@@ -960,10 +960,10 @@ export type ActivityUncheckedUpdateManyWithoutDealInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   contactId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
-  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
   note?: Prisma.StringFieldUpdateOperationsInput | string
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -974,13 +974,13 @@ export type ActivitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   contactId?: boolean
   dealId?: boolean
   userId?: boolean
-  title?: boolean
   type?: boolean
   note?: boolean
   date?: boolean
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  title?: boolean
   contact?: boolean | Prisma.Activity$contactArgs<ExtArgs>
   deal?: boolean | Prisma.Activity$dealArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["activity"]>
 
@@ -990,13 +990,13 @@ export type ActivitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   contactId?: boolean
   dealId?: boolean
   userId?: boolean
-  title?: boolean
   type?: boolean
   note?: boolean
   date?: boolean
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  title?: boolean
   contact?: boolean | Prisma.Activity$contactArgs<ExtArgs>
   deal?: boolean | Prisma.Activity$dealArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["activity"]>
 
@@ -1006,13 +1006,13 @@ export type ActivitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   contactId?: boolean
   dealId?: boolean
   userId?: boolean
-  title?: boolean
   type?: boolean
   note?: boolean
   date?: boolean
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  title?: boolean
   contact?: boolean | Prisma.Activity$contactArgs<ExtArgs>
   deal?: boolean | Prisma.Activity$dealArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["activity"]>
 
@@ -1022,38 +1022,38 @@ export type ActivitySelectScalar = {
   contactId?: boolean
   dealId?: boolean
   userId?: boolean
-  title?: boolean
   type?: boolean
   note?: boolean
   date?: boolean
+  title?: boolean
 }
 
-export type ActivityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "contactId" | "dealId" | "userId" | "title" | "type" | "note" | "date", ExtArgs["result"]["activity"]>
+export type ActivityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "contactId" | "dealId" | "userId" | "type" | "note" | "date" | "title", ExtArgs["result"]["activity"]>
 export type ActivityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   contact?: boolean | Prisma.Activity$contactArgs<ExtArgs>
   deal?: boolean | Prisma.Activity$dealArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type ActivityIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   contact?: boolean | Prisma.Activity$contactArgs<ExtArgs>
   deal?: boolean | Prisma.Activity$dealArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type ActivityIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   contact?: boolean | Prisma.Activity$contactArgs<ExtArgs>
   deal?: boolean | Prisma.Activity$dealArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $ActivityPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Activity"
   objects: {
-    tenant: Prisma.$TenantPayload<ExtArgs>
     contact: Prisma.$ContactPayload<ExtArgs> | null
     deal: Prisma.$DealPayload<ExtArgs> | null
+    tenant: Prisma.$TenantPayload<ExtArgs>
     user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1062,10 +1062,10 @@ export type $ActivityPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     contactId: string | null
     dealId: string | null
     userId: string
-    title: string | null
     type: $Enums.ActivityType
     note: string
     date: Date
+    title: string | null
   }, ExtArgs["result"]["activity"]>
   composites: {}
 }
@@ -1460,9 +1460,9 @@ readonly fields: ActivityFieldRefs;
  */
 export interface Prisma__ActivityClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  tenant<T extends Prisma.TenantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TenantDefaultArgs<ExtArgs>>): Prisma.Prisma__TenantClient<runtime.Types.Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   contact<T extends Prisma.Activity$contactArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Activity$contactArgs<ExtArgs>>): Prisma.Prisma__ContactClient<runtime.Types.Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   deal<T extends Prisma.Activity$dealArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Activity$dealArgs<ExtArgs>>): Prisma.Prisma__DealClient<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  tenant<T extends Prisma.TenantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TenantDefaultArgs<ExtArgs>>): Prisma.Prisma__TenantClient<runtime.Types.Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1498,10 +1498,10 @@ export interface ActivityFieldRefs {
   readonly contactId: Prisma.FieldRef<"Activity", 'String'>
   readonly dealId: Prisma.FieldRef<"Activity", 'String'>
   readonly userId: Prisma.FieldRef<"Activity", 'String'>
-  readonly title: Prisma.FieldRef<"Activity", 'String'>
   readonly type: Prisma.FieldRef<"Activity", 'ActivityType'>
   readonly note: Prisma.FieldRef<"Activity", 'String'>
   readonly date: Prisma.FieldRef<"Activity", 'DateTime'>
+  readonly title: Prisma.FieldRef<"Activity", 'String'>
 }
     
 

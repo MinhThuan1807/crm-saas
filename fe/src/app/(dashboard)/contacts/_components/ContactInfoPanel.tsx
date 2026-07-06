@@ -14,7 +14,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { StageBadge, type DealStage } from "@/components/StageBage";
-import { GetContactResType } from "@/lib/validations/contacts.scheme";
+import { GetContactResType, ContactTagConst, ContactTagType } from "@/lib/validations/contacts.scheme";
 import { formatCurrency, getInitials, relativeTime } from "@/lib/helper";
 import {
   DropdownMenu,
@@ -33,6 +33,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import ContactDialog from "./ContactDialog";
+
+const CONTACT_TAG_COLOR: Record<ContactTagType, string> = {
+  [ContactTagConst.Enterprise]: "bg-blue-100 text-blue-800 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800",
+  [ContactTagConst.Vip]: "bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800",
+  [ContactTagConst.Potential]: "bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800",
+};
 
 interface ContactInfoPanelProps {
   contact: GetContactResType;
@@ -163,29 +169,23 @@ export function ContactInfoPanel({ contact }: ContactInfoPanelProps) {
           </div>
 
           {/* Tags */}
-          <div className="flex gap-1.5">
-            <span
-              className="px-2.5 py-0.5 rounded-full"
-              style={{
-                fontSize: 11,
-                fontWeight: 500,
-                color: "#3B6D11",
-                background: "#E8F5E0",
-              }}
-            >
-              VIP
-            </span>
-            <span
-              className="px-2.5 py-0.5 rounded-full"
-              style={{
-                fontSize: 11,
-                fontWeight: 500,
-                color: "#534AB7",
-                background: "#EEEDFE",
-              }}
-            >
-              Enterprise
-            </span>
+          <div className="flex flex-wrap gap-1 justify-center">
+            {contact?.tags && contact.tags.length > 0 ? (
+              contact.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium border ${CONTACT_TAG_COLOR[tag as ContactTagType]}`}
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 500,
+                  }}
+                >
+                  {tag}
+                </span>
+              ))
+            ) : (
+              <span className="text-xs text-muted-foreground italic">Không có tags</span>
+            )}
           </div>
         </div>
 
