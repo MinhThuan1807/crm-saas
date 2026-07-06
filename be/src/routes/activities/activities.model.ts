@@ -19,7 +19,7 @@ export const ActivityTypeEnum = z.enum([
   ActivityTypeConst.NOTE,
 ])
 
-// ─── BASE SCHEMA (response shape với relations) ───────────────────────────────
+// ─── BASE SCHEMA (response shape with relations) ───────────────────────────────
 export const ActivityBaseSchema = z.object({
   id: z.string(),
   tenantId: z.string(),
@@ -72,14 +72,14 @@ export const CreateActivityForDealBodySchema = z
     title: z.string().optional().nullable(),
     note: z.string().min(1, 'Nội dung không được để trống'),
     date: zIsoDatetime.optional(),
-    contactId: z.string().optional(), // optional — có thể gắn thêm contact
+    contactId: z.string().optional(), // optional — can attach contact
   })
   .strict()
 
 export type CreateActivityForDealBodyType = z.infer<typeof CreateActivityForDealBodySchema>
 
 // ─── UPDATE ───────────────────────────────────────────────────────────────────
-// PATCH /activities/:id — partial, ít nhất 1 field
+// PATCH /activities/:id — partial, at least 1 field
 export const UpdateActivityBodySchema = z
   .object({
     type: ActivityTypeEnum.optional(),

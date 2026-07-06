@@ -14,7 +14,7 @@ export const UserBaseSchema = z.object({
 
 export type UserType = z.infer<typeof UserBaseSchema>;
 
-// Schema này dùng để validate dữ liệu trả về khi đăng ký thành công, không bao gồm password
+// This schema is used to validate response data upon successful registration, excluding password
 
 export const UserWithPasswordSchema = UserBaseSchema.extend({
   password: z.string(),

@@ -44,12 +44,12 @@ export class AuthController {
 
     res.cookie('accessToken', accessToken, {
       ...COOKIE_OPTIONS,
-      maxAge: 15 * 60 * 1000, // 15 phút
+      maxAge: 15 * 60 * 1000, // 15 minutes
     })
 
     res.cookie('refreshToken', refreshToken, {
       ...COOKIE_OPTIONS,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
     console.log(refreshToken)
     return { message: 'Đăng nhập thành công' }
@@ -61,7 +61,6 @@ export class AuthController {
   logout(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
     const refreshToken = req.cookies['refreshToken']
 
-    // Phải truyền đúng options khi clear, không thì browser không xóa được
     res.clearCookie('accessToken', COOKIE_OPTIONS)
     res.clearCookie('refreshToken', COOKIE_OPTIONS)
 
@@ -93,20 +92,20 @@ export class AuthController {
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth(@Req() req: Request) {
-    // Luồng tự động chuyển hướng sang Google Login
+    // Flow automatically redirects to Google Login
   }
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req: any, @Res({ passthrough: true }) res: Response) {
-    // req.user chứa thông tin từ GoogleStrategy trả ra ở validate()
+    // req.user contains info returned by GoogleStrategy in validate()
     const user = await this.authService.validateGoogleUser(req.user);
-    // Sinh accessToken và refreshToken tương tự hàm login truyền thống
+    // Generate accessToken and refreshToken similar to traditional login
     const { accessToken, refreshToken } = await this.authService.generateTokens({
       userId: user.id,
       role: user.role,
       tenantId: user.tenantId,
     });
-    // Thiết lập cookie tương tự hàm login
+    // Set cookies similar to login
     res.cookie('accessToken', accessToken, {
       ...COOKIE_OPTIONS,
       maxAge: 15 * 60 * 1000,
@@ -115,7 +114,7 @@ export class AuthController {
       ...COOKIE_OPTIONS,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    // Chuyển hướng người dùng về trang chủ của Frontend
+    // Redirect user to the frontend home page
     res.redirect(process.env.FRONTEND_URL || 'http://localhost:3000');
   }
 

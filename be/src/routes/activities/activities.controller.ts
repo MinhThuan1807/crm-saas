@@ -80,7 +80,7 @@ export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
   // GET /activities?page=1&limit=20&type=CALL&search=...&contactId=...&dealId=...
-  // Khai báo trước PATCH/DELETE :id để NestJS match đúng
+  // Declare before PATCH/DELETE :id so NestJS matches correctly
   @Get()
   @ApiOkResponse({ type: GetActivitiesPaginatedResDto })
   @ZodSerializerDto(GetActivitiesPaginatedResDto)

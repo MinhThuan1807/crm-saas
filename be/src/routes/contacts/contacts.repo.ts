@@ -45,7 +45,7 @@ export class ContactsRepository {
         deals: { where: { deletedAt: null } },
         activities: { orderBy: { date: 'desc' }, take: 10 },
       },
-      take: query.limit + 1, // lấy thêm 1 để biết còn trang tiếp không
+      take: query.limit + 1, // take 1 more to check if there is a next page
       cursor: query.cursor ? { id: query.cursor } : undefined,
       skip: query.cursor ? 1 : 0,
       orderBy: { createdAt: 'desc' },
@@ -75,7 +75,7 @@ export class ContactsRepository {
     })
   }
 
-  // xoa mềm, chỉ cập nhật trường deletedAt
+  // soft delete, only updates the deletedAt field
   delete(contactId: string, tenantId: string) {
     return this.prismaService.contact.update({
       where: { id: contactId, tenantId },

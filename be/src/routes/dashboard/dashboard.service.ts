@@ -69,13 +69,13 @@ export class DashboardService {
     period: DashboardPeriodType,
     userContext: { userId: string; role: string },
   ): Promise<DashboardResType> {
-    // Lấy phiên bản cache hiện tại của Tenant
+    // Get the current cache version of the Tenant
     const version = await this.redisService.getTenantCacheVersion(tenantId);
 
-    // Tạo khóa cache độc nhất dựa theo Tenant, phiên bản, chu kỳ lọc và phân quyền người dùng
+    // Generate a unique cache key based on Tenant, version, period, and user authorization
     const cacheKey = `cache:dashboard:${tenantId}:${version}:${period}:${userContext.userId}:${userContext.role}`;
 
-    // Thử dữ liệu từ Redis
+    // Attempt to fetch data from Redis
     const cachedData = await this.redisService.get(cacheKey);
     if (cachedData) {
       return cachedData;
@@ -319,7 +319,7 @@ export class DashboardService {
       upcomingActivities,
     }
 
-    // Lưu kết quả tính toán vào Redis với TTL là 5 phút trước khi trả về
+    // Save the computed result to Redis with a 5-minute TTL before returning
     await this.redisService.set(cacheKey, result, 300);
 
     return result;
