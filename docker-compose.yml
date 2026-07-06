@@ -1,8 +1,5 @@
 version: '3.9'
 
-# ─── Frontend: Deploy trên Vercel (không cần ở đây) ──────────────────────────
-# VPS chỉ chạy: Backend (NestJS) + PostgreSQL + Redis
-
 services:
   # ─── PostgreSQL Database ──────────────────────────────────────────────────────
   postgres:

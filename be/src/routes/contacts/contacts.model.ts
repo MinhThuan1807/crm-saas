@@ -10,7 +10,7 @@ export const ContactTagConst  = {
 export type ContactTagType  = typeof ContactTagConst [keyof typeof ContactTagConst ];
 
 // ─────────────────────────────────────────
-// BASE SCHEMAS — Không dùng trực tiếp làm Res/Body
+// BASE SCHEMAS — Not used directly for Res/Body
 // ─────────────────────────────────────────
 const ContactBaseSchema = z.object({
   id:        z.string(),
@@ -53,7 +53,7 @@ export const UpdateContactBodySchema = CreateContactBodySchema
     { message: 'Ít nhất phải có một trường được cập nhật' }
   )
 
-export const UpdateContactResSchema = CreateContactResSchema  // trả về giống Create
+export const UpdateContactResSchema = CreateContactResSchema  // returns same as Create
 
 export type UpdateContactBodyType = z.infer<typeof UpdateContactBodySchema>
 export type UpdateContactResType  = z.infer<typeof UpdateContactResSchema>
@@ -108,14 +108,14 @@ export const GetContactsQuerySchema = z.object({
 })
 
 export const GetContactsResSchema = z.object({
-  data: z.array(CreateContactResSchema),  // dùng lại, không expose deletedAt
+  data: z.array(CreateContactResSchema),  // reuse, do not expose deletedAt
   pagination: z.object({
     nextCursor: z.string().nullable(),
     hasNextPage: z.boolean(),
   }),
 })
 export const GetContactsWithDealsActivitiesResSchema = z.object({
-  data: z.array(GetContactWithDealsActivitiesResSchema),  // dùng lại, không expose deletedAt
+  data: z.array(GetContactWithDealsActivitiesResSchema),  // reuse, do not expose deletedAt
   pagination: z.object({
     nextCursor: z.string().nullable(),
     hasNextPage: z.boolean(),

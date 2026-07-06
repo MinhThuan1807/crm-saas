@@ -23,7 +23,7 @@ export class ActivitiesService {
     private readonly redisService: RedisService,
   ) {}
 
-  // Tạo activity gắn với contact — validate contact thuộc tenant trước
+  // Create activity associated with contact — validate contact belongs to tenant first
   async createForContact(
     tenantId: string,
     contactId: string,
@@ -39,9 +39,9 @@ export class ActivitiesService {
     return activity
   }
 
-  // Tạo activity gắn với deal — validate deal thuộc tenant trước
-  // Nếu body có contactId, cũng validate contact thuộc tenant.
-  // Đồng thời, nếu không có contactId, tự động gán contactId từ Deal (Cascading Timeline)
+  // Create activity associated with deal — validate deal belongs to tenant first
+  // If body has contactId, also validate contact belongs to tenant.
+  // In addition, if contactId is missing, automatically assign contactId from Deal (Cascading Timeline)
   async createForDeal(
     tenantId: string,
     dealId: string,
@@ -67,7 +67,7 @@ export class ActivitiesService {
     return activity
   }
 
-  // Lấy activities theo contact — validate contact trước
+  // Get activities by contact — validate contact first
   async getByContact(
     tenantId: string,
     contactId: string,
@@ -80,8 +80,8 @@ export class ActivitiesService {
     return { data }
   }
 
-  // Lấy activities theo deal — validate deal trước
-  // Throw NotFoundException khi deal không tồn tại (không trả về { data: [] })
+  // Get activities by deal — validate deal first
+  // Throw NotFoundException if deal does not exist (does not return { data: [] })
   async getByDeal(
     tenantId: string,
     dealId: string,
@@ -94,7 +94,7 @@ export class ActivitiesService {
     return { data }
   }
 
-  // Lấy tất cả activities của tenant, phân trang và lọc
+  // Get all activities of tenant, paginate and filter
   async getAll(
     tenantId: string,
     query: GetActivitiesQueryType,
@@ -109,7 +109,7 @@ export class ActivitiesService {
     }
   }
 
-  // Partial update — chỉ update fields được cung cấp (Audit-safe Lock)
+  // Partial update — only update provided fields (Audit-safe Lock)
   async updateActivity(
     activityId: string,
     tenantId: string,
@@ -119,7 +119,7 @@ export class ActivitiesService {
     const existing = await this.activitiesRepo.findOne(activityId, tenantId)
     if (!existing) throw new NotFoundException('Hoạt động không tồn tại')
 
-    // Lock: Chỉ người tạo ra activity hoặc Admin/Manager mới được sửa
+    // Lock: Only the creator of the activity or Admin/Manager is allowed to edit
     if (userContext?.role === ROLE.SALES_REP && existing.userId !== userContext.userId) {
       throw new ForbiddenException('Bạn không có quyền sửa hoạt động này')
     }
@@ -129,7 +129,7 @@ export class ActivitiesService {
     return activity
   }
 
-  // Hard delete — Activity không có deletedAt (Audit-safe Lock)
+  // Hard delete — Activity has no deletedAt (Audit-safe Lock)
   async deleteActivity(
     activityId: string,
     tenantId: string,
@@ -138,7 +138,7 @@ export class ActivitiesService {
     const existing = await this.activitiesRepo.findOne(activityId, tenantId)
     if (!existing) throw new NotFoundException('Hoạt động không tồn tại')
 
-    // Lock: Chỉ người tạo ra activity hoặc Admin/Manager mới được xóa
+    // Lock: Only the creator of the activity or Admin/Manager is allowed to delete
     if (userContext?.role === ROLE.SALES_REP && existing.userId !== userContext.userId) {
       throw new ForbiddenException('Bạn không có quyền xóa hoạt động này')
     }
