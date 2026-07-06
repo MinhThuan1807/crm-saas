@@ -1,6 +1,14 @@
 import z from "zod";
 import { zIsoDatetime } from "src/common/utils/zod.util";
 
+export const ContactTagConst  = {
+  Enterprise: "Enterprise",
+  Vip: "Vip",
+  Potential: "Tiềm năng"
+} as const;
+
+export type ContactTagType  = typeof ContactTagConst [keyof typeof ContactTagConst ];
+
 // ─────────────────────────────────────────
 // BASE SCHEMAS — Không dùng trực tiếp làm Res/Body
 // ─────────────────────────────────────────
@@ -8,10 +16,15 @@ const ContactBaseSchema = z.object({
   id:        z.string(),
   tenantId:  z.string(),
   name:      z.string().min(2).max(100),
-  email:     z.string().email().optional(),
+  email:     z.string().optional(),
   phone:     z.string().optional(),
   company:   z.string().optional(),
   position:  z.string().optional(),
+  tags:      z.array(z.enum([
+    ContactTagConst.Enterprise,
+    ContactTagConst.Vip,
+    ContactTagConst.Potential,
+  ])).optional(),
   createdAt: zIsoDatetime,
   updatedAt: zIsoDatetime,
   deletedAt: zIsoDatetime.nullable(),
@@ -21,7 +34,7 @@ const ContactBaseSchema = z.object({
 // CREATE — POST /contacts
 // ─────────────────────────────────────────
 export const CreateContactBodySchema = ContactBaseSchema
-  .pick({ name: true, email: true, phone: true, company: true, position: true })
+  .pick({ name: true, email: true, phone: true, company: true, position: true, tags: true})
   .strict()
 
 export const CreateContactResSchema = ContactBaseSchema
@@ -91,6 +104,7 @@ export const GetContactsQuerySchema = z.object({
   cursor: z.string().optional(),
   limit:  z.coerce.number().min(1).max(100).default(10),
   search: z.string().optional(),
+  tag:    z.string().optional(),
 })
 
 export const GetContactsResSchema = z.object({

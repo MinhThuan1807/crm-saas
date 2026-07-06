@@ -17,11 +17,7 @@ export class ContactsController {
   @ApiOkResponse({ type: GetContactsResDto })
   @ZodSerializerDto(GetContactsResDto)
   getContacts(@CurrentUser() user: AccessTokenPayload, @Query() query: GetContactsQueryDto) {
-    return this.contactService.getAllContacts(user.tenantId, {
-      cursor: query.cursor,
-      limit: query.limit,
-      search: query.search
-    }, { userId: user.userId, role: user.role });
+    return this.contactService.getAllContacts(user.tenantId, query, { userId: user.userId, role: user.role });
   }
 
   @Get(':id')

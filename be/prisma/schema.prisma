@@ -61,6 +61,7 @@ model Contact {
   phone      String?
   company    String?
   position   String?
+  tags       String[]
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   deletedAt  DateTime?

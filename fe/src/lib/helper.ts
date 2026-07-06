@@ -4,6 +4,20 @@ export function relativeTime(dateStr: string | Date): string {
   const diff = Math.floor(
     (now.getTime() - then.getTime()) / (1000 * 60 * 60 * 24),
   );
+
+  // Xử lý các ngày trong tương lai (khi then > now)
+  if (diff < 0) {
+    const futureDiff = Math.abs(diff);
+    if (futureDiff === 1) return "Ngày mai";
+    if (futureDiff < 7) return `Sau ${futureDiff} ngày`;
+    if (futureDiff < 14) return "Sau 1 tuần";
+    if (futureDiff < 21) return "Sau 2 tuần";
+    if (futureDiff < 28) return "Sau 3 tuần";
+    if (futureDiff < 60) return "Sau 1 tháng";
+    if (futureDiff < 90) return "Sau 2 tháng";
+    return `Sau ${Math.floor(futureDiff / 30)} tháng`;
+  }
+
   if (diff === 0) return "Hôm nay";
   if (diff === 1) return "1 ngày trước";
   if (diff < 7) return `${diff} ngày trước`;
@@ -20,7 +34,7 @@ export function formatDate(dateStr: string | Date): string {
   return date.toLocaleDateString("vi-VN", {
     day: "2-digit",
     month: "2-digit",
-    year: "2-digit",
+    year: "numeric",
   });
 }
 

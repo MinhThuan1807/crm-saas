@@ -66,7 +66,11 @@ export class AuthService {
       })
     }
 
-    const tokens = await this.generateTokens({ userId: user.id, role: user.role, tenantId: user.tenantId })
+    const tokens = await this.generateTokens({
+      userId: user.id, 
+      role: user.role, 
+      tenantId: user.tenantId 
+    })
     return tokens
   }
 

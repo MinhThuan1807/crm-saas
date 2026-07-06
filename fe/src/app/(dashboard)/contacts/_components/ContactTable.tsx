@@ -16,6 +16,8 @@ import { Button } from "../../../../components/ui/button";
 import { getInitials, relativeTime } from "@/lib/helper";
 import {
   Contact,
+  ContactTagConst,
+  ContactTagType,
   GetContactWithDealsActivitiesResType,
 } from "@/lib/validations/contacts.scheme";
 interface ContactTableProps {
@@ -41,6 +43,12 @@ const TABLE_COLUMNS = [
   "Hoạt động cuối",
   "",
 ] as const;
+
+const CONTACT_TAG_COLOR: Record<ContactTagType, string> = {
+  [ContactTagConst.Enterprise]: "bg-blue-100 text-blue-800 border-blue-200",
+  [ContactTagConst.Vip]: "bg-purple-100 text-purple-800 border-purple-200",
+  [ContactTagConst.Potential]: "bg-orange-100 text-orange-800 border-orange-200",
+};
 
 function ContactTableSkeleton() {
   return (
@@ -379,25 +387,22 @@ function ContactTable({
                   </TableCell>
 
                   {/* ── Tags ── */}
-                  {/* <TableCell className="px-4 py-3"> */}
-                    {/* <div className="flex gap-1 flex-wrap"> */}
-                      {/* {contact.tags.map((tag, i) => (
-                            <span
-                              key={tag}
-                              className="inline-block px-2 py-0.5 rounded-full"
-                              style={{
-                                fontSize: 10,
-                                fontWeight: 500,
-                                color: contact.tagStyles[i]?.color ?? "#6B6B67",
-                                background:
-                                  contact.tagStyles[i]?.bg ?? "#F1EFE8",
-                              }}
-                            >
-                              {tag}
-                            </span>
-                          ))} */}
-                    {/* </div> */}
-                  {/* </TableCell> */}
+                  <TableCell className="px-4 py-3">
+                    <div className="flex gap-1 flex-wrap">
+                      {contact?.tags?.map((tag, i) => (
+                        <span
+                          key={tag}
+                          className={`inline-block px-2 py-0.5 rounded-full ${CONTACT_TAG_COLOR[tag]}`}
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 500,
+                          }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </TableCell>
 
                   {/* ── Deals ── */}
                   <TableCell

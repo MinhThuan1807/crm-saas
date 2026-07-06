@@ -8,11 +8,18 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useGetContacts } from "@/hooks/useContacts";
 import ContactTable from "@/app/(dashboard)/contacts/_components/ContactTable";
-import { Contact } from "@/lib/validations/contacts.scheme";
+import { Contact, ContactTagConst } from "@/lib/validations/contacts.scheme";
 import ContactDialog from "@/app/(dashboard)/contacts/_components/ContactDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const ContactsPage = () => {
   const [search, setSearch] = useState("");
+  const [selectedTag, setSelectedTag] = useState<string | undefined>(undefined);
   const router = useRouter();
   const [debouncedSearch] = useDebounceValue(search, 300);
   const [dialog, setDialog] = useState<{
@@ -21,7 +28,7 @@ const ContactsPage = () => {
   }>({ isOpen: false });
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useGetContacts({ limit: 10, search: debouncedSearch });
+    useGetContacts({ limit: 10, search: debouncedSearch, tag: selectedTag });
 
   const contacts = data?.pages.flatMap((page) => page.data) ?? [];
 
@@ -61,14 +68,35 @@ const ContactsPage = () => {
                 Lọc theo
               </Button>
 
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 gap-1 border-border text-muted-foreground hover:text-foreground text-xs"
-              >
-                Tất cả tags
-                <ChevronDown size={12} />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-1 border-border text-muted-foreground hover:text-foreground text-xs cursor-pointer"
+                  >
+                    {selectedTag ? `Tag: ${selectedTag}` : "Tất cả tags"}
+                    <ChevronDown size={12} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    className="cursor-pointer text-xs"
+                    onClick={() => setSelectedTag(undefined)}
+                  >
+                    Tất cả tags
+                  </DropdownMenuItem>
+                  {Object.values(ContactTagConst).map((tag) => (
+                    <DropdownMenuItem
+                      key={tag}
+                      className="cursor-pointer text-xs"
+                      onClick={() => setSelectedTag(tag)}
+                    >
+                      {tag}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               <Button
                 size="sm"

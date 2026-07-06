@@ -27,7 +27,6 @@ export type AggregateContact = {
 export type ContactMinAggregateOutputType = {
   id: string | null
   tenantId: string | null
-  ownerId: string | null
   name: string | null
   email: string | null
   phone: string | null
@@ -36,12 +35,12 @@ export type ContactMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
+  ownerId: string | null
 }
 
 export type ContactMaxAggregateOutputType = {
   id: string | null
   tenantId: string | null
-  ownerId: string | null
   name: string | null
   email: string | null
   phone: string | null
@@ -50,20 +49,22 @@ export type ContactMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
+  ownerId: string | null
 }
 
 export type ContactCountAggregateOutputType = {
   id: number
   tenantId: number
-  ownerId: number
   name: number
   email: number
   phone: number
   company: number
   position: number
+  tags: number
   createdAt: number
   updatedAt: number
   deletedAt: number
+  ownerId: number
   _all: number
 }
 
@@ -71,7 +72,6 @@ export type ContactCountAggregateOutputType = {
 export type ContactMinAggregateInputType = {
   id?: true
   tenantId?: true
-  ownerId?: true
   name?: true
   email?: true
   phone?: true
@@ -80,12 +80,12 @@ export type ContactMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
+  ownerId?: true
 }
 
 export type ContactMaxAggregateInputType = {
   id?: true
   tenantId?: true
-  ownerId?: true
   name?: true
   email?: true
   phone?: true
@@ -94,20 +94,22 @@ export type ContactMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
+  ownerId?: true
 }
 
 export type ContactCountAggregateInputType = {
   id?: true
   tenantId?: true
-  ownerId?: true
   name?: true
   email?: true
   phone?: true
   company?: true
   position?: true
+  tags?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
+  ownerId?: true
   _all?: true
 }
 
@@ -186,15 +188,16 @@ export type ContactGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type ContactGroupByOutputType = {
   id: string
   tenantId: string
-  ownerId: string
   name: string
   email: string | null
   phone: string | null
   company: string | null
   position: string | null
+  tags: string[]
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
+  ownerId: string
   _count: ContactCountAggregateOutputType | null
   _min: ContactMinAggregateOutputType | null
   _max: ContactMaxAggregateOutputType | null
@@ -221,37 +224,39 @@ export type ContactWhereInput = {
   NOT?: Prisma.ContactWhereInput | Prisma.ContactWhereInput[]
   id?: Prisma.StringFilter<"Contact"> | string
   tenantId?: Prisma.StringFilter<"Contact"> | string
-  ownerId?: Prisma.StringFilter<"Contact"> | string
   name?: Prisma.StringFilter<"Contact"> | string
   email?: Prisma.StringNullableFilter<"Contact"> | string | null
   phone?: Prisma.StringNullableFilter<"Contact"> | string | null
   company?: Prisma.StringNullableFilter<"Contact"> | string | null
   position?: Prisma.StringNullableFilter<"Contact"> | string | null
+  tags?: Prisma.StringNullableListFilter<"Contact">
   createdAt?: Prisma.DateTimeFilter<"Contact"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Contact"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Contact"> | Date | string | null
-  tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
-  owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  deals?: Prisma.DealListRelationFilter
+  ownerId?: Prisma.StringFilter<"Contact"> | string
   activities?: Prisma.ActivityListRelationFilter
+  owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
+  deals?: Prisma.DealListRelationFilter
 }
 
 export type ContactOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
-  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   company?: Prisma.SortOrderInput | Prisma.SortOrder
   position?: Prisma.SortOrderInput | Prisma.SortOrder
+  tags?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  tenant?: Prisma.TenantOrderByWithRelationInput
-  owner?: Prisma.UserOrderByWithRelationInput
-  deals?: Prisma.DealOrderByRelationAggregateInput
+  ownerId?: Prisma.SortOrder
   activities?: Prisma.ActivityOrderByRelationAggregateInput
+  owner?: Prisma.UserOrderByWithRelationInput
+  tenant?: Prisma.TenantOrderByWithRelationInput
+  deals?: Prisma.DealOrderByRelationAggregateInput
 }
 
 export type ContactWhereUniqueInput = Prisma.AtLeast<{
@@ -260,33 +265,35 @@ export type ContactWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ContactWhereInput[]
   NOT?: Prisma.ContactWhereInput | Prisma.ContactWhereInput[]
   tenantId?: Prisma.StringFilter<"Contact"> | string
-  ownerId?: Prisma.StringFilter<"Contact"> | string
   name?: Prisma.StringFilter<"Contact"> | string
   email?: Prisma.StringNullableFilter<"Contact"> | string | null
   phone?: Prisma.StringNullableFilter<"Contact"> | string | null
   company?: Prisma.StringNullableFilter<"Contact"> | string | null
   position?: Prisma.StringNullableFilter<"Contact"> | string | null
+  tags?: Prisma.StringNullableListFilter<"Contact">
   createdAt?: Prisma.DateTimeFilter<"Contact"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Contact"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Contact"> | Date | string | null
-  tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
-  owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  deals?: Prisma.DealListRelationFilter
+  ownerId?: Prisma.StringFilter<"Contact"> | string
   activities?: Prisma.ActivityListRelationFilter
+  owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
+  deals?: Prisma.DealListRelationFilter
 }, "id">
 
 export type ContactOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
-  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   company?: Prisma.SortOrderInput | Prisma.SortOrder
   position?: Prisma.SortOrderInput | Prisma.SortOrder
+  tags?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   _count?: Prisma.ContactCountOrderByAggregateInput
   _max?: Prisma.ContactMaxOrderByAggregateInput
   _min?: Prisma.ContactMinOrderByAggregateInput
@@ -298,15 +305,16 @@ export type ContactScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ContactScalarWhereWithAggregatesInput | Prisma.ContactScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Contact"> | string
   tenantId?: Prisma.StringWithAggregatesFilter<"Contact"> | string
-  ownerId?: Prisma.StringWithAggregatesFilter<"Contact"> | string
   name?: Prisma.StringWithAggregatesFilter<"Contact"> | string
   email?: Prisma.StringNullableWithAggregatesFilter<"Contact"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"Contact"> | string | null
   company?: Prisma.StringNullableWithAggregatesFilter<"Contact"> | string | null
   position?: Prisma.StringNullableWithAggregatesFilter<"Contact"> | string | null
+  tags?: Prisma.StringNullableListFilter<"Contact">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Contact"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Contact"> | Date | string
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Contact"> | Date | string | null
+  ownerId?: Prisma.StringWithAggregatesFilter<"Contact"> | string
 }
 
 export type ContactCreateInput = {
@@ -316,29 +324,31 @@ export type ContactCreateInput = {
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  tenant: Prisma.TenantCreateNestedOneWithoutContactsInput
-  owner: Prisma.UserCreateNestedOneWithoutOwnedContactsInput
-  deals?: Prisma.DealCreateNestedManyWithoutContactInput
   activities?: Prisma.ActivityCreateNestedManyWithoutContactInput
+  owner: Prisma.UserCreateNestedOneWithoutOwnedContactsInput
+  tenant: Prisma.TenantCreateNestedOneWithoutContactsInput
+  deals?: Prisma.DealCreateNestedManyWithoutContactInput
 }
 
 export type ContactUncheckedCreateInput = {
   id?: string
   tenantId: string
-  ownerId: string
   name: string
   email?: string | null
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  deals?: Prisma.DealUncheckedCreateNestedManyWithoutContactInput
+  ownerId: string
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutContactInput
+  deals?: Prisma.DealUncheckedCreateNestedManyWithoutContactInput
 }
 
 export type ContactUpdateInput = {
@@ -348,43 +358,46 @@ export type ContactUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutContactsNestedInput
-  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedContactsNestedInput
-  deals?: Prisma.DealUpdateManyWithoutContactNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutContactNestedInput
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedContactsNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutContactsNestedInput
+  deals?: Prisma.DealUpdateManyWithoutContactNestedInput
 }
 
 export type ContactUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
-  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deals?: Prisma.DealUncheckedUpdateManyWithoutContactNestedInput
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutContactNestedInput
+  deals?: Prisma.DealUncheckedUpdateManyWithoutContactNestedInput
 }
 
 export type ContactCreateManyInput = {
   id?: string
   tenantId: string
-  ownerId: string
   name: string
   email?: string | null
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  ownerId: string
 }
 
 export type ContactUpdateManyMutationInput = {
@@ -394,6 +407,7 @@ export type ContactUpdateManyMutationInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -402,15 +416,16 @@ export type ContactUpdateManyMutationInput = {
 export type ContactUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
-  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ContactListRelationFilter = {
@@ -423,24 +438,32 @@ export type ContactOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type ContactCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
-  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   company?: Prisma.SortOrder
   position?: Prisma.SortOrder
+  tags?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
 }
 
 export type ContactMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
-  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
@@ -449,12 +472,12 @@ export type ContactMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
 }
 
 export type ContactMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
-  ownerId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
@@ -463,6 +486,7 @@ export type ContactMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
 }
 
 export type ContactScalarRelationFilter = {
@@ -559,6 +583,15 @@ export type ContactUncheckedUpdateManyWithoutOwnerNestedInput = {
   deleteMany?: Prisma.ContactScalarWhereInput | Prisma.ContactScalarWhereInput[]
 }
 
+export type ContactCreatetagsInput = {
+  set: string[]
+}
+
+export type ContactUpdatetagsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
@@ -600,27 +633,29 @@ export type ContactCreateWithoutTenantInput = {
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  activities?: Prisma.ActivityCreateNestedManyWithoutContactInput
   owner: Prisma.UserCreateNestedOneWithoutOwnedContactsInput
   deals?: Prisma.DealCreateNestedManyWithoutContactInput
-  activities?: Prisma.ActivityCreateNestedManyWithoutContactInput
 }
 
 export type ContactUncheckedCreateWithoutTenantInput = {
   id?: string
-  ownerId: string
   name: string
   email?: string | null
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  deals?: Prisma.DealUncheckedCreateNestedManyWithoutContactInput
+  ownerId: string
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutContactInput
+  deals?: Prisma.DealUncheckedCreateNestedManyWithoutContactInput
 }
 
 export type ContactCreateOrConnectWithoutTenantInput = {
@@ -655,15 +690,16 @@ export type ContactScalarWhereInput = {
   NOT?: Prisma.ContactScalarWhereInput | Prisma.ContactScalarWhereInput[]
   id?: Prisma.StringFilter<"Contact"> | string
   tenantId?: Prisma.StringFilter<"Contact"> | string
-  ownerId?: Prisma.StringFilter<"Contact"> | string
   name?: Prisma.StringFilter<"Contact"> | string
   email?: Prisma.StringNullableFilter<"Contact"> | string | null
   phone?: Prisma.StringNullableFilter<"Contact"> | string | null
   company?: Prisma.StringNullableFilter<"Contact"> | string | null
   position?: Prisma.StringNullableFilter<"Contact"> | string | null
+  tags?: Prisma.StringNullableListFilter<"Contact">
   createdAt?: Prisma.DateTimeFilter<"Contact"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Contact"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Contact"> | Date | string | null
+  ownerId?: Prisma.StringFilter<"Contact"> | string
 }
 
 export type ContactCreateWithoutOwnerInput = {
@@ -673,12 +709,13 @@ export type ContactCreateWithoutOwnerInput = {
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  activities?: Prisma.ActivityCreateNestedManyWithoutContactInput
   tenant: Prisma.TenantCreateNestedOneWithoutContactsInput
   deals?: Prisma.DealCreateNestedManyWithoutContactInput
-  activities?: Prisma.ActivityCreateNestedManyWithoutContactInput
 }
 
 export type ContactUncheckedCreateWithoutOwnerInput = {
@@ -689,11 +726,12 @@ export type ContactUncheckedCreateWithoutOwnerInput = {
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  deals?: Prisma.DealUncheckedCreateNestedManyWithoutContactInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutContactInput
+  deals?: Prisma.DealUncheckedCreateNestedManyWithoutContactInput
 }
 
 export type ContactCreateOrConnectWithoutOwnerInput = {
@@ -729,26 +767,28 @@ export type ContactCreateWithoutDealsInput = {
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  tenant: Prisma.TenantCreateNestedOneWithoutContactsInput
-  owner: Prisma.UserCreateNestedOneWithoutOwnedContactsInput
   activities?: Prisma.ActivityCreateNestedManyWithoutContactInput
+  owner: Prisma.UserCreateNestedOneWithoutOwnedContactsInput
+  tenant: Prisma.TenantCreateNestedOneWithoutContactsInput
 }
 
 export type ContactUncheckedCreateWithoutDealsInput = {
   id?: string
   tenantId: string
-  ownerId: string
   name: string
   email?: string | null
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  ownerId: string
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutContactInput
 }
 
@@ -775,26 +815,28 @@ export type ContactUpdateWithoutDealsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutContactsNestedInput
-  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedContactsNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutContactNestedInput
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedContactsNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutContactsNestedInput
 }
 
 export type ContactUncheckedUpdateWithoutDealsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
-  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutContactNestedInput
 }
 
@@ -805,26 +847,28 @@ export type ContactCreateWithoutActivitiesInput = {
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  tenant: Prisma.TenantCreateNestedOneWithoutContactsInput
   owner: Prisma.UserCreateNestedOneWithoutOwnedContactsInput
+  tenant: Prisma.TenantCreateNestedOneWithoutContactsInput
   deals?: Prisma.DealCreateNestedManyWithoutContactInput
 }
 
 export type ContactUncheckedCreateWithoutActivitiesInput = {
   id?: string
   tenantId: string
-  ownerId: string
   name: string
   email?: string | null
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  ownerId: string
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutContactInput
 }
 
@@ -851,40 +895,43 @@ export type ContactUpdateWithoutActivitiesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  tenant?: Prisma.TenantUpdateOneRequiredWithoutContactsNestedInput
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedContactsNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutContactsNestedInput
   deals?: Prisma.DealUpdateManyWithoutContactNestedInput
 }
 
 export type ContactUncheckedUpdateWithoutActivitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
-  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   deals?: Prisma.DealUncheckedUpdateManyWithoutContactNestedInput
 }
 
 export type ContactCreateManyTenantInput = {
   id?: string
-  ownerId: string
   name: string
   email?: string | null
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  ownerId: string
 }
 
 export type ContactUpdateWithoutTenantInput = {
@@ -894,40 +941,43 @@ export type ContactUpdateWithoutTenantInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activities?: Prisma.ActivityUpdateManyWithoutContactNestedInput
   owner?: Prisma.UserUpdateOneRequiredWithoutOwnedContactsNestedInput
   deals?: Prisma.DealUpdateManyWithoutContactNestedInput
-  activities?: Prisma.ActivityUpdateManyWithoutContactNestedInput
 }
 
 export type ContactUncheckedUpdateWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deals?: Prisma.DealUncheckedUpdateManyWithoutContactNestedInput
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutContactNestedInput
+  deals?: Prisma.DealUncheckedUpdateManyWithoutContactNestedInput
 }
 
 export type ContactUncheckedUpdateManyWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type ContactCreateManyOwnerInput = {
@@ -938,6 +988,7 @@ export type ContactCreateManyOwnerInput = {
   phone?: string | null
   company?: string | null
   position?: string | null
+  tags?: Prisma.ContactCreatetagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -950,12 +1001,13 @@ export type ContactUpdateWithoutOwnerInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activities?: Prisma.ActivityUpdateManyWithoutContactNestedInput
   tenant?: Prisma.TenantUpdateOneRequiredWithoutContactsNestedInput
   deals?: Prisma.DealUpdateManyWithoutContactNestedInput
-  activities?: Prisma.ActivityUpdateManyWithoutContactNestedInput
 }
 
 export type ContactUncheckedUpdateWithoutOwnerInput = {
@@ -966,11 +1018,12 @@ export type ContactUncheckedUpdateWithoutOwnerInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deals?: Prisma.DealUncheckedUpdateManyWithoutContactNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutContactNestedInput
+  deals?: Prisma.DealUncheckedUpdateManyWithoutContactNestedInput
 }
 
 export type ContactUncheckedUpdateManyWithoutOwnerInput = {
@@ -981,6 +1034,7 @@ export type ContactUncheckedUpdateManyWithoutOwnerInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   company?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   position?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tags?: Prisma.ContactUpdatetagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -992,13 +1046,13 @@ export type ContactUncheckedUpdateManyWithoutOwnerInput = {
  */
 
 export type ContactCountOutputType = {
-  deals: number
   activities: number
+  deals: number
 }
 
 export type ContactCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  deals?: boolean | ContactCountOutputTypeCountDealsArgs
   activities?: boolean | ContactCountOutputTypeCountActivitiesArgs
+  deals?: boolean | ContactCountOutputTypeCountDealsArgs
 }
 
 /**
@@ -1014,120 +1068,125 @@ export type ContactCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
 /**
  * ContactCountOutputType without action
  */
-export type ContactCountOutputTypeCountDealsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.DealWhereInput
+export type ContactCountOutputTypeCountActivitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActivityWhereInput
 }
 
 /**
  * ContactCountOutputType without action
  */
-export type ContactCountOutputTypeCountActivitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ActivityWhereInput
+export type ContactCountOutputTypeCountDealsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DealWhereInput
 }
 
 
 export type ContactSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   tenantId?: boolean
-  ownerId?: boolean
   name?: boolean
   email?: boolean
   phone?: boolean
   company?: boolean
   position?: boolean
+  tags?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
-  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  deals?: boolean | Prisma.Contact$dealsArgs<ExtArgs>
+  ownerId?: boolean
   activities?: boolean | Prisma.Contact$activitiesArgs<ExtArgs>
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  deals?: boolean | Prisma.Contact$dealsArgs<ExtArgs>
   _count?: boolean | Prisma.ContactCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contact"]>
 
 export type ContactSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   tenantId?: boolean
-  ownerId?: boolean
   name?: boolean
   email?: boolean
   phone?: boolean
   company?: boolean
   position?: boolean
+  tags?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  ownerId?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contact"]>
 
 export type ContactSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   tenantId?: boolean
-  ownerId?: boolean
   name?: boolean
   email?: boolean
   phone?: boolean
   company?: boolean
   position?: boolean
+  tags?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  ownerId?: boolean
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["contact"]>
 
 export type ContactSelectScalar = {
   id?: boolean
   tenantId?: boolean
-  ownerId?: boolean
   name?: boolean
   email?: boolean
   phone?: boolean
   company?: boolean
   position?: boolean
+  tags?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
+  ownerId?: boolean
 }
 
-export type ContactOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "ownerId" | "name" | "email" | "phone" | "company" | "position" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["contact"]>
+export type ContactOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "name" | "email" | "phone" | "company" | "position" | "tags" | "createdAt" | "updatedAt" | "deletedAt" | "ownerId", ExtArgs["result"]["contact"]>
 export type ContactInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
-  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  deals?: boolean | Prisma.Contact$dealsArgs<ExtArgs>
   activities?: boolean | Prisma.Contact$activitiesArgs<ExtArgs>
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  deals?: boolean | Prisma.Contact$dealsArgs<ExtArgs>
   _count?: boolean | Prisma.ContactCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ContactIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
 }
 export type ContactIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
 }
 
 export type $ContactPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Contact"
   objects: {
-    tenant: Prisma.$TenantPayload<ExtArgs>
-    owner: Prisma.$UserPayload<ExtArgs>
-    deals: Prisma.$DealPayload<ExtArgs>[]
     activities: Prisma.$ActivityPayload<ExtArgs>[]
+    owner: Prisma.$UserPayload<ExtArgs>
+    tenant: Prisma.$TenantPayload<ExtArgs>
+    deals: Prisma.$DealPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     tenantId: string
-    ownerId: string
     name: string
     email: string | null
     phone: string | null
     company: string | null
     position: string | null
+    tags: string[]
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
+    ownerId: string
   }, ExtArgs["result"]["contact"]>
   composites: {}
 }
@@ -1522,10 +1581,10 @@ readonly fields: ContactFieldRefs;
  */
 export interface Prisma__ContactClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  tenant<T extends Prisma.TenantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TenantDefaultArgs<ExtArgs>>): Prisma.Prisma__TenantClient<runtime.Types.Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  deals<T extends Prisma.Contact$dealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contact$dealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   activities<T extends Prisma.Contact$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contact$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  tenant<T extends Prisma.TenantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TenantDefaultArgs<ExtArgs>>): Prisma.Prisma__TenantClient<runtime.Types.Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  deals<T extends Prisma.Contact$dealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Contact$dealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1557,15 +1616,16 @@ export interface Prisma__ContactClient<T, Null = never, ExtArgs extends runtime.
 export interface ContactFieldRefs {
   readonly id: Prisma.FieldRef<"Contact", 'String'>
   readonly tenantId: Prisma.FieldRef<"Contact", 'String'>
-  readonly ownerId: Prisma.FieldRef<"Contact", 'String'>
   readonly name: Prisma.FieldRef<"Contact", 'String'>
   readonly email: Prisma.FieldRef<"Contact", 'String'>
   readonly phone: Prisma.FieldRef<"Contact", 'String'>
   readonly company: Prisma.FieldRef<"Contact", 'String'>
   readonly position: Prisma.FieldRef<"Contact", 'String'>
+  readonly tags: Prisma.FieldRef<"Contact", 'String[]'>
   readonly createdAt: Prisma.FieldRef<"Contact", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Contact", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"Contact", 'DateTime'>
+  readonly ownerId: Prisma.FieldRef<"Contact", 'String'>
 }
     
 
@@ -1967,30 +2027,6 @@ export type ContactDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
- * Contact.deals
- */
-export type Contact$dealsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Deal
-   */
-  select?: Prisma.DealSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Deal
-   */
-  omit?: Prisma.DealOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.DealInclude<ExtArgs> | null
-  where?: Prisma.DealWhereInput
-  orderBy?: Prisma.DealOrderByWithRelationInput | Prisma.DealOrderByWithRelationInput[]
-  cursor?: Prisma.DealWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.DealScalarFieldEnum | Prisma.DealScalarFieldEnum[]
-}
-
-/**
  * Contact.activities
  */
 export type Contact$activitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2012,6 +2048,30 @@ export type Contact$activitiesArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.ActivityScalarFieldEnum | Prisma.ActivityScalarFieldEnum[]
+}
+
+/**
+ * Contact.deals
+ */
+export type Contact$dealsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Deal
+   */
+  select?: Prisma.DealSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Deal
+   */
+  omit?: Prisma.DealOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DealInclude<ExtArgs> | null
+  where?: Prisma.DealWhereInput
+  orderBy?: Prisma.DealOrderByWithRelationInput | Prisma.DealOrderByWithRelationInput[]
+  cursor?: Prisma.DealWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DealScalarFieldEnum | Prisma.DealScalarFieldEnum[]
 }
 
 /**
