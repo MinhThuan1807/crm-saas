@@ -16,15 +16,15 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         : undefined,
     })
     
-    // Gọi constructor của PrismaClient gốc
+    // Call the original PrismaClient constructor
     super({ adapter })
 
-    // 1. Tạo Prisma Client Extension
+    // Create Prisma Client Extension
     this.extendedClient = this.$extends({
       query: {
         $allModels: {
           async $allOperations({ model, operation, args, query }) {
-            // Danh sách các model cần tự động cô lập dữ liệu theo tenantId
+            // List of models that need to automatically isolate data by tenantId
             const tenantModels = [
               'User',
               'Contact',
@@ -37,15 +37,15 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
             ]
 
             if (tenantModels.includes(model)) {
-              // Lấy tenantId từ CLS context nếu có ClsService
+              // Get tenantId from CLS context if ClsService is available
               const tenantId = cls ? cls.get<string>('tenantId') : undefined
               const bypass = cls ? cls.get<boolean>('bypassTenantIsolation') : undefined
 
-              // Chỉ tiêm filter khi có tenantId và không có cờ bypass
+              // Only inject filter when tenantId is available and bypass is not set
               if (tenantId && !bypass) {
                 const queryArgs = args as any
 
-                // 1.1. Với các thao tác Đọc, Cập nhật, Xóa (cần lọc theo where)
+                // Với các thao tác Đọc, Cập nhật, Xóa (cần lọc theo where)
                 if (
                   [
                     'findFirst',
@@ -64,7 +64,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
                   queryArgs.where.tenantId = tenantId
                 }
 
-                // 1.2. Với các thao tác Tạo mới (cần gán dữ liệu tenantId)
+                // For create operations (need to assign tenantId)
                 if (['create', 'createMany'].includes(operation)) {
                   if (queryArgs.data) {
                     if (Array.isArray(queryArgs.data)) {
@@ -77,7 +77,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
                   }
                 }
 
-                // 1.3. Với các thao tác Upsert (kết hợp gán cả where và data)
+                // For upsert operations (combining both where and data)
                 if (operation === 'upsert') {
                   queryArgs.where = queryArgs.where || {}
                   queryArgs.where.tenantId = tenantId
@@ -96,7 +96,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       },
     })
 
-    // 2. Sử dụng Proxy để chuyển tiếp toàn bộ các cuộc gọi của PrismaService sang client đã mở rộng
+    // Use Proxy to forward all calls from PrismaService to the extended client
     return new Proxy(this, {
       get: (target, prop) => {
         const source = prop in target.extendedClient ? target.extendedClient : target
@@ -110,7 +110,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
 
   async onModuleInit() {
-    // Kết nối CSDL khi khởi tạo module
     await this.$connect()
   }
 }
