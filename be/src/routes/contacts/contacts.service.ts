@@ -13,7 +13,7 @@ export class ContactsService {
   async getAllContacts(tenantId: string, query: GetContactsQueryType, userContext?: { userId: string; role: string }) {
       const { limit } = query;
 
-      const contacts = await this.contactRepository.findAll(tenantId, query, userContext);
+      const contacts = await this.contactRepository.findAll(query, userContext);
 
       const hasNextPage = contacts.length > limit;
       const data = hasNextPage ? contacts.slice(0, -1) : contacts;
@@ -27,7 +27,7 @@ export class ContactsService {
   }
 
   async getContactById(contactId: string, tenantId: string, userContext?: { userId: string; role: string }) {
-    const contact =  await this.contactRepository.findOne(contactId, tenantId, userContext);
+    const contact =  await this.contactRepository.findOne(contactId, userContext);
     if (!contact) {
       throw new NotFoundException('Liên hệ không tồn tại');
     }
@@ -35,37 +35,37 @@ export class ContactsService {
   }
 
   async createContact(tenantId: string, ownerId: string, body: CreateContactBodyType) {
-    const result = await this.contactRepository.create(tenantId, ownerId, body)
+    const result = await this.contactRepository.create(ownerId, body)
     await this.redisService.invalidateTenantCache(tenantId)
     return result
   }
 
   async update(contactId: string, tenantId: string, body: Partial<CreateContactBodyType>, userContext?: { userId: string; role: string }) {
-    const exits = await this.contactRepository.findOne(contactId, tenantId, userContext);
+    const exits = await this.contactRepository.findOne(contactId, userContext);
     if (!exits) {
       throw new NotFoundException('Liên hệ không tồn tại');
     }
-    const result = await this.contactRepository.update(contactId, tenantId, body);
+    const result = await this.contactRepository.update(contactId, body);
     await this.redisService.invalidateTenantCache(tenantId)
     return result
   }
 
   async delete(contactId: string, tenantId: string, userContext?: { userId: string; role: string }) {
-    const exits = await this.contactRepository.findOne(contactId, tenantId, userContext);
+    const exits = await this.contactRepository.findOne(contactId, userContext);
     if (!exits) {
       throw new NotFoundException('Liên hệ không tồn tại');
     }
-    const result = await this.contactRepository.delete(contactId, tenantId)
+    const result = await this.contactRepository.delete(contactId)
     await this.redisService.invalidateTenantCache(tenantId)
     return result
   }
 
   async restore(contactId: string, tenantId: string, userContext?: { userId: string; role: string }) {
-    const exits = await this.contactRepository.findDeleted(contactId, tenantId, userContext);
+    const exits = await this.contactRepository.findDeleted(contactId, userContext);
     if (!exits) {
       throw new NotFoundException('Liên hệ không tồn tại');
     }
-    const result = await this.contactRepository.restore(contactId, tenantId)
+    const result = await this.contactRepository.restore(contactId)
     await this.redisService.invalidateTenantCache(tenantId)
     return result
   }

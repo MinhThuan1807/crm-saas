@@ -18,14 +18,12 @@ export class ActivitiesRepository {
 
   // Shared create for both contact and deal contexts
   create(
-    tenantId: string,
     userId: string,
     data: CreateActivityForContactBodyType | CreateActivityForDealBodyType,
     context: { contactId?: string; dealId?: string },
   ): Promise<ActivityWithRelations> {
     return this.prisma.activity.create({
       data: {
-        tenantId,
         userId,
         type: data.type,
         note: data.note,
@@ -33,7 +31,7 @@ export class ActivitiesRepository {
         date: data.date ?? new Date(),
         contactId: context.contactId ?? null,
         dealId: context.dealId ?? null,
-      },
+      } as any,
       include: {
         user: { select: { id: true, name: true } },
         contact: { select: { id: true, name: true, company: true } },
@@ -43,9 +41,9 @@ export class ActivitiesRepository {
   }
 
   // Get activities by contact, ordered by date desc
-  findAllByContact(tenantId: string, contactId: string): Promise<ActivityWithRelations[]> {
+  findAllByContact(contactId: string): Promise<ActivityWithRelations[]> {
     return this.prisma.activity.findMany({
-      where: { tenantId, contactId },
+      where: { contactId },
       orderBy: { date: 'desc' },
       include: {
         user: { select: { id: true, name: true } },
@@ -56,9 +54,9 @@ export class ActivitiesRepository {
   }
 
   // Get activities by deal, ordered by date desc with id desc as tiebreaker
-  findAllByDeal(tenantId: string, dealId: string): Promise<ActivityWithRelations[]> {
+  findAllByDeal(dealId: string): Promise<ActivityWithRelations[]> {
     return this.prisma.activity.findMany({
-      where: { tenantId, dealId },
+      where: { dealId },
       orderBy: [{ date: 'desc' }, { id: 'desc' }],
       include: {
         user: { select: { id: true, name: true } },
@@ -70,13 +68,11 @@ export class ActivitiesRepository {
 
   // Get all activities for tenant with pagination and filters
   async findAll(
-    tenantId: string,
     query: GetActivitiesQueryType,
     userContext?: { userId: string; role: string },
   ): Promise<{ data: ActivityWithRelations[]; total: number }> {
     const isSalesRep = userContext?.role === ROLE.SALES_REP
     const where = {
-      tenantId,
       ...(isSalesRep && { userId: userContext.userId }),
       ...(query.type && { type: query.type }),
       ...(query.contactId && { contactId: query.contactId }),
@@ -107,10 +103,10 @@ export class ActivitiesRepository {
     return { data, total }
   }
 
-  // Find a single activity by id + tenantId, returns null if not found
-  findOne(activityId: string, tenantId: string): Promise<ActivityWithRelations | null> {
+  // Find a single activity by id, returns null if not found
+  findOne(activityId: string): Promise<ActivityWithRelations | null> {
     return this.prisma.activity.findFirst({
-      where: { id: activityId, tenantId },
+      where: { id: activityId },
       include: {
         user: { select: { id: true, name: true } },
         contact: { select: { id: true, name: true, company: true } },
@@ -120,9 +116,9 @@ export class ActivitiesRepository {
   }
 
   // Partial update — only updates provided fields
-  update(activityId: string, tenantId: string, data: UpdateActivityBodyType): Promise<ActivityWithRelations> {
+  update(activityId: string, data: UpdateActivityBodyType): Promise<ActivityWithRelations> {
     return this.prisma.activity.update({
-      where: { id: activityId, tenantId },
+      where: { id: activityId },
       data,
       include: {
         user: { select: { id: true, name: true } },
@@ -133,9 +129,11 @@ export class ActivitiesRepository {
   }
 
   // Hard delete — Activity has no deletedAt field
-  async hardDelete(activityId: string, tenantId: string): Promise<void> {
+  async hardDelete(activityId: string): Promise<void> {
     await this.prisma.activity.delete({
-      where: { id: activityId, tenantId },
+      where: { id: activityId },
     })
   }
 }
+
+

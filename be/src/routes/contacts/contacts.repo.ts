@@ -7,10 +7,9 @@ import { ROLE } from 'src/common/constants/role.constanst'
 export class ContactsRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  create(tenantId: string, ownerId: string, data: CreateContactBodyType) {
+  create(ownerId: string, data: CreateContactBodyType) {
     return this.prismaService.contact.create({
       data: {
-        tenantId,
         ownerId,
         name: data.name,
         email: data.email ?? null,
@@ -18,15 +17,14 @@ export class ContactsRepository {
         company: data.company ?? null,
         position: data.position ?? null,
         tags: data.tags ?? []
-      },
+      } as any,
     })
   }
 
-  findAll(tenantId: string, query: GetContactsQueryType, userContext?: { userId: string; role: string }) {
+  findAll(query: GetContactsQueryType, userContext?: { userId: string; role: string }) {
     const isSalesRep = userContext?.role === ROLE.SALES_REP
     return this.prismaService.contact.findMany({
       where: {
-        tenantId,
         deletedAt: null,
         ...(isSalesRep && { ownerId: userContext.userId }),
         ...(query.tag && {
@@ -52,12 +50,11 @@ export class ContactsRepository {
     })
   }
 
-  findOne(contactId: string, tenantId: string, userContext?: { userId: string; role: string }) {
+  findOne(contactId: string, userContext?: { userId: string; role: string }) {
     const isSalesRep = userContext?.role === ROLE.SALES_REP
     return this.prismaService.contact.findFirst({
       where: { 
         id: contactId, 
-        tenantId, 
         deletedAt: null,
         ...(isSalesRep && { ownerId: userContext.userId }),
       },
@@ -68,37 +65,38 @@ export class ContactsRepository {
     })
   }
 
-  update(contactId: string, tenantId: string, data: Partial<CreateContactBodyType>) {
+  update(contactId: string, data: Partial<CreateContactBodyType>) {
     return this.prismaService.contact.update({
-      where: { id: contactId, tenantId, deletedAt: null },
+      where: { id: contactId, deletedAt: null },
       data: { ...data },
     })
   }
 
   // soft delete, only updates the deletedAt field
-  delete(contactId: string, tenantId: string) {
+  delete(contactId: string) {
     return this.prismaService.contact.update({
-      where: { id: contactId, tenantId },
+      where: { id: contactId },
       data: { deletedAt: new Date() },
     })
   }
 
-  findDeleted(contactId: string, tenantId: string, userContext?: { userId: string; role: string }) {
+  findDeleted(contactId: string, userContext?: { userId: string; role: string }) {
     const isSalesRep = userContext?.role === ROLE.SALES_REP
     return this.prismaService.contact.findFirst({
       where: { 
         id: contactId, 
-        tenantId, 
         deletedAt: { not: null },
         ...(isSalesRep && { ownerId: userContext.userId }),
       },
     })
   }
-  restore(contactId: string, tenantId: string) {
+  restore(contactId: string) {
     return this.prismaService.contact.update({
-      where: { id: contactId, tenantId },
+      where: { id: contactId },
       data: { deletedAt: null },
     })
   }
 }
+
+
 
