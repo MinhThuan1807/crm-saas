@@ -49,8 +49,8 @@ export class ReportsService {
 
     // ─── Metrics ───
     const [currentDeals, previousDeals] = await Promise.all([
-      this.reportsRepo.findDealsInPeriod(tenantId, start, end, userFilter),
-      this.reportsRepo.findDealsInPeriod(tenantId, prevStart, prevEnd, userFilter),
+      this.reportsRepo.findDealsInPeriod(start, end, userFilter),
+      this.reportsRepo.findDealsInPeriod(prevStart, prevEnd, userFilter),
     ])
 
     // Metric 1: Total Revenue (CLOSED_WON deals value in period)
@@ -131,7 +131,7 @@ export class ReportsService {
       temp.setMonth(temp.getMonth() + 1)
     }
 
-    const targets = await this.reportsRepo.findKpiTargets(tenantId, userFilter)
+    const targets = await this.reportsRepo.findKpiTargets(userFilter)
 
     const monthlyData = monthsList.map((m) => {
       const monthTargets = targets.filter((t) => t.month === m.month && t.year === m.year)
@@ -178,7 +178,7 @@ export class ReportsService {
     })
 
     // Top CLOSED_WON deals
-    const topDealsRaw = await this.reportsRepo.findTopWonDeals(tenantId, start, end, userFilter, 6)
+    const topDealsRaw = await this.reportsRepo.findTopWonDeals(start, end, userFilter, 6)
 
     const topDeals = topDealsRaw.map((d) => {
       return {
@@ -265,16 +265,16 @@ export class ReportsService {
     const isSalesRep = userContext.role === ROLE.SALES_REP
     const { start, end } = parseDates(startDateStr, endDateStr)
 
-    const users = await this.reportsRepo.findUsers(tenantId, isSalesRep ? { id: userContext.userId } : {})
+    const users = await this.reportsRepo.findUsers(isSalesRep ? { id: userContext.userId } : {})
 
     const repsPerformance = await Promise.all(
       users.map(async (u) => {
-        const wonDeals = await this.reportsRepo.findUserClosedDeals(tenantId, u.id, DealStage.CLOSED_WON, start, end)
+        const wonDeals = await this.reportsRepo.findUserClosedDeals(u.id, DealStage.CLOSED_WON, start, end)
         const actual = wonDeals.reduce((sum, d) => sum + Number(d.value), 0)
 
-        const lostDeals = await this.reportsRepo.findUserClosedDeals(tenantId, u.id, DealStage.CLOSED_LOST, start, end)
+        const lostDeals = await this.reportsRepo.findUserClosedDeals(u.id, DealStage.CLOSED_LOST, start, end)
 
-        const targets = await this.reportsRepo.findKpiTargets(tenantId, { userId: u.id })
+        const targets = await this.reportsRepo.findKpiTargets({ userId: u.id })
         
         let totalTarget = 0
         const temp = new Date(start)
@@ -287,7 +287,7 @@ export class ReportsService {
         const totalClosed = wonDeals.length + lostDeals.length
         const winRate = totalClosed > 0 ? Math.round((wonDeals.length / totalClosed) * 100) : 0
 
-        const activitiesCount = await this.reportsRepo.countUserActivities(tenantId, u.id, start, end)
+        const activitiesCount = await this.reportsRepo.countUserActivities(u.id, start, end)
 
         const closed = [...wonDeals, ...lostDeals].filter((d) => d.closeDate)
         let avgDaysToClose = 0
@@ -324,7 +324,7 @@ export class ReportsService {
       throw new ForbiddenException('Chỉ ADMIN hoặc MANAGER mới có quyền cập nhật KPI.')
     }
 
-    return this.reportsRepo.upsertKpiTarget(tenantId, dto.userId, dto.month, dto.year, dto.target)
+    return this.reportsRepo.upsertKpiTarget(dto.userId, dto.month, dto.year, dto.target)
   }
 
   // ─── 4. PIPELINE ANALYSIS API ──────────────────────────────────────────────
@@ -335,7 +335,7 @@ export class ReportsService {
     const isSalesRep = userContext.role === ROLE.SALES_REP
     const userFilter = isSalesRep ? { ownerId: userContext.userId } : {}
 
-    const deals = await this.reportsRepo.findAllDeals(tenantId, userFilter)
+    const deals = await this.reportsRepo.findAllDeals(userFilter)
 
     const funnelStages = [
       { name: '1. Lead (Prospect)', key: DealStage.PROSPECT },
@@ -425,7 +425,7 @@ export class ReportsService {
     const currentYear = now.getFullYear()
     const months = Array.from({ length: 12 }, (_, i) => i + 1)
 
-    const kpiTargets = await this.reportsRepo.findKpiTargetsForYear(tenantId, currentYear, userFilter)
+    const kpiTargets = await this.reportsRepo.findKpiTargetsForYear(currentYear, userFilter)
 
     let cumActual = 0
     let cumForecast = 0
@@ -483,7 +483,7 @@ export class ReportsService {
     const userFilter = isSalesRep ? { userId: userContext.userId } : {}
     const { start, end } = parseDates(startDateStr, endDateStr)
 
-    const activities = await this.reportsRepo.findActivities(tenantId, start, end, userFilter)
+    const activities = await this.reportsRepo.findActivities(start, end, userFilter)
 
     const monthsList: { label: string; year: number; month: number }[] = []
     const temp = new Date(start)
@@ -495,7 +495,7 @@ export class ReportsService {
       temp.setMonth(temp.getMonth() + 1)
     }
 
-    const tasks = await this.reportsRepo.findTasks(tenantId, start, end, isSalesRep, userContext.userId)
+    const tasks = await this.reportsRepo.findTasks(start, end, isSalesRep, userContext.userId)
 
     const trend = monthsList.map((m) => {
       const monthActivities = activities.filter((a) => {
@@ -536,3 +536,4 @@ export class ReportsService {
     }
   }
 }
+
