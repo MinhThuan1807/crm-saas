@@ -17,8 +17,14 @@ import { DashboardModule } from './routes/dashboard/dashboard.module';
 import { ReportsModule } from './routes/reports/reports.module';
 import { AiModule } from './routes/ai/ai.module';
 import { TenantInterceptor } from './common/interceptors/tenant.interceptor'
+import { AuditLogsModule } from './routes/audit-logs/audit-logs.module';
 @Module({
-  imports: [CommonModule, AuthModule, ContactsModule, ActivitiesModule, DealModule, UsersModule, InvitationsModule, DashboardModule, ReportsModule, AiModule],
+  imports: [
+    CommonModule, AuthModule, ContactsModule, 
+    ActivitiesModule, DealModule, UsersModule, 
+    InvitationsModule, DashboardModule, ReportsModule,
+    AiModule, AuditLogsModule
+  ],
   controllers: [AppController],
   providers: [
     AppService,
@@ -31,7 +37,7 @@ import { TenantInterceptor } from './common/interceptors/tenant.interceptor'
     {
       provide: APP_INTERCEPTOR,
       useClass: TenantInterceptor,
-    }
+    },
   ],
 })
 export class AppModule { }

@@ -6,8 +6,9 @@ const authRoutes = ['/login', '/register'];
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const accessToken = request.cookies.get('accessToken')?.value;
+  const refreshToken = request.cookies.get('refreshToken')?.value
 
-  // Nếu đã login mà vào auth page
+  // If user already logged in and try access auth page
   if (authRoutes.includes(pathname) && accessToken) {
     return NextResponse.redirect(new URL('/', request.url));
   }
@@ -18,13 +19,13 @@ export function proxy(request: NextRequest) {
       return pathname === '/';
     }
 
-    return pathname.startsWith(route);
+    return pathname === route || pathname.startsWith(route + '/');
   });
 
-  // Chưa login mà vào protected route
-  if (isProtectedRoute && !accessToken) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
+  // if user haven't logged in and try access protected page
+  if (isProtectedRoute && !accessToken && !refreshToken){
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
 
   return NextResponse.next();
 }
