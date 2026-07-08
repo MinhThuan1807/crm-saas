@@ -19,6 +19,7 @@ model Tenant {
   invitations Invitation[]
   kpiTargets  KpiTarget[]
   users       User[]
+  auditLogs   AuditLog[]
 }
 
 model User {
@@ -37,7 +38,7 @@ model User {
   kpiTargets    KpiTarget[]
   refreshTokens RefreshToken[]
   tenant        Tenant         @relation(fields: [tenantId], references: [id])
-
+  auditLog      AuditLog[]
   @@index([tenantId])
 }
 
@@ -191,6 +192,24 @@ model KpiTarget {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([tenantId, userId, month, year])
+  @@index([tenantId, userId])
+}
+model AuditLog {
+  id         String   @id @default(cuid())
+  tenantId   String
+  userId     String
+  action     String   // "CREATE", "UPDATE", "DELETE"
+  targetType String   // "DEAL", "CONTACT"
+  targetId   String
+  targetName String?
+  changes    Json     // Format: { [fieldName]: { old: any, new: any } }
+  createdAt  DateTime @default(now())
+
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, targetType])
   @@index([tenantId, userId])
 }
 

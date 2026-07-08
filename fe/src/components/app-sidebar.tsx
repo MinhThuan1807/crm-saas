@@ -19,6 +19,8 @@ import {
   BarChart2,
   Settings,
   LogOut,
+  FileText,
+  Shield,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -36,15 +38,44 @@ function getInitials(name?: string): string {
   return parts[0] ? parts[0][0].toUpperCase() : '';
 }
 
-const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: GitBranch, label: "Pipeline", path: "/pipeline" },
-  { icon: Users, label: "Contacts", path: "/contacts" },
-  { icon: CalendarCheck, label: "Activities", path: "/activities" },
-  { icon: BarChart2, label: "Reports", path: "/reports" },
-  { icon: Settings, label: "Settings", path: "/settings" },
+const navGroups = [
+  {
+    label: "Dashboard",
+    path: "/",
+    icon: LayoutDashboard,
+  },
+  {
+    label: "Sales",
+    items: [
+      { icon: GitBranch, label: "Pipeline", path: "/pipeline" },
+      { icon: Users, label: "Contacts", path: "/contacts" },
+    ],
+  },
+  {
+    label: "Activities",
+    path: "/activities",
+    icon: CalendarCheck,
+  },
+  {
+    label: "Reports",
+    path: "/reports",
+    icon: BarChart2,
+  },
+  {
+    label: "Administration",
+    roles: ["ADMIN", "MANAGER"],
+    items: [
+      // { icon: Users, label: "Users", path: "/users" },
+      { icon: Shield, label: "Roles", path: "/roles" },
+      { icon: FileText, label: "Audit Logs", path: "/audit-logs" },
+    ],
+  },
+  {
+    label: "Settings",
+    path: "/settings",
+    icon: Settings,
+  },
 ];
-
 export function AppSidebar() {
   const { mutate: logout } = useLogout();
   const { data: me } = useMe();
@@ -98,32 +129,63 @@ export function AppSidebar() {
             </div>
           </div>
         </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarMenu className="flex-1 p-2 space-y-0.5">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const active = isActive(item.path);
-                return (
-                  <SidebarMenuItem key={item.path}>
-                    <Link
-                      href={item.path}
-                      style={{ textDecoration: "none", fontSize: 13, fontWeight: active ? 500 : 400 }}
-                      className={cn(
-                        "flex items-center gap-2 w-full px-2 py-1.5 rounded-lg transition-colors",
-                        active
-                          ? "bg-secondary text-primary"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                      )}
-                    >
-                      <Icon size={14} strokeWidth={active ? 2.2 : 1.8} />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroup>
+          <SidebarContent className="p-3 overflow-y-auto flex-1 space-y-0.5">
+          {navGroups.map((group, gIdx) => {
+            // Check role restrictions
+            if (group.roles && (!me?.role || !group.roles.includes(me.role))) {
+              return null;
+            }
+            // Case 1: Group is a direct clickable link
+            if (group.path) {
+              const active = isActive(group.path);
+              const Icon = group.icon!;
+              return (
+                <div key={gIdx} className="px-1">
+                  <Link
+                    href={group.path}
+                    className={cn(
+                      "flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm transition-all no-underline font-medium",
+                      active
+                        ? "bg-[#EEEDFE] text-[#534AB7]"
+                        : "text-[#495057] hover:bg-[#E9ECEF] hover:text-[#212529]"
+                    )}
+                  >
+                    <Icon size={16} />
+                    <span>{group.label}</span>
+                  </Link>
+                </div>
+              );
+            }
+            // Case 2: Group is a header with indented children
+            return (
+              <div key={gIdx} className="space-y-1">
+                <span className="text-xs font-semibold text-[#868E96] uppercase tracking-wider px-4 block">
+                  {group.label}
+                </span>
+                <div className="space-y-0.5 pl-3">
+                  {group.items?.map((item) => {
+                    const active = isActive(item.path);
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.path}
+                        href={item.path}
+                        className={cn(
+                          "flex items-center gap-3 w-full px-3 py-1.5 rounded-lg text-sm transition-all no-underline font-normal",
+                          active
+                            ? "bg-[#EEEDFE] text-[#534AB7] font-medium"
+                            : "text-[#495057] hover:bg-[#E9ECEF] hover:text-[#212529]"
+                        )}
+                      >
+                        <Icon size={14} />
+                        <span>{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
         </SidebarContent>
         <SidebarFooter>
           {/* User section */}
