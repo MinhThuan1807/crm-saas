@@ -7,11 +7,10 @@ import { ROLE } from 'src/common/constants/role.constanst'
 export class DealRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  findAllByTenant(tenantId: string, userContext?: { userId: string; role: string }) {
+  findAllByTenant(userContext?: { userId: string; role: string }) {
     const isSalesRep = userContext?.role === ROLE.SALES_REP
     return this.prismaService.deal.findMany({
       where: { 
-        tenantId, 
         deletedAt: null,
         ...(isSalesRep && { ownerId: userContext.userId })
       },
@@ -38,12 +37,11 @@ export class DealRepository {
     })
   }
 
-  findOne(dealId: string, tenantId: string, userContext?: { userId: string; role: string }) {
+  findOne(dealId: string, userContext?: { userId: string; role: string }) {
     const isSalesRep = userContext?.role === ROLE.SALES_REP
     return this.prismaService.deal.findFirst({
       where: { 
         id: dealId, 
-        tenantId, 
         deletedAt: null,
         ...(isSalesRep && { ownerId: userContext.userId })
       },
@@ -57,10 +55,9 @@ export class DealRepository {
     })
   }
 
-  create(tenantId: string, data: CreateDealBodyType) {
+  create(data: CreateDealBodyType) {
     return this.prismaService.deal.create({
       data: {
-        tenantId,
         ownerId: data.ownerId,
         title: data.title,
         value: data.value ?? 0,
@@ -68,29 +65,31 @@ export class DealRepository {
         contactId: data.contactId,
         closeDate: data.closeDate ?? null,
         note: data.note ?? null,
-      },
+      } as any,
     })
   }
 
-  update(dealId: string, tenantId: string, data: UpdateDealBodyType) {
+  update(dealId: string, data: UpdateDealBodyType) {
     return this.prismaService.deal.update({
-      where: { id: dealId, tenantId, deletedAt: null },
+      where: { id: dealId, deletedAt: null },
       data,
     })
   }
 
-  updateStage(dealId: string, tenantId: string, stage: DealStageType) {
+  updateStage(dealId: string, stage: DealStageType) {
     return this.prismaService.deal.update({
-      where: { id: dealId, tenantId, deletedAt: null },
+      where: { id: dealId, deletedAt: null },
       data: { stage },
     })
   }
 
-  softDelete(dealId: string, tenantId: string) {
+  softDelete(dealId: string) {
     return this.prismaService.deal.update({
-      where: { id: dealId, tenantId, deletedAt: null },
+      where: { id: dealId, deletedAt: null },
       data: { deletedAt: new Date() },
     })
   }
 }
+
+
 

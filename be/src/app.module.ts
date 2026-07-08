@@ -16,6 +16,7 @@ import { InvitationsModule } from './routes/invitations/invitations.module';
 import { DashboardModule } from './routes/dashboard/dashboard.module';
 import { ReportsModule } from './routes/reports/reports.module';
 import { AiModule } from './routes/ai/ai.module';
+import { TenantInterceptor } from './common/interceptors/tenant.interceptor'
 @Module({
   imports: [CommonModule, AuthModule, ContactsModule, ActivitiesModule, DealModule, UsersModule, InvitationsModule, DashboardModule, ReportsModule, AiModule],
   controllers: [AppController],
@@ -27,6 +28,10 @@ import { AiModule } from './routes/ai/ai.module';
     },
     { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TenantInterceptor,
+    }
   ],
 })
-export class AppModule {}
+export class AppModule { }

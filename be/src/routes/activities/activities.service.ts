@@ -31,10 +31,10 @@ export class ActivitiesService {
     body: CreateActivityForContactBodyType,
     userContext?: { userId: string; role: string },
   ): Promise<ActivityWithRelations> {
-    const contact = await this.contactsRepo.findOne(contactId, tenantId, userContext)
+    const contact = await this.contactsRepo.findOne(contactId, userContext)
     if (!contact) throw new NotFoundException('Liên hệ không tồn tại')
 
-    const activity = await this.activitiesRepo.create(tenantId, userId, body, { contactId })
+    const activity = await this.activitiesRepo.create(userId, body, { contactId })
     await this.redisService.invalidateTenantCache(tenantId)
     return activity
   }
@@ -49,17 +49,17 @@ export class ActivitiesService {
     body: CreateActivityForDealBodyType,
     userContext?: { userId: string; role: string },
   ): Promise<ActivityWithRelations> {
-    const deal = await this.dealRepo.findOne(dealId, tenantId, userContext)
+    const deal = await this.dealRepo.findOne(dealId, userContext)
     if (!deal) throw new NotFoundException('Deal không tồn tại')
 
     if (body.contactId) {
-      const contact = await this.contactsRepo.findOne(body.contactId, tenantId, userContext)
+      const contact = await this.contactsRepo.findOne(body.contactId, userContext)
       if (!contact) throw new NotFoundException('Liên hệ không tồn tại')
     }
 
     const targetContactId = body.contactId || deal.contactId
 
-    const activity = await this.activitiesRepo.create(tenantId, userId, body, {
+    const activity = await this.activitiesRepo.create(userId, body, {
       dealId,
       contactId: targetContactId,
     })
@@ -73,10 +73,10 @@ export class ActivitiesService {
     contactId: string,
     userContext?: { userId: string; role: string },
   ): Promise<{ data: ActivityWithRelations[] }> {
-    const contact = await this.contactsRepo.findOne(contactId, tenantId, userContext)
+    const contact = await this.contactsRepo.findOne(contactId, userContext)
     if (!contact) throw new NotFoundException('Liên hệ không tồn tại')
 
-    const data = await this.activitiesRepo.findAllByContact(tenantId, contactId)
+    const data = await this.activitiesRepo.findAllByContact(contactId)
     return { data }
   }
 
@@ -87,10 +87,10 @@ export class ActivitiesService {
     dealId: string,
     userContext?: { userId: string; role: string },
   ): Promise<{ data: ActivityWithRelations[] }> {
-    const deal = await this.dealRepo.findOne(dealId, tenantId, userContext)
+    const deal = await this.dealRepo.findOne(dealId, userContext)
     if (!deal) throw new NotFoundException('Deal không tồn tại')
 
-    const data = await this.activitiesRepo.findAllByDeal(tenantId, dealId)
+    const data = await this.activitiesRepo.findAllByDeal(dealId)
     return { data }
   }
 
@@ -100,7 +100,7 @@ export class ActivitiesService {
     query: GetActivitiesQueryType,
     userContext?: { userId: string; role: string },
   ): Promise<GetActivitiesPaginatedResType> {
-    const { data, total } = await this.activitiesRepo.findAll(tenantId, query, userContext)
+    const { data, total } = await this.activitiesRepo.findAll(query, userContext)
     return {
       data,
       total,
@@ -116,7 +116,7 @@ export class ActivitiesService {
     body: UpdateActivityBodyType,
     userContext?: { userId: string; role: string },
   ): Promise<ActivityWithRelations> {
-    const existing = await this.activitiesRepo.findOne(activityId, tenantId)
+    const existing = await this.activitiesRepo.findOne(activityId)
     if (!existing) throw new NotFoundException('Hoạt động không tồn tại')
 
     // Lock: Only the creator of the activity or Admin/Manager is allowed to edit
@@ -124,7 +124,7 @@ export class ActivitiesService {
       throw new ForbiddenException('Bạn không có quyền sửa hoạt động này')
     }
 
-    const activity = await this.activitiesRepo.update(activityId, tenantId, body)
+    const activity = await this.activitiesRepo.update(activityId, body)
     await this.redisService.invalidateTenantCache(tenantId)
     return activity
   }
@@ -135,7 +135,7 @@ export class ActivitiesService {
     tenantId: string,
     userContext?: { userId: string; role: string },
   ): Promise<{ message: string }> {
-    const existing = await this.activitiesRepo.findOne(activityId, tenantId)
+    const existing = await this.activitiesRepo.findOne(activityId)
     if (!existing) throw new NotFoundException('Hoạt động không tồn tại')
 
     // Lock: Only the creator of the activity or Admin/Manager is allowed to delete
@@ -144,7 +144,7 @@ export class ActivitiesService {
     }
 
     try {
-      await this.activitiesRepo.hardDelete(activityId, tenantId)
+      await this.activitiesRepo.hardDelete(activityId)
       await this.redisService.invalidateTenantCache(tenantId)
       return { message: 'Xóa hoạt động thành công' }
     } catch (error) {

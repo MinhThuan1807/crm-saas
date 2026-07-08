@@ -36,18 +36,18 @@ export class DealService {
       if (data.ownerId !== userContext.userId) {
         throw new ForbiddenException('Bạn chỉ có thể tạo deal do chính mình sở hữu')
       }
-      const contact = await this.contactsRepo.findOne(data.contactId, tenantId, userContext)
+      const contact = await this.contactsRepo.findOne(data.contactId, userContext)
       if (!contact) {
         throw new NotFoundException('Liên hệ không tồn tại')
       }
     }
-    const deal = await this.dealRepo.create(tenantId, data)
+    const deal = await this.dealRepo.create(data)
     await this.redisService.invalidateTenantCache(tenantId)
     return deal
   }
 
   async getPipleline(tenantId: string, userContext?: { userId: string; role: string }) {
-    const deals = await this.dealRepo.findAllByTenant(tenantId, userContext)
+    const deals = await this.dealRepo.findAllByTenant(userContext)
 
     const stageMap: Record<DealStageType, DealCardRes[]> = {
       [DealStageConst.PROSPECT]: [],
@@ -64,7 +64,7 @@ export class DealService {
   }
 
   async getDealById(dealId: string, tenantId: string, userContext?: { userId: string; role: string }) {
-    const deal = await this.dealRepo.findOne(dealId, tenantId, userContext)
+    const deal = await this.dealRepo.findOne(dealId, userContext)
     if (!deal) {
       throw new NotFoundException('Không tìm thấy deal')
     }
@@ -72,17 +72,17 @@ export class DealService {
   }
 
   async update(dealId: string, tenantId: string, body: UpdateDealBodyType, userContext?: { userId: string; role: string }) {
-    const deal = await this.dealRepo.findOne(dealId, tenantId, userContext)
+    const deal = await this.dealRepo.findOne(dealId, userContext)
     if (!deal) {
       throw new NotFoundException('Không tìm thấy deal')
     }
-    const updated = await this.dealRepo.update(dealId, tenantId, body)
+    const updated = await this.dealRepo.update(dealId, body)
     await this.redisService.invalidateTenantCache(tenantId)
     return updated
   }
 
   async updateDealStage(dealId: string, tenantId: string, stage: DealStageType, userContext?: { userId: string; role: string }) {
-    const deal = await this.dealRepo.findOne(dealId, tenantId, userContext)
+    const deal = await this.dealRepo.findOne(dealId, userContext)
     if (!deal) {
       throw new NotFoundException('Không tìm thấy deal')
     }
@@ -90,17 +90,17 @@ export class DealService {
       throw new UnprocessableEntityException('Giai đoạn không hợp lệ')
     }
 
-    const updated = await this.dealRepo.updateStage(dealId, tenantId, stage)
+    const updated = await this.dealRepo.updateStage(dealId, stage)
     await this.redisService.invalidateTenantCache(tenantId)
     return updated
   }
 
   async delete(dealId: string, tenantId: string, userContext?: { userId: string; role: string }) {
-    const deal = await this.dealRepo.findOne(dealId, tenantId, userContext)
+    const deal = await this.dealRepo.findOne(dealId, userContext)
     if (!deal) {
       throw new NotFoundException('Không tìm thấy deal')
     }
-    await this.dealRepo.softDelete(dealId, tenantId)
+    await this.dealRepo.softDelete(dealId)
     await this.redisService.invalidateTenantCache(tenantId)
     return { message: 'Xóa deal thành công' }
   }
@@ -112,7 +112,7 @@ export class DealService {
     body: AnalyzeDealBodyType,
     userContext?: { userId: string; role: string },
   ): Promise<AnalyzeDealResType> {
-    const deal = await this.dealRepo.findOne(dealId, tenantId, userContext)
+    const deal = await this.dealRepo.findOne(dealId, userContext)
     if (!deal) {
       throw new NotFoundException('Không tìm thấy deal')
     }
@@ -132,25 +132,25 @@ export class DealService {
   }
 
   async createTask(dealId: string, tenantId: string, data: CreateTaskBodyType) {
-    const task = await this.taskRepo.create(dealId, tenantId, data)
+    const task = await this.taskRepo.create(dealId, data)
     await this.redisService.invalidateTenantCache(tenantId)
     return task
   }
 
   async createTasksBulk(dealId: string, tenantId: string, tasks: CreateTaskBodyType[]) {
-    const result = await this.taskRepo.createMany(dealId, tenantId, tasks)
+    const result = await this.taskRepo.createMany(dealId, tasks)
     await this.redisService.invalidateTenantCache(tenantId)
     return result
   }
 
   async updateTask(dealId: string, tenantId: string, taskId: string, data: UpdateTaskBodyType) {
-    const task = await this.taskRepo.update(dealId, tenantId, taskId, data)
+    const task = await this.taskRepo.update(dealId, taskId, data)
     await this.redisService.invalidateTenantCache(tenantId)
     return task
   }
 
   async deleteTask(dealId: string, tenantId: string, taskId: string) {
-    const result = await this.taskRepo.delete(dealId, tenantId, taskId)
+    const result = await this.taskRepo.delete(dealId, taskId)
     await this.redisService.invalidateTenantCache(tenantId)
     return result
   }

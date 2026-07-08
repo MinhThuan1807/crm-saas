@@ -6,6 +6,7 @@ import { SharedUserRepository } from './repositories/shared-user.repo';
 import { JwtModule } from '@nestjs/jwt';
 import { RedisService } from './services/redis.service';
 import { MailService } from './services/mail.service';
+import { ClsModule } from 'nestjs-cls';
 
 // const sharedProviders = PrismaService;
 const sharedProviders = [PrismaService, TokenService, HashingService , SharedUserRepository, RedisService, MailService];
@@ -13,8 +14,14 @@ const sharedProviders = [PrismaService, TokenService, HashingService , SharedUse
 @Module({
    imports: [
     JwtModule.register({}), 
+    ClsModule.forRoot({
+      global: true,
+      middleware: {
+        mount: true
+      }
+    })
   ],
   providers: [...sharedProviders],
   exports: sharedProviders,
 })
-export class CommonModule {}
+export class CommonModule { }
