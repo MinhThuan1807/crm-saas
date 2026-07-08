@@ -94,3 +94,8 @@ export type Invitation = Prisma.InvitationModel
  * 
  */
 export type KpiTarget = Prisma.KpiTargetModel
+/**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel

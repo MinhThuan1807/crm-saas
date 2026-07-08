@@ -131,27 +131,7 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) 
                     <p className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 500 }}>Admin</p>
                   </div>
                   <p className="text-[#6B6B67]" style={{ fontSize: 12 }}>
-                    Quản lý workspace, thành viên và cài đặt
-                  </p>
-                </div>
-              </label>
-
-              {/* Sales Rep card */}
-              <label
-                className="flex items-start gap-3 p-4 rounded-[10px] border cursor-pointer transition-all"
-                style={{
-                  borderColor: role === "Sales Rep" ? "#534AB7" : "#E8E7E2",
-                  background:  role === "Sales Rep" ? "#EEEDFE" : "white",
-                }}
-              >
-                <RadioGroupItem value="Sales Rep" className="mt-0.5 shrink-0 border-[#534AB7] text-[#534AB7]" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <ChartIcon size={14} style={{ color: role === "Sales Rep" ? "#534AB7" : "#6B6B67" }} />
-                    <p className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 500 }}>Sales Rep</p>
-                  </div>
-                  <p className="text-[#6B6B67]" style={{ fontSize: 12 }}>
-                    Xem và quản lý deals, contacts, activities
+                    Quản lý workspace, quản lý thành viên và cấu hình cài đặt hệ thống.
                   </p>
                 </div>
               </label>
@@ -171,7 +151,27 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) 
                     <p className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 500 }}>Manager</p>
                   </div>
                   <p className="text-[#6B6B67]" style={{ fontSize: 12 }}>
-                    Xem và quản lý deals, contacts, activities
+                    Quản lý toàn bộ khách hàng, cơ hội bán hàng và xem báo cáo thống kê của workspace.
+                  </p>
+                </div>
+              </label>
+
+              {/* Sales Rep card */}
+              <label
+                className="flex items-start gap-3 p-4 rounded-[10px] border cursor-pointer transition-all"
+                style={{
+                  borderColor: role === "Sales Rep" ? "#534AB7" : "#E8E7E2",
+                  background:  role === "Sales Rep" ? "#EEEDFE" : "white",
+                }}
+              >
+                <RadioGroupItem value="Sales Rep" className="mt-0.5 shrink-0 border-[#534AB7] text-[#534AB7]" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <ChartIcon size={14} style={{ color: role === "Sales Rep" ? "#534AB7" : "#6B6B67" }} />
+                    <p className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 500 }}>Sales Rep</p>
+                  </div>
+                  <p className="text-[#6B6B67]" style={{ fontSize: 12 }}>
+                    Xem và quản lý các cơ hội bán hàng, khách hàng, hoạt động được phân công.
                   </p>
                 </div>
               </label>
@@ -278,6 +278,7 @@ export function MembersRoles() {
     const matchRole   =
       roleFilter === "all"       ? true :
       roleFilter === "admin"     ? m.role === "Admin" :
+      roleFilter === "manager"    ? m.role === "Manager" :
       roleFilter === "salesrep"  ? m.role === "Sales Rep" : true;
     return matchSearch && matchRole;
   });
@@ -328,11 +329,12 @@ export function MembersRoles() {
         )}
 
         {/* Stats row */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           {[
             { label: "Tổng thành viên", value: `${membersList.length} / 10`, note: "Free plan limit"   },
-            { label: "Admin",           value: `${membersList.filter(m => m.role === "Admin").length}`,       note: "Quản lý workspace" },
-            { label: "Sales Rep",       value: `${membersList.filter(m => m.role === "Sales Rep").length}`,       note: "Thành viên sales"  },
+            { label: "Admin",           value: `${membersList.filter(m => m.role === "Admin").length}`, note: "Quản lý workspace" },
+            { label: "Manager",         value: `${membersList.filter(m => m.role === "Manager").length}`, note: "Quản lý đội sales" },
+            { label: "Sales Rep",       value: `${membersList.filter(m => m.role === "Sales Rep").length}`, note: "Thành viên sales"  },
           ].map((s) => (
             <div key={s.label} className="bg-white rounded-[10px] border border-[#E8E7E2] px-5 py-4">
               <p className="text-[#6B6B67] mb-1.5" style={{ fontSize: 12 }}>{s.label}</p>
@@ -370,6 +372,7 @@ export function MembersRoles() {
               <SelectContent className="rounded-[10px] border-[#E8E7E2]">
                 <SelectItem value="all"     style={{ fontSize: 13 }}>Tất cả role</SelectItem>
                 <SelectItem value="admin"   style={{ fontSize: 13 }}>Admin</SelectItem>
+                <SelectItem value="manager"   style={{ fontSize: 13 }}>Manager</SelectItem>
                 <SelectItem value="salesrep" style={{ fontSize: 13 }}>Sales Rep</SelectItem>
               </SelectContent>
             </Select>
