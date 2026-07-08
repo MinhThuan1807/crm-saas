@@ -213,6 +213,7 @@ export type UserWhereInput = {
   kpiTargets?: Prisma.KpiTargetListRelationFilter
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
+  auditLog?: Prisma.AuditLogListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -231,6 +232,7 @@ export type UserOrderByWithRelationInput = {
   kpiTargets?: Prisma.KpiTargetOrderByRelationAggregateInput
   refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
   tenant?: Prisma.TenantOrderByWithRelationInput
+  auditLog?: Prisma.AuditLogOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -252,6 +254,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   kpiTargets?: Prisma.KpiTargetListRelationFilter
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
+  auditLog?: Prisma.AuditLogListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -297,6 +300,7 @@ export type UserCreateInput = {
   kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
+  auditLog?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -314,6 +318,7 @@ export type UserUncheckedCreateInput = {
   ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
   kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLog?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -331,6 +336,7 @@ export type UserUpdateInput = {
   kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
+  auditLog?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -348,6 +354,7 @@ export type UserUncheckedUpdateInput = {
   ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
   kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLog?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -564,6 +571,20 @@ export type UserUpdateOneRequiredWithoutKpiTargetsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutKpiTargetsInput, Prisma.UserUpdateWithoutKpiTargetsInput>, Prisma.UserUncheckedUpdateWithoutKpiTargetsInput>
 }
 
+export type UserCreateNestedOneWithoutAuditLogInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuditLogInput, Prisma.UserUncheckedCreateWithoutAuditLogInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuditLogInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAuditLogNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuditLogInput, Prisma.UserUncheckedCreateWithoutAuditLogInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuditLogInput
+  upsert?: Prisma.UserUpsertWithoutAuditLogInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuditLogInput, Prisma.UserUpdateWithoutAuditLogInput>, Prisma.UserUncheckedUpdateWithoutAuditLogInput>
+}
+
 export type UserCreateWithoutTenantInput = {
   id?: string
   email: string
@@ -578,6 +599,7 @@ export type UserCreateWithoutTenantInput = {
   ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
   kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  auditLog?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTenantInput = {
@@ -594,6 +616,7 @@ export type UserUncheckedCreateWithoutTenantInput = {
   ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
   kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLog?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTenantInput = {
@@ -650,6 +673,7 @@ export type UserCreateWithoutAccountsInput = {
   kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
+  auditLog?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -666,6 +690,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
   kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLog?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -698,6 +723,7 @@ export type UserUpdateWithoutAccountsInput = {
   kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
+  auditLog?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -714,6 +740,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
   kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLog?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOwnedContactsInput = {
@@ -730,6 +757,7 @@ export type UserCreateWithoutOwnedContactsInput = {
   kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
+  auditLog?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOwnedContactsInput = {
@@ -746,6 +774,7 @@ export type UserUncheckedCreateWithoutOwnedContactsInput = {
   ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
   kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLog?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOwnedContactsInput = {
@@ -778,6 +807,7 @@ export type UserUpdateWithoutOwnedContactsInput = {
   kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
+  auditLog?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedContactsInput = {
@@ -794,6 +824,7 @@ export type UserUncheckedUpdateWithoutOwnedContactsInput = {
   ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
   kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLog?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOwnedDealsInput = {
@@ -810,6 +841,7 @@ export type UserCreateWithoutOwnedDealsInput = {
   kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
+  auditLog?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOwnedDealsInput = {
@@ -826,6 +858,7 @@ export type UserUncheckedCreateWithoutOwnedDealsInput = {
   ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
   kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLog?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOwnedDealsInput = {
@@ -858,6 +891,7 @@ export type UserUpdateWithoutOwnedDealsInput = {
   kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
+  auditLog?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedDealsInput = {
@@ -874,6 +908,7 @@ export type UserUncheckedUpdateWithoutOwnedDealsInput = {
   ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
   kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLog?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutActivitiesInput = {
@@ -890,6 +925,7 @@ export type UserCreateWithoutActivitiesInput = {
   kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
+  auditLog?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutActivitiesInput = {
@@ -906,6 +942,7 @@ export type UserUncheckedCreateWithoutActivitiesInput = {
   ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
   kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLog?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutActivitiesInput = {
@@ -938,6 +975,7 @@ export type UserUpdateWithoutActivitiesInput = {
   kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
+  auditLog?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutActivitiesInput = {
@@ -954,6 +992,7 @@ export type UserUncheckedUpdateWithoutActivitiesInput = {
   ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
   kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLog?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRefreshTokensInput = {
@@ -970,6 +1009,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
   kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
+  auditLog?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRefreshTokensInput = {
@@ -986,6 +1026,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
   ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
   kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  auditLog?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRefreshTokensInput = {
@@ -1018,6 +1059,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
   kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
+  auditLog?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefreshTokensInput = {
@@ -1034,6 +1076,7 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
   ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
   kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
+  auditLog?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutKpiTargetsInput = {
@@ -1050,6 +1093,7 @@ export type UserCreateWithoutKpiTargetsInput = {
   ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
+  auditLog?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutKpiTargetsInput = {
@@ -1066,6 +1110,7 @@ export type UserUncheckedCreateWithoutKpiTargetsInput = {
   ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
   ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLog?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutKpiTargetsInput = {
@@ -1098,6 +1143,7 @@ export type UserUpdateWithoutKpiTargetsInput = {
   ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
+  auditLog?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutKpiTargetsInput = {
@@ -1113,6 +1159,91 @@ export type UserUncheckedUpdateWithoutKpiTargetsInput = {
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
   ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
   ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLog?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAuditLogInput = {
+  id?: string
+  email: string
+  name: string
+  role?: $Enums.Role
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  password?: string | null
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  tenant: Prisma.TenantCreateNestedOneWithoutUsersInput
+}
+
+export type UserUncheckedCreateWithoutAuditLogInput = {
+  id?: string
+  tenantId: string
+  email: string
+  name: string
+  role?: $Enums.Role
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  password?: string | null
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutUserInput
+  ownedContacts?: Prisma.ContactUncheckedCreateNestedManyWithoutOwnerInput
+  ownedDeals?: Prisma.DealUncheckedCreateNestedManyWithoutOwnerInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAuditLogInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuditLogInput, Prisma.UserUncheckedCreateWithoutAuditLogInput>
+}
+
+export type UserUpsertWithoutAuditLogInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAuditLogInput, Prisma.UserUncheckedUpdateWithoutAuditLogInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuditLogInput, Prisma.UserUncheckedCreateWithoutAuditLogInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAuditLogInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAuditLogInput, Prisma.UserUncheckedUpdateWithoutAuditLogInput>
+}
+
+export type UserUpdateWithoutAuditLogInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutUsersNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAuditLogInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutUserNestedInput
+  ownedContacts?: Prisma.ContactUncheckedUpdateManyWithoutOwnerNestedInput
+  ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1140,6 +1271,7 @@ export type UserUpdateWithoutTenantInput = {
   ownedDeals?: Prisma.DealUpdateManyWithoutOwnerNestedInput
   kpiTargets?: Prisma.KpiTargetUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  auditLog?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTenantInput = {
@@ -1156,6 +1288,7 @@ export type UserUncheckedUpdateWithoutTenantInput = {
   ownedDeals?: Prisma.DealUncheckedUpdateManyWithoutOwnerNestedInput
   kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLog?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutTenantInput = {
@@ -1180,6 +1313,7 @@ export type UserCountOutputType = {
   ownedDeals: number
   kpiTargets: number
   refreshTokens: number
+  auditLog: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1189,6 +1323,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   ownedDeals?: boolean | UserCountOutputTypeCountOwnedDealsArgs
   kpiTargets?: boolean | UserCountOutputTypeCountKpiTargetsArgs
   refreshTokens?: boolean | UserCountOutputTypeCountRefreshTokensArgs
+  auditLog?: boolean | UserCountOutputTypeCountAuditLogArgs
 }
 
 /**
@@ -1243,6 +1378,13 @@ export type UserCountOutputTypeCountRefreshTokensArgs<ExtArgs extends runtime.Ty
   where?: Prisma.RefreshTokenWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAuditLogArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuditLogWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1260,6 +1402,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   kpiTargets?: boolean | Prisma.User$kpiTargetsArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  auditLog?: boolean | Prisma.User$auditLogArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1307,6 +1450,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   kpiTargets?: boolean | Prisma.User$kpiTargetsArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
+  auditLog?: boolean | Prisma.User$auditLogArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1326,6 +1470,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     kpiTargets: Prisma.$KpiTargetPayload<ExtArgs>[]
     refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
     tenant: Prisma.$TenantPayload<ExtArgs>
+    auditLog: Prisma.$AuditLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1737,6 +1882,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   kpiTargets<T extends Prisma.User$kpiTargetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$kpiTargetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$KpiTargetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   refreshTokens<T extends Prisma.User$refreshTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tenant<T extends Prisma.TenantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TenantDefaultArgs<ExtArgs>>): Prisma.Prisma__TenantClient<runtime.Types.Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  auditLog<T extends Prisma.User$auditLogArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2316,6 +2462,30 @@ export type User$refreshTokensArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.RefreshTokenScalarFieldEnum | Prisma.RefreshTokenScalarFieldEnum[]
+}
+
+/**
+ * User.auditLog
+ */
+export type User$auditLogArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuditLog
+   */
+  select?: Prisma.AuditLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuditLog
+   */
+  omit?: Prisma.AuditLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditLogInclude<ExtArgs> | null
+  where?: Prisma.AuditLogWhereInput
+  orderBy?: Prisma.AuditLogOrderByWithRelationInput | Prisma.AuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.AuditLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
 }
 
 /**

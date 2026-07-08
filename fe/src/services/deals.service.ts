@@ -8,6 +8,7 @@ import {
   PipelineRes,
 } from "@/lib/validations/deals.schema";
 
+
 export const dealsService = {
   getPipeline: async (): Promise<PipelineRes> => {
     const res = await axiosInstance.get("deals/pipeline");
