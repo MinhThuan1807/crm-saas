@@ -34,7 +34,7 @@ export class ContactActivitiesController {
     @Param('contactId') contactId: string,
     @Body() body: CreateActivityForContactBodyDto,
   ) {
-    return this.activitiesService.createForContact(user.tenantId, contactId, user.userId, body, { userId: user.userId, role: user.role })
+    return this.activitiesService.createForContact(user.tenantId, contactId, user.userId, body, user)
   }
 
   // GET /contacts/:contactId/activities
@@ -42,7 +42,7 @@ export class ContactActivitiesController {
   @ApiOkResponse({ type: GetActivitiesResDto })
   @ZodSerializerDto(GetActivitiesResDto)
   getActivities(@CurrentUser() user: AccessTokenPayload, @Param('contactId') contactId: string) {
-    return this.activitiesService.getByContact(user.tenantId, contactId, { userId: user.userId, role: user.role })
+    return this.activitiesService.getByContact(user.tenantId, contactId, user)
   }
 }
 
@@ -63,7 +63,7 @@ export class DealActivitiesController {
     @Param('dealId') dealId: string,
     @Body() body: CreateActivityForDealBodyDto,
   ) {
-    return this.activitiesService.createForDeal(user.tenantId, dealId, user.userId, body, { userId: user.userId, role: user.role })
+    return this.activitiesService.createForDeal(user.tenantId, dealId, user.userId, body, user)
   }
 
   // GET /deals/:dealId/activities
@@ -71,7 +71,7 @@ export class DealActivitiesController {
   @ApiOkResponse({ type: GetActivitiesResDto })
   @ZodSerializerDto(GetActivitiesResDto)
   getActivities(@CurrentUser() user: AccessTokenPayload, @Param('dealId') dealId: string) {
-    return this.activitiesService.getByDeal(user.tenantId, dealId, { userId: user.userId, role: user.role })
+    return this.activitiesService.getByDeal(user.tenantId, dealId, user)
   }
 }
 
@@ -89,7 +89,7 @@ export class ActivitiesController {
   @ApiOkResponse({ type: GetActivitiesPaginatedResDto })
   @ZodSerializerDto(GetActivitiesPaginatedResDto)
   getAll(@CurrentUser() user: AccessTokenPayload, @Query() query: GetActivitiesQueryDto) {
-    return this.activitiesService.getAll(user.tenantId, query, { userId: user.userId, role: user.role })
+    return this.activitiesService.getAll(user.tenantId, query, user)
   }
 
   // PATCH /activities/:id
@@ -101,7 +101,7 @@ export class ActivitiesController {
     @Param('id') activityId: string,
     @Body() body: UpdateActivityBodyDto,
   ) {
-    return this.activitiesService.updateActivity(activityId, user.tenantId, body, { userId: user.userId, role: user.role })
+    return this.activitiesService.updateActivity(activityId, user.tenantId, body, user)
   }
 
   // DELETE /activities/:id
@@ -109,6 +109,6 @@ export class ActivitiesController {
   @ApiOkResponse({ type: MessageDto })
   @ZodSerializerDto(MessageDto)
   deleteActivity(@CurrentUser() user: AccessTokenPayload, @Param('id') activityId: string) {
-    return this.activitiesService.deleteActivity(activityId, user.tenantId, { userId: user.userId, role: user.role })
+    return this.activitiesService.deleteActivity(activityId, user.tenantId, user)
   }
 }

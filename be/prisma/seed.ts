@@ -1,6 +1,7 @@
+// be/prisma/seed.ts
 import * as bcrypt from 'bcrypt'
 import { PrismaClient } from '../generated/prisma-client/client'
-import { Role, DealStage, ActivityType, AiSuggestionType } from '../generated/prisma-client/enums'
+import { DealStage, ActivityType, AiSuggestionType } from '../generated/prisma-client/enums'
 import 'dotenv/config'
 import { PrismaPg } from '@prisma/adapter-pg'
 
@@ -13,7 +14,6 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter })
 
-// Helper functions for random data generation
 function getRandomElement<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
 }
@@ -36,9 +36,22 @@ function removeDiacritics(str: string): string {
     .replace(/Đ/g, 'D')
 }
 
+// Helper sinh tháng có trọng số: tập trung nhiều ở tháng 5, 6, 7 (May, June, July) và ít hơn ở Jan - Apr
+function getRandomWeightedMonth(): number {
+  const months = [
+    1, 1,             // Tháng 1 (trọng số 2)
+    2, 2,             // Tháng 2 (trọng số 2)
+    3, 3, 3,          // Tháng 3 (trọng số 3)
+    4, 4, 4,          // Tháng 4 (trọng số 3)
+    5, 5, 5, 5, 5,    // Tháng 5 (trọng số 5)
+    6, 6, 6, 6, 6, 6, // Tháng 6 (trọng số 6)
+    7, 7, 7, 7, 7, 7, 7, 7 // Tháng 7 - Tháng hiện tại (trọng số 8)
+  ]
+  return getRandomElement(months)
+}
+
 async function main() {
   console.log('🌱 Bắt đầu dọn dẹp dữ liệu cũ...')
-  // Clear existing records safely in order of dependency
   await prisma.aiSuggestion.deleteMany({})
   await prisma.task.deleteMany({})
   await prisma.activity.deleteMany({})
@@ -47,51 +60,124 @@ async function main() {
   await prisma.kpiTarget.deleteMany({})
   await prisma.refreshToken.deleteMany({})
   await prisma.invitation.deleteMany({})
+  await prisma.rolePermission.deleteMany({})
+  await prisma.permission.deleteMany({})
   await prisma.user.deleteMany({})
+  await prisma.role.deleteMany({})
   await prisma.tenant.deleteMany({})
 
-  console.log('🌱 Bắt đầu khởi tạo dữ liệu mẫu lớn...')
+  console.log('🌱 Bắt đầu khởi tạo dữ liệu mẫu...')
 
-  // ── 1. TENANT ────────────────────────────────────────
-  const tenant = await prisma.tenant.upsert({
-    where: { slug: 'cong-ty-abc' },
-    update: {},
-    create: {
+  // 1. Tạo Tenant
+  const tenant = await prisma.tenant.create({
+    data: {
       name: 'Công ty ABC',
       slug: 'cong-ty-abc',
       plan: 'pro',
     },
   })
-  console.log('✅ Tenant:', tenant.name)
 
-  // ── 2. USERS (8 Users) ─────────────────────────────────
+  // 2. Tạo danh sách các Quyền (Permissions) hệ thống
+  const permissionsList = [
+    { action: 'manage', subject: 'all', description: 'Quản trị hệ thống toàn quyền' },
+    
+    { action: 'create', subject: 'Contact', description: 'Tạo liên hệ mới' },
+    { action: 'read', subject: 'Contact', description: 'Xem thông tin liên hệ' },
+    { action: 'update', subject: 'Contact', description: 'Sửa thông tin liên hệ' },
+    { action: 'delete', subject: 'Contact', description: 'Xóa liên hệ' },
+
+    { action: 'create', subject: 'Deal', description: 'Tạo Deal mới' },
+    { action: 'read', subject: 'Deal', description: 'Xem Deal' },
+    { action: 'update', subject: 'Deal', description: 'Cập nhật Deal' },
+    { action: 'delete', subject: 'Deal', description: 'Xóa Deal' },
+
+    { action: 'create', subject: 'Task', description: 'Tạo Task mới' },
+    { action: 'read', subject: 'Task', description: 'Xem Task' },
+    { action: 'update', subject: 'Task', description: 'Cập nhật Task' },
+    { action: 'delete', subject: 'Task', description: 'Xóa Task' },
+
+    { action: 'create', subject: 'Activity', description: 'Tạo Hoạt động mới' },
+    { action: 'read', subject: 'Activity', description: 'Xem Hoạt động' },
+    { action: 'update', subject: 'Activity', description: 'Sửa Hoạt động' },
+    { action: 'delete', subject: 'Activity', description: 'Xóa Hoạt động' },
+  ]
+
+  for (const perm of permissionsList) {
+    await prisma.permission.upsert({
+      where: { action_subject: { action: perm.action, subject: perm.subject } },
+      update: {},
+      create: perm,
+    })
+  }
+
+  // 3. Tạo các Role mặc định cho Tenant
+  const adminRole = await prisma.role.create({
+    data: { tenantId: tenant.id, name: 'ADMIN', description: 'Quản trị viên' }
+  })
+  const managerRole = await prisma.role.create({
+    data: { tenantId: tenant.id, name: 'MANAGER', description: 'Quản lý bán hàng' }
+  })
+  const salesRepRole = await prisma.role.create({
+    data: { tenantId: tenant.id, name: 'SALES_REP', description: 'Nhân viên bán hàng' }
+  })
+
+  // 4. Liên kết quyền cho ADMIN (manage:all)
+  const dbManageAll = await prisma.permission.findUnique({
+    where: { action_subject: { action: 'manage', subject: 'all' } }
+  })
+  if (dbManageAll) {
+    await prisma.rolePermission.create({
+      data: { roleId: adminRole.id, permissionId: dbManageAll.id }
+    })
+  }
+
+  // 5. Liên kết quyền cho MANAGER (đọc ghi mọi Contact, Deal, Task, Activity)
+  const allDomainPerms = await prisma.permission.findMany({
+    where: { subject: { in: ['Contact', 'Deal', 'Task', 'Activity'] } }
+  })
+  for (const perm of allDomainPerms) {
+    await prisma.rolePermission.create({
+      data: { roleId: managerRole.id, permissionId: perm.id }
+    })
+  }
+
+  // 6. Phân quyền ABAC cho SALES_REP (Chỉ được xem/sửa các thực thể do mình sở hữu)
+  for (const perm of allDomainPerms) {
+    const isSubjectRestricted = ['Contact', 'Deal', 'Activity'].includes(perm.subject)
+    await prisma.rolePermission.create({
+      data: {
+        roleId: salesRepRole.id,
+        permissionId: perm.id,
+        conditions: isSubjectRestricted 
+          ? (perm.subject === 'Activity' ? { userId: '${user.id}' } : { ownerId: '${user.id}' })
+          : undefined
+      }
+    })
+  }
+
+  // 7. Tạo Người dùng mẫu (Sử dụng roleId động)
   const hashedPassword = await bcrypt.hash('Password123!', 10)
 
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@abc.com' },
-    update: {},
-    create: {
+  const admin = await prisma.user.create({
+    data: {
       tenantId: tenant.id,
       email: 'admin@abc.com',
       password: hashedPassword,
       name: 'Nguyễn Admin',
-      role: Role.ADMIN,
+      roleId: adminRole.id,
     },
   })
 
-  const manager = await prisma.user.upsert({
-    where: { email: 'manager@abc.com' },
-    update: {},
-    create: {
+  const manager = await prisma.user.create({
+    data: {
       tenantId: tenant.id,
       email: 'manager@abc.com',
       password: hashedPassword,
       name: 'Trần Manager',
-      role: Role.MANAGER,
+      roleId: managerRole.id,
     },
   })
 
-  // 5 Sales Reps (Matching standard frontend report performance mock names)
   const salesRepsData = [
     { email: 'sales@abc.com', name: 'Lê Sales Rep' },
     { email: 'huong@abc.com', name: 'Trần Thị Hương' },
@@ -103,15 +189,13 @@ async function main() {
 
   const salesReps: any[] = []
   for (const rep of salesRepsData) {
-    const r = await prisma.user.upsert({
-      where: { email: rep.email },
-      update: {},
-      create: {
+    const r = await prisma.user.create({
+      data: {
         tenantId: tenant.id,
         email: rep.email,
         password: hashedPassword,
         name: rep.name,
-        role: Role.SALES_REP,
+        roleId: salesRepRole.id,
       },
     })
     salesReps.push(r)
@@ -119,18 +203,15 @@ async function main() {
 
   const allTeamUsers = [manager, ...salesReps]
 
-  console.log('✅ Users: admin / manager / 6 sales reps seeded.')
-
-  // ── 3. CONTACTS (30 Contacts) ──────────────────────────
+  // 8. Tạo Contacts (30 Contacts) kèm dữ liệu tags
   const companyNames = [
     'Vingroup', 'Viettel', 'FPT Software', 'Masan Group', 'Techcombank',
-    'Vietcombank', 'Vinamilk', 'Thế Giới Di Động', 'VNG Corporation', 'Tập đoàn Hòa Phát',
-    'Bamboo Airways', 'Kido Group', 'SMC Corporation', 'Delta Group', 'Sun Group',
-    'Nova Land', 'Coteccons', 'Bình Minh Plastics', 'Rang Dong Group', 'Thiên Long'
+    'Vietcombank', 'Vinamilk', 'Thế Giới Di Động', 'VNG Corporation', 'Tập đoàn Hòa Phát'
   ]
-  const contactFirstNames = ['Nam', 'Lan', 'Hương', 'Quang', 'Minh', 'Thu', 'Tuấn', 'Hùng', 'Hoa', 'Liên', 'Trang', 'Sơn', 'Dũng', 'Thủy', 'Anh', 'Phương', 'Linh', 'Khánh', 'Cường', 'Hải']
-  const contactLastNames = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Vũ', 'Hoàng', 'Đặng', 'Bùi', 'Trịnh', 'Lý']
-  const positions = ['CEO', 'CTO', 'Giám đốc IT', 'Trưởng phòng Mua hàng', 'Giám đốc Vận hành', 'Trưởng phòng Kinh doanh', 'Phó giám đốc']
+  const contactFirstNames = ['Nam', 'Lan', 'Hương', 'Quang', 'Minh', 'Thu', 'Tuấn', 'Hùng']
+  const contactLastNames = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Vũ']
+  const positions = ['CEO', 'CTO', 'Giám đốc IT', 'Trưởng phòng Mua hàng']
+  const contactTagsList = ['Enterprise', 'Vip', 'Tiềm năng']
 
   const contacts: any[] = []
   for (let i = 1; i <= 30; i++) {
@@ -143,6 +224,14 @@ async function main() {
     const cleanFirstName = removeDiacritics(firstName).toLowerCase().replace(/\s+/g, '')
     const cleanCompany = removeDiacritics(company).toLowerCase().replace(/[^a-z0-9]/g, '')
     const email = `${cleanFirstName}.${getRandomInt(10, 99)}@${cleanCompany}.com`
+
+    // Chọn ngẫu nhiên 1-3 tags
+    const tagsCount = getRandomInt(1, 3)
+    const selectedTags: string[] = []
+    while (selectedTags.length < tagsCount) {
+      const tag = getRandomElement(contactTagsList)
+      if (!selectedTags.includes(tag)) selectedTags.push(tag)
+    }
     
     const contact = await prisma.contact.create({
       data: {
@@ -154,50 +243,61 @@ async function main() {
         phone: getRandomPhone(),
         company,
         position: getRandomElement(positions),
+        tags: selectedTags, // Thêm tags vào cơ sở dữ liệu
       },
     })
     contacts.push(contact)
   }
 
-  console.log('✅ Contacts: 30 contacts generated.')
-
-  // ── 4. DEALS (45 Deals) ────────────────────────────────
+  // 9. Tạo Deals (45 Deals) phân bổ theo tháng có trọng số (May-Jul 2026 chiếm đa số)
   const dealStages = [
-    DealStage.PROSPECT, DealStage.PROSPECT,
-    DealStage.QUALIFIED, DealStage.QUALIFIED,
-    DealStage.PROPOSAL, DealStage.PROPOSAL,
-    DealStage.CLOSED_WON, DealStage.CLOSED_WON, DealStage.CLOSED_WON, DealStage.CLOSED_WON, // Heavy won weight
-    DealStage.CLOSED_LOST,
+    DealStage.PROSPECT, DealStage.QUALIFIED, DealStage.PROPOSAL, DealStage.CLOSED_WON, DealStage.CLOSED_LOST
   ]
-
-  const dealTitles = [
-    'Triển khai ERP', 'Tích hợp thanh toán API', 'Nâng cấp Cloud Server', 'Hệ thống POS bán hàng',
-    'Hợp đồng bảo trì hệ thống', 'Dịch vụ Cyber Security', 'Data Analytics Dashboard',
-    'Cung cấp bản quyền Office 365', 'Phát triển ứng dụng Mobile', 'Hạ tầng mạng văn phòng mới'
-  ]
-
+  const dealTitles = ['Triển khai ERP', 'Tích hợp thanh toán API', 'Nâng cấp Cloud Server', 'Hợp đồng bảo trì', 'Phát triển Mobile App']
   const deals: any[] = []
   const currentYear = 2026
 
   for (let i = 1; i <= 45; i++) {
     const contact = getRandomElement(contacts)
-    // Make sure deal owner is the same as contact owner for clean data
     const ownerId = contact.ownerId
     const title = `${getRandomElement(dealTitles)} - ${contact.company}`
-    const value = getRandomInt(15, 85) * 10_000_000 // 150M to 850M
-    const stage = getRandomElement(dealStages)
-
-    // Spread deals across the months of 2026
-    const month = getRandomInt(1, 12)
-    const startDay = getRandomInt(1, 15)
-    const createdAt = new Date(currentYear, month - 1, startDay)
+    const value = getRandomInt(15, 85) * 10_000_000
+    
+    let stage: DealStage
+    let createdAt: Date
+    
+    if (i <= 15) {
+      // 15 Deals trong tháng hiện tại (1/7 -> 8/7/2026) để không bị rơi vào tương lai (>9/7)
+      // Mỗi stage có đúng 3 deal
+      const stageIndex = Math.floor((i - 1) / 3)
+      stage = dealStages[stageIndex]
+      
+      const day = getRandomInt(1, 8)
+      createdAt = new Date(currentYear, 6, day) // Tháng 7 (index 6)
+    } else if (i <= 30) {
+      // 15 Deals trong tháng trước (Tháng 6/2026)
+      const stageIndex = Math.floor((i - 16) / 3)
+      stage = dealStages[stageIndex]
+      
+      const day = getRandomInt(1, 28)
+      createdAt = new Date(currentYear, 5, day) // Tháng 6 (index 5)
+    } else {
+      // 15 Deals trong các tháng trước nữa (Tháng 1 -> Tháng 5/2026)
+      stage = getRandomElement(dealStages)
+      const month = getRandomInt(1, 5) // Tháng 1 -> 5
+      const day = getRandomInt(1, 28)
+      createdAt = new Date(currentYear, month - 1, day)
+    }
 
     let closeDate: Date | null = null
     if (stage === DealStage.CLOSED_WON || stage === DealStage.CLOSED_LOST) {
-      // Close date is 10 to 28 days after creation
-      closeDate = new Date(createdAt.getTime() + getRandomInt(10, 28) * 24 * 60 * 60 * 1000)
+      // Đảm bảo ngày đóng của các deal tháng 7 nằm trước ngày 9/7
+      const dealDay = createdAt.getDate()
+      const closeDay = stage === DealStage.CLOSED_WON && createdAt.getMonth() === 6 
+        ? getRandomInt(dealDay, 9) 
+        : getRandomInt(dealDay, dealDay + 15)
+      closeDate = new Date(createdAt.getFullYear(), createdAt.getMonth(), closeDay)
     } else {
-      // Future close date
       closeDate = new Date(createdAt.getTime() + getRandomInt(30, 60) * 24 * 60 * 60 * 1000)
     }
 
@@ -218,46 +318,30 @@ async function main() {
     deals.push(deal)
   }
 
-  console.log('✅ Deals: 45 deals generated.')
-
-  // ── 5. ACTIVITIES (60 Activities) ──────────────────────
+  // 10. Tạo Activities (60 Activities)
   const activityTypes = [ActivityType.CALL, ActivityType.EMAIL, ActivityType.MEETING, ActivityType.NOTE]
   const activityNotes = {
-    [ActivityType.CALL]: [
-      'Gọi điện giới thiệu dịch vụ và báo giá sơ bộ.',
-      'Gọi điện thảo luận chi tiết các yêu cầu tùy chỉnh.',
-      'Follow up sau khi gửi proposal, khách hàng hứa sẽ phản hồi sớm.',
-      'Liên hệ hỗ trợ kỹ thuật về môi trường demo.'
-    ],
-    [ActivityType.EMAIL]: [
-      'Gửi brochure sản phẩm và báo giá chi tiết qua email.',
-      'Gửi email làm rõ một số điểm trong bản thảo hợp đồng.',
-      'Gửi email xác nhận lịch hẹn gặp trực tiếp tuần tới.',
-      'Gửi email cảm ơn và tóm tắt cuộc họp.'
-    ],
-    [ActivityType.MEETING]: [
-      'Họp demo sản phẩm trực tuyến qua Zoom/Meet.',
-      'Gặp trực tiếp thương thảo điều khoản hợp đồng.',
-      'Họp kick-off dự án và phân chia nhân lực.',
-      'Họp khảo sát hiện trạng hạ tầng của khách hàng.'
-    ],
-    [ActivityType.NOTE]: [
-      'Khách hàng có vẻ ưu tiên giải pháp triển khai nhanh hơn là giá thấp.',
-      'Thông tin thêm: Đối thủ đang chào giá thấp hơn 10% nhưng dịch vụ hỗ trợ kém.',
-      'Ghi chú kỹ thuật: Cần tích hợp thêm Zalo OA và cổng thanh toán VNPay.',
-      'Ghi chú: Khách hàng dự kiến ký hợp đồng vào cuối tháng này.'
-    ]
+    [ActivityType.CALL]: ['Gọi điện giới thiệu dịch vụ và báo giá sơ bộ.', 'Gọi điện thảo luận chi tiết các yêu cầu tùy chỉnh.', 'Follow up sau khi gửi proposal.'],
+    [ActivityType.EMAIL]: ['Gửi brochure sản phẩm và báo giá chi tiết.', 'Gửi email làm rõ một số điểm hợp đồng.', 'Gửi email tóm tắt cuộc họp.'],
+    [ActivityType.MEETING]: ['Họp demo sản phẩm trực tuyến qua Zoom/Meet.', 'Gặp trực tiếp thương thảo điều khoản.', 'Họp khảo sát hiện trạng hạ tầng.'],
+    [ActivityType.NOTE]: ['Khách hàng có vẻ ưu tiên giải pháp triển khai nhanh.', 'Đối thủ đang chào giá thấp hơn nhưng support kém.', 'Ghi chú kỹ thuật cần tích hợp thêm cổng thanh toán.']
   }
 
   for (let i = 1; i <= 60; i++) {
     const deal = getRandomElement(deals)
     const type = getRandomElement(activityTypes)
-    const noteList = activityNotes[type]
-    const note = getRandomElement(noteList)
+    const note = getRandomElement(activityNotes[type])
     
-    // Activity date is around the deal creation date
     const dealDate = new Date(deal.createdAt)
-    const activityDate = new Date(dealDate.getTime() + getRandomInt(1, 10) * 24 * 60 * 60 * 1000)
+    let activityDate: Date
+    
+    if (dealDate.getMonth() === 6) {
+      // Nếu deal tạo trong tháng 7, giới hạn hoạt động trong khoảng dealDate -> 9/7
+      const dealDay = dealDate.getDate()
+      activityDate = new Date(2026, 6, getRandomInt(dealDay, 9))
+    } else {
+      activityDate = new Date(dealDate.getTime() + getRandomInt(1, 10) * 24 * 60 * 60 * 1000)
+    }
 
     await prisma.activity.create({
       data: {
@@ -274,23 +358,27 @@ async function main() {
     })
   }
 
-  console.log('✅ Activities: 60 activities logged.')
-
-  // ── 6. TASKS (60 Tasks) ────────────────────────────────
-  const taskTitles = [
-    'Gửi báo giá chính thức', 'Chuẩn bị slide demo', 'Gọi điện follow up tiến độ',
-    'Trình duyệt bản thảo hợp đồng', 'Setup môi trường kiểm thử', 'Gửi email tóm tắt cuộc họp',
-    'Khảo sát chi tiết nhu cầu', 'Xác nhận thông tin thanh toán'
-  ]
+  // 11. Tạo Tasks (60 Tasks)
+  const taskTitles = ['Gửi báo giá chính thức', 'Chuẩn bị slide demo', 'Gọi điện follow up', 'Trình duyệt hợp đồng', 'Setup môi trường test']
 
   for (let i = 1; i <= 60; i++) {
     const deal = getRandomElement(deals)
     const title = getRandomElement(taskTitles)
-    const done = Math.random() > 0.4 // 60% task done
+    const done = Math.random() > 0.4
 
     const dealDate = new Date(deal.createdAt)
-    // Due date around deal creation/close date
-    const dueDate = new Date(dealDate.getTime() + getRandomInt(5, 20) * 24 * 60 * 60 * 1000)
+    let dueDate: Date
+    
+    if (dealDate.getMonth() === 6) {
+      // Một số task của tháng 7 sẽ có hạn chót trong tương lai gần (ví dụ: ngày 10, 11, 12/7) để hiển thị "Hoạt động sắp tới"
+      if (!done) {
+        dueDate = new Date(2026, 6, getRandomInt(10, 12))
+      } else {
+        dueDate = new Date(2026, 6, getRandomInt(dealDate.getDate(), 9))
+      }
+    } else {
+      dueDate = new Date(dealDate.getTime() + getRandomInt(5, 20) * 24 * 60 * 60 * 1000)
+    }
 
     await prisma.task.create({
       data: {
@@ -305,10 +393,7 @@ async function main() {
     })
   }
 
-  console.log('✅ Tasks: 60 tasks populated.')
-
-  // ── 7. AI SUGGESTIONS ──────────────────────────────────
-  // Add some sample suggestions on top deals
+  // 12. AI Suggestions (5 suggestions)
   const topDealsForAi = deals.slice(0, 5)
   for (const deal of topDealsForAi) {
     await prisma.aiSuggestion.create({
@@ -322,15 +407,11 @@ async function main() {
       },
     })
   }
-  console.log('✅ AI Suggestions: 5 suggestions generated.')
 
-  // ── 8. KPI TARGETS (72 Target Records - 12 Months * 6 Users) ─────────
-  // Populate monthly target KPIs for all sales reps and manager for entire 2026
+  // 13. KPI Targets (72 Target Records - 12 Months * 7 Users)
   for (const user of allTeamUsers) {
     for (let month = 1; month <= 12; month++) {
-      // Set target targets around 150M to 500M VND
       const target = getRandomInt(15, 50) * 10_000_000
-
       await prisma.kpiTarget.create({
         data: {
           tenantId: tenant.id,
@@ -343,22 +424,46 @@ async function main() {
     }
   }
 
-  console.log('✅ KPI Targets: 72 monthly targets generated for 2026.')
+  // 14. Thống kê dữ liệu mẫu đẹp mắt
+  const usersCount = await prisma.user.count()
+  const rolesCount = await prisma.role.count()
+  const permissionsCount = await prisma.permission.count()
+  const contactsCount = await prisma.contact.count()
+  const dealsCount = await prisma.deal.count()
+  const activitiesCount = await prisma.activity.count()
+  const tasksCount = await prisma.task.count()
+  const aiSuggestionsCount = await prisma.aiSuggestion.count()
+  const kpiTargetsCount = await prisma.kpiTarget.count()
 
-  // ── SUMMARY ───────────────────────────────────────────
-  console.log('\n📋 THÔNG TIN ĐĂNG NHẬP TEST:')
-  console.log('┌──────────────────────────────────────────────┐')
-  console.log('│  Role     │ Email            │ Password      │')
-  console.log('├──────────────────────────────────────────────┤')
-  console.log('│  ADMIN    │ admin@abc.com    │ Password123!  │')
-  console.log('│  MANAGER  │ manager@abc.com  │ Password123!  │')
-  console.log('│  SALES 1  │ sales@abc.com    │ Password123!  │')
-  console.log('│  SALES 2  │ huong@abc.com    │ Password123!  │')
-  console.log('│  SALES 3  │ quang@abc.com    │ Password123!  │')
-  console.log('│  SALES 4  │ lan@abc.com      │ Password123!  │')
-  console.log('│  SALES 5  │ minh@abc.com     │ Password123!  │')
-  console.log('│  SALES 6  │ thu@abc.com      │ Password123!  │')
-  console.log('└──────────────────────────────────────────────┘')
+  console.log(`
+========================================================================
+📊 BẢN TIN THỐNG KÊ DỮ LIỆU ĐƯỢC SEED (TENANT: ${tenant.name})
+========================================================================
+🏢 Tenant ID:        ${tenant.id}
+💼 Plan:             ${tenant.plan.toUpperCase()}
+🔑 Vai trò & Quyền Hạn:
+   - Tổng số Roles:  ${rolesCount} (ADMIN, MANAGER, SALES_REP)
+   - Tổng số Quyền:  ${permissionsCount} (Được map thông qua RolePermission)
+👥 Danh sách tài khoản (Mật khẩu mặc định: Password123!):
+   - [ADMIN] Nguyễn Admin      | Email: admin@abc.com   | Quyền: manage -> all
+   - [MANAGER] Trần Manager    | Email: manager@abc.com | Quyền: CRUD toàn công ty
+   - [SALES_REP] Lê Sales Rep  | Email: sales@abc.com   | Quyền ABAC (Chỉ xem dữ liệu sở hữu)
+   - [SALES_REP] Trần T. Hương | Email: huong@abc.com   | Quyền ABAC (Chỉ xem dữ liệu sở hữu)
+   - [SALES_REP] Nguyễn Quang  | Email: quang@abc.com   | Quyền ABAC (Chỉ xem dữ liệu sở hữu)
+   - [SALES_REP] Phạm T. Lan   | Email: lan@abc.com     | Quyền ABAC (Chỉ xem dữ liệu sở hữu)
+   - [SALES_REP] Vũ Đức Minh   | Email: minh@abc.com    | Quyền ABAC (Chỉ xem dữ liệu sở hữu)
+   - [SALES_REP] Lê Thị Thu    | Email: thu@abc.com     | Quyền ABAC (Chỉ xem dữ liệu sở hữu)
+📈 Thống kê thực thể nghiệp vụ đã tạo:
+   - 📞 Contacts (Liên hệ):    ${contactsCount} liên hệ (Có gắn tags ngẫu nhiên)
+   - 🤝 Deals (Cơ hội):        ${dealsCount} cơ hội (Trọng số phân bổ tháng 5, 6, 7/2026)
+   - 📅 Activities (Hoạt động): ${activitiesCount} hoạt động
+   - 📝 Tasks (Nhiệm vụ):      ${tasksCount} nhiệm vụ
+   - 🧠 AI Suggestions:       ${aiSuggestionsCount} gợi ý từ AI
+   - 🎯 KPI Target Records:    ${kpiTargetsCount} mục tiêu doanh số
+========================================================================
+  `);
+
+  console.log('✅ Seed dữ liệu thành công!');
 }
 
 main()

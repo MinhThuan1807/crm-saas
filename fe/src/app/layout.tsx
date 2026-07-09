@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "./providers/queryProvider";
+import { ThemeProvider } from "next-themes";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -25,14 +26,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistInter.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryProvider> 
-            {children}
-        </QueryProvider>
-        <Toaster position="top-right" richColors />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <QueryProvider> 
+              {children}
+          </QueryProvider>
+          <Toaster position="top-right" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );

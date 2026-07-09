@@ -13,6 +13,7 @@ model Tenant {
   slug        String       @unique
   plan        String       @default("free")
   createdAt   DateTime     @default(now())
+  roles       Role[]
   activities  Activity[]
   contacts    Contact[]
   deals       Deal[]
@@ -27,7 +28,8 @@ model User {
   tenantId      String
   email         String         @unique
   name          String
-  role          Role           @default(SALES_REP)
+  roleId        String
+  role          Role           @relation(fields: [roleId], references: [id])
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   password      String?
@@ -40,6 +42,46 @@ model User {
   tenant        Tenant         @relation(fields: [tenantId], references: [id])
   auditLog      AuditLog[]
   @@index([tenantId])
+  @@index([roleId])
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  tenantId    String           // Đảm bảo tính đa thuê bao (SaaS): Mỗi tenant có thể định nghĩa role riêng
+  name        String           // "ADMIN", "MANAGER", "SALES_REP" hoặc tên tùy chỉnh
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  tenant      Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  users       User[]
+  invitations Invitation[]
+  permissions RolePermission[]
+  @@unique([tenantId, name])
+  @@index([tenantId])
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  action      String           // "manage", "create", "read", "update", "delete"
+  subject     String           // "Contact", "Deal", "Task", "Activity", "User", "all"
+  description String?
+  createdAt   DateTime         @default(now())
+  roles       RolePermission[]
+  
+  @@unique([action, subject])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  conditions   Json?           // Lưu trữ điều kiện sở hữu (ABAC), ví dụ: {"ownerId": "${user.id}"}
+  
+  role         Role            @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission      @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  @@id([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
 }
 
 model Account {
@@ -167,17 +209,19 @@ model Invitation {
   id        String           @id @default(cuid())
   tenantId  String
   email     String
-  role      Role             @default(SALES_REP)
+  roleId    String
+  role      Role             @relation(fields: [roleId], references: [id], onDelete: Cascade)
   token     String           @unique
   status    InvitationStatus @default(PENDING)
   expiresAt DateTime
   createdAt DateTime         @default(now())
   tenant    Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
   @@unique([tenantId, email])
   @@index([tenantId])
   @@index([token])
+  @@index([roleId])
 }
+
 
 model KpiTarget {
   id        String   @id @default(cuid())
@@ -211,12 +255,6 @@ model AuditLog {
   @@index([tenantId])
   @@index([tenantId, targetType])
   @@index([tenantId, userId])
-}
-
-enum Role {
-  ADMIN
-  MANAGER
-  SALES_REP
 }
 
 enum DealStage {

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/common/services/prisma.service'
 import { CreateContactBodyType, GetContactsQueryType } from './contacts.model'
-import { ROLE } from 'src/common/constants/role.constanst'
 
 @Injectable()
 export class ContactsRepository {
@@ -21,16 +20,13 @@ export class ContactsRepository {
     })
   }
 
-  findAll(query: GetContactsQueryType, userContext?: { userId: string; role: string }) {
-    const isSalesRep = userContext?.role === ROLE.SALES_REP
+  findAll(query: GetContactsQueryType, filters?: { ownerId?: string }) {
     return this.prismaService.contact.findMany({
       where: {
         deletedAt: null,
-        ...(isSalesRep && { ownerId: userContext.userId }),
+        ...(filters?.ownerId && { ownerId: filters.ownerId }),
         ...(query.tag && {
-          tags: {
-            has: query.tag,
-          },
+          tags: { has: query.tag },
         }),
         OR: query.search
           ? [
@@ -43,20 +39,19 @@ export class ContactsRepository {
         deals: { where: { deletedAt: null } },
         activities: { orderBy: { date: 'desc' }, take: 10 },
       },
-      take: query.limit + 1, // take 1 more to check if there is a next page
+      take: query.limit + 1,
       cursor: query.cursor ? { id: query.cursor } : undefined,
       skip: query.cursor ? 1 : 0,
       orderBy: { createdAt: 'desc' },
     })
   }
 
-  findOne(contactId: string, userContext?: { userId: string; role: string }) {
-    const isSalesRep = userContext?.role === ROLE.SALES_REP
+  findOne(contactId: string, filters?: { ownerId?: string }) {
     return this.prismaService.contact.findFirst({
       where: { 
         id: contactId, 
         deletedAt: null,
-        ...(isSalesRep && { ownerId: userContext.userId }),
+        ...(filters?.ownerId && { ownerId: filters.ownerId }),
       },
       include: {
         deals: { where: { deletedAt: null } },
@@ -72,7 +67,6 @@ export class ContactsRepository {
     })
   }
 
-  // soft delete, only updates the deletedAt field
   delete(contactId: string) {
     return this.prismaService.contact.update({
       where: { id: contactId },
@@ -80,16 +74,16 @@ export class ContactsRepository {
     })
   }
 
-  findDeleted(contactId: string, userContext?: { userId: string; role: string }) {
-    const isSalesRep = userContext?.role === ROLE.SALES_REP
+  findDeleted(contactId: string, filters?: { ownerId?: string }) {
     return this.prismaService.contact.findFirst({
       where: { 
         id: contactId, 
         deletedAt: { not: null },
-        ...(isSalesRep && { ownerId: userContext.userId }),
+        ...(filters?.ownerId && { ownerId: filters.ownerId }),
       },
     })
   }
+
   restore(contactId: string) {
     return this.prismaService.contact.update({
       where: { id: contactId },
@@ -97,6 +91,3 @@ export class ContactsRepository {
     })
   }
 }
-
-
-

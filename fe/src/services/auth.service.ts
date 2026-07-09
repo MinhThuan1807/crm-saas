@@ -15,7 +15,14 @@ export const authService = {
     const response = await axiosInstance.post("auth/register", values);
     return response.data;
   },
-  me: async (): Promise<{ id: string; email: string; name: string; role: string; tenantId: string }> => {
+  me: async (): Promise<{
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+    tenantId: string;
+    permissions: { action: string; subject: string; conditions?: any }[];
+  }> => {
     const response = await axiosInstance.get("auth/me");
     return response.data;
   },
