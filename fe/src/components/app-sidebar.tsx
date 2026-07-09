@@ -41,7 +41,7 @@ function getInitials(name?: string): string {
 const navGroups = [
   {
     label: "Dashboard",
-    path: "/",
+    path: "/dashboard",
     icon: LayoutDashboard,
   },
   {
@@ -85,7 +85,7 @@ export function AppSidebar() {
     logout();
   };
   const isActive = (path: string) => {
-    if (path === "/") return pathName === "/";
+    if (path === "/dashboard") return pathName === "/dashboard";
     return pathName.startsWith(path);
   };
   return (

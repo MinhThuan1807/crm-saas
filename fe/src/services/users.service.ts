@@ -18,4 +18,34 @@ export const usersService = {
     const res = await axiosInstance.delete(`users/${id}`);
     return res.data;
   },
+
+  getRoles: async (): Promise<any[]> => {
+    const res = await axiosInstance.get("users/roles");
+    return res.data;
+  },
+
+  getPermissions: async (): Promise<any[]> => {
+    const res = await axiosInstance.get("users/permissions");
+    return res.data;
+  },
+
+  updateRolePermissions: async (roleId: string, permissionIds: string[]) => {
+    const res = await axiosInstance.put(`users/roles/${roleId}/permissions`, { permissionIds });
+    return res.data;
+  },
+
+  createRole: async (data: { name: string; description?: string }) => {
+    const res = await axiosInstance.post("users/roles", data);
+    return res.data;
+  },
+
+  updateRole: async (roleId: string, data: { name: string; description?: string }) => {
+    const res = await axiosInstance.patch(`users/roles/${roleId}`, data);
+    return res.data;
+  },
+
+  deleteRole: async (roleId: string) => {
+    const res = await axiosInstance.delete(`users/roles/${roleId}`);
+    return res.data;
+  },
 };

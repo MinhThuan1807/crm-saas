@@ -26,6 +26,7 @@
     "seed": "npx ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@casl/ability": "^7.0.1",
     "@nestjs/bull": "^11.0.4",
     "@nestjs/bullmq": "^11.0.4",
     "@nestjs/common": "^11.0.1",

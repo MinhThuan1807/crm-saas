@@ -53,21 +53,21 @@ export class DealController {
   @ApiOkResponse({ type: CreateDealResDto })
   @ZodSerializerDto(CreateDealResDto)
   create(@Body() body: CreateDealBodyType, @CurrentUser() user: AccessTokenPayload) {
-    return this.dealService.create(user.tenantId, { ...body }, { userId: user.userId, role: user.role })
+    return this.dealService.create(user.tenantId, { ...body }, user)
   }
 
   @Get('pipeline')
   @ApiOkResponse({ type: GetDealsPipelineResDto })
   @ZodSerializerDto(GetDealsPipelineResDto)
   getPipeline(@CurrentUser() user: AccessTokenPayload) {
-    return this.dealService.getPipleline(user.tenantId, { userId: user.userId, role: user.role })
+    return this.dealService.getPipleline(user.tenantId, user)
   }
 
   @Get(':id')
   @ApiOkResponse({ type: GetDealResDto })
   @ZodSerializerDto(GetDealResDto)
   getDealById(@Param('id') dealId: string, @CurrentUser() user: AccessTokenPayload) {
-    return this.dealService.getDealById(dealId, user.tenantId, { userId: user.userId, role: user.role })
+    return this.dealService.getDealById(dealId, user.tenantId, user)
   }
 
   @Patch(':id/stage')
@@ -78,21 +78,21 @@ export class DealController {
     @CurrentUser() user: AccessTokenPayload,
     @Body() body: { stage: DealStageType },
   ) {
-    return this.dealService.updateDealStage(dealId, user.tenantId, body.stage, { userId: user.userId, role: user.role })
+    return this.dealService.updateDealStage(dealId, user.tenantId, body.stage, user)
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: UpdateDealResDto })
   @ZodSerializerDto(UpdateDealResDto)
   update(@Param('id') dealId: string, @CurrentUser() user: AccessTokenPayload, @Body() body: UpdateDealBodyType) {
-    return this.dealService.update(dealId, user.tenantId, body, { userId: user.userId, role: user.role })
+    return this.dealService.update(dealId, user.tenantId, body, user)
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: MessageDto })
   @ZodSerializerDto(MessageDto)
   delete(@Param('id') dealId: string, @CurrentUser() user: AccessTokenPayload) {
-    return this.dealService.delete(dealId, user.tenantId, { userId: user.userId, role: user.role })
+    return this.dealService.delete(dealId, user.tenantId, user)
   }
 
   @UseGuards(AiRateLimitGuard)
@@ -104,7 +104,7 @@ export class DealController {
     @CurrentUser() user: AccessTokenPayload,
   ) {
     try {
-      return await this.dealService.analyze(dealId, user.tenantId, user.userId, body, { userId: user.userId, role: user.role })
+      return await this.dealService.analyze(dealId, user.tenantId, user.userId, body, user)
     } catch (err) {
       if (err instanceof HttpException) throw err
       // log original error for debugging before returning generic 503
@@ -117,7 +117,7 @@ export class DealController {
   @Get(':id/ai-stream')
   async aiStream(@Param('id') dealId: string, @CurrentUser() user: AccessTokenPayload, @Res() res: Response) {
     // verify deal exists and belongs to tenant
-    await this.dealService.getDealById(dealId, user.tenantId, { userId: user.userId, role: user.role })
+    await this.dealService.getDealById(dealId, user.tenantId, user)
 
     // subscribe and keep connection open
     subscribeToAiStream(user.tenantId, dealId, res)
@@ -133,7 +133,7 @@ export class DealController {
     @Body() body: CreateTaskBodyDto,
     @CurrentUser() user: AccessTokenPayload,
   ) {
-    return this.dealService.createTask(dealId, user.tenantId, body)
+    return this.dealService.createTask(dealId, user.tenantId, body, user)
   }
 
   @Post(':id/tasks/bulk')
@@ -142,7 +142,7 @@ export class DealController {
     @Body() body: CreateTasksBulkBodyDto,
     @CurrentUser() user: AccessTokenPayload,
   ) {
-    return this.dealService.createTasksBulk(dealId, user.tenantId, body.tasks)
+    return this.dealService.createTasksBulk(dealId, user.tenantId, body.tasks, user)
   }
 
   @Patch(':id/tasks/:taskId')
@@ -154,7 +154,7 @@ export class DealController {
     @Body() body: UpdateTaskBodyDto,
     @CurrentUser() user: AccessTokenPayload,
   ) {
-    return this.dealService.updateTask(dealId, user.tenantId, taskId, body)
+    return this.dealService.updateTask(dealId, user.tenantId, taskId, body, user)
   }
 
   @Delete(':id/tasks/:taskId')
@@ -163,7 +163,7 @@ export class DealController {
     @Param('taskId') taskId: string,
     @CurrentUser() user: AccessTokenPayload,
   ) {
-    await this.dealService.deleteTask(dealId, user.tenantId, taskId)
+    await this.dealService.deleteTask(dealId, user.tenantId, taskId, user)
     return { ok: true }
   }
 }

@@ -7,9 +7,18 @@ import { JwtModule } from '@nestjs/jwt';
 import { RedisService } from './services/redis.service';
 import { MailService } from './services/mail.service';
 import { ClsModule } from 'nestjs-cls';
+import { CaslAbilityFactory } from './casl/casl-ability.factory';
 
 // const sharedProviders = PrismaService;
-const sharedProviders = [PrismaService, TokenService, HashingService , SharedUserRepository, RedisService, MailService];
+const sharedProviders = [
+  PrismaService,
+  TokenService,
+  HashingService,
+  SharedUserRepository,
+  RedisService,
+  MailService,
+  CaslAbilityFactory, // Đăng ký CaslAbilityFactory tại đây
+];
 @Global()
 @Module({
    imports: [
@@ -25,3 +34,4 @@ const sharedProviders = [PrismaService, TokenService, HashingService , SharedUse
   exports: sharedProviders,
 })
 export class CommonModule { }
+

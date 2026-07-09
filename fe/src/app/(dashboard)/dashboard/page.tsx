@@ -72,7 +72,7 @@ export default function DashboardPage() {
       </header>
 
       {/* ── Main content ───────────────────────────────────────────────────── */}
-      <main className="flex-1 overflow-y-auto p-6 space-y-5 bg-[#F8F8F7]">
+      <main className="flex-1 overflow-y-auto p-6 space-y-5 bg-[#F8F8F7] dark:bg-background">
 
         {/* Welcome strip */}
         <div className="flex items-center justify-between">

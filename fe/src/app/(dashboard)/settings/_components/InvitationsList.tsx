@@ -16,6 +16,15 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
 import { Invitation } from "@/services/invitations.service";
+import { useQuery } from "@tanstack/react-query";
+import { usersService } from "@/services/users.service";
+
+const formatRoleDisplayName = (name: string) => {
+  if (name === "ADMIN") return "Admin";
+  if (name === "MANAGER") return "Manager";
+  if (name === "SALES_REP") return "Sales Rep";
+  return name;
+};
 
 // ── Copy link button component ───────────────────────────────────────────────
 function CopyLinkButton({ token }: { token: string }) {
@@ -185,7 +194,7 @@ export function InvitationsList() {
                   {/* Role */}
                   <td className="px-5 py-3">
                     <span className="text-[#1A1A18]" style={{ fontSize: 13 }}>
-                      {inv.role === "ADMIN" ? "Admin" : inv.role === "MANAGER" ? "Manager" : "Sales Rep"}
+                      {formatRoleDisplayName(inv.role)}
                     </span>
                   </td>
 
@@ -296,7 +305,12 @@ function EditInvitationDialog({
 }) {
   const updateMutation = useUpdateInvitation();
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"ADMIN" | "MANAGER" | "SALES_REP">("SALES_REP");
+  const [role, setRole] = useState<string>("SALES_REP");
+
+  const { data: roles = [] } = useQuery({
+    queryKey: ["roles"],
+    queryFn: usersService.getRoles,
+  });
 
   useEffect(() => {
     if (invitation) {
@@ -353,14 +367,16 @@ function EditInvitationDialog({
           {/* Role */}
           <div className="flex flex-col gap-1.5">
             <Label className="text-[#1A1A18]" style={{ fontSize: 13 }}>Vai trò</Label>
-            <Select value={role} onValueChange={(v) => setRole(v as any)}>
+            <Select value={role} onValueChange={(v) => setRole(v)}>
               <SelectTrigger className="h-10 rounded-[10px] border-[#E8E7E2] focus:ring-[#534AB7]/30 focus:border-[#534AB7]" style={{ fontSize: 13 }}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-[10px] border-[#E8E7E2]">
-                <SelectItem value="ADMIN" style={{ fontSize: 13 }}>Admin</SelectItem>
-                <SelectItem value="MANAGER" style={{ fontSize: 13 }}>Manager</SelectItem>
-                <SelectItem value="SALES_REP" style={{ fontSize: 13 }}>Sales Rep</SelectItem>
+                {roles.map((r: any) => (
+                  <SelectItem key={r.id} value={r.name} style={{ fontSize: 13 }}>
+                    {formatRoleDisplayName(r.name)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

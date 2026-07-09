@@ -63,7 +63,9 @@ axiosInstance.interceptors.response.use(
     ) {
       isRefreshing = false;
       processQueue(error);
-      window.location.href = "/login";
+      if (typeof window !== "undefined" && window.location.pathname !== "/") {
+        window.location.href = "/login";
+      }
       return Promise.reject(error);
     }
 
@@ -91,7 +93,9 @@ axiosInstance.interceptors.response.use(
       return axiosInstance(originalRequest);
     } catch (refreshError) {
       processQueue(refreshError);
-      window.location.href = "/login";
+      if (typeof window !== "undefined" && window.location.pathname !== "/") {
+        window.location.href = "/login";
+      }
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

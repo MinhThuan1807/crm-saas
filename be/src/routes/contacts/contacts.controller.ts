@@ -19,14 +19,14 @@ export class ContactsController {
   @ApiOkResponse({ type: GetContactsResDto })
   @ZodSerializerDto(GetContactsResDto)
   getContacts(@CurrentUser() user: AccessTokenPayload, @Query() query: GetContactsQueryDto) {
-    return this.contactService.getAllContacts(user.tenantId, query, { userId: user.userId, role: user.role });
+    return this.contactService.getAllContacts(user.tenantId, query, user);
   }
 
   @Get(':id')
   @ApiOkResponse({ type: GetContactResDto })
   @ZodSerializerDto(GetContactResDto)
   getContactById(@CurrentUser() user: AccessTokenPayload, @Param('id') contactId: string) {
-    return this.contactService.getContactById(contactId, user.tenantId, { userId: user.userId, role: user.role });
+    return this.contactService.getContactById(contactId, user.tenantId, user);
   }
 
   @Post()
@@ -45,7 +45,7 @@ export class ContactsController {
     @Param('id') contactId: string,
     @Body() body: UpdateContactBodyDto,
   ) {
-    return this.contactService.update(contactId, user.tenantId, body, { userId: user.userId, role: user.role })
+    return this.contactService.update(contactId, user.tenantId, body, user)
   }
 
   @Delete(':id')
@@ -53,7 +53,7 @@ export class ContactsController {
     @CurrentUser() user: AccessTokenPayload,
     @Param('id') contactId: string,
   ) {
-    return this.contactService.delete(contactId, user.tenantId, { userId: user.userId, role: user.role })
+    return this.contactService.delete(contactId, user.tenantId, user)
   }
 
   @Patch(':id/restore')
@@ -61,7 +61,7 @@ export class ContactsController {
     @CurrentUser() user: AccessTokenPayload,
     @Param('id') contactId: string,
   ) {
-    return this.contactService.restore(contactId, user.tenantId, { userId: user.userId, role: user.role })
+    return this.contactService.restore(contactId, user.tenantId, user)
   }
 }
 

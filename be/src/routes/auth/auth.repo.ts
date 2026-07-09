@@ -9,18 +9,33 @@ export class AuthRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findUserByEmail(email: string) {
-    return await this.prismaService.user.findUnique({
+    const user =  await this.prismaService.user.findUnique({
       where: { email },
+      include: { role: true },
     })
+    if(!user) {
+      return null;
+    }
+    return {
+      ...user,
+      role: user.role.name as any,
+    }
   }
 
-  async findRefreshTokenIncludeUser(refreshToken: string): Promise<RefreshTokenType & { user: UserType }> {
-    return await this.prismaService.refreshToken.findUnique({
+   async findRefreshTokenIncludeUser(refreshToken: string): Promise<any> {
+    const tokenRecord = await this.prismaService.refreshToken.findUnique({
       where: { token: refreshToken },
-      include: { user: { include: { tenant: true } } },
+      include: { user: { include: { tenant: true, role: true } } },
     })
+    if (!tokenRecord) return null;
+    return {
+      ...tokenRecord,
+      user: {
+        ...tokenRecord.user,
+        role: tokenRecord.user.role.name,
+      }
+    }
   }
-
   async deleteRefreshToken(token: string) {
     return await this.prismaService.refreshToken.delete({
       where: { token },

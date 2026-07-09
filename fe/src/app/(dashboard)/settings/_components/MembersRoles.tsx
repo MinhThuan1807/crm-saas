@@ -22,10 +22,19 @@ import {
 
 import { useGetUsers, useUpdateUser, useDeleteUser } from "@/hooks/useUsers";
 import { useGetInvitations, useCreateInvitation } from "@/hooks/useInvitations";
+import { useQuery } from "@tanstack/react-query";
+import { usersService } from "@/services/users.service";
 
 // ── Types & data ──────────────────────────────────────────────────────────────
-type MemberRole   = "Admin" | "Sales Rep" | "Manager";
+type MemberRole   = string;
 type MemberStatus = "active" | "pending";
+
+const formatRoleDisplayName = (name: string) => {
+  if (name === "ADMIN") return "Admin";
+  if (name === "MANAGER") return "Manager";
+  if (name === "SALES_REP") return "Sales Rep";
+  return name;
+};
 
 interface Member {
   id: string;
@@ -36,7 +45,6 @@ interface Member {
   isYou?: boolean;
 }
 
-// ── Role badge ─────────────────────────────────────────────────────────────────
 function RoleBadge({ role, status }: { role: MemberRole; status: MemberStatus }) {
   if (status === "pending") {
     return (
@@ -46,34 +54,48 @@ function RoleBadge({ role, status }: { role: MemberRole; status: MemberStatus })
       </span>
     );
   }
-  return role === "Admin" ? (
+  return role === "ADMIN" ? (
     <span className="inline-flex items-center px-2 py-0.5 rounded-full" style={{ fontSize: 11, fontWeight: 600, background: "#EEEDFE", color: "#534AB7" }}>
       Admin
     </span>
-  ) : role === "Sales Rep" ? (
+  ) : role === "SALES_REP" ? (
     <span className="inline-flex items-center px-2 py-0.5 rounded-full" style={{ fontSize: 11, fontWeight: 600, background: "#E6F1FB", color: "#185FA5" }}>
       Sales Rep
     </span>
-  ) : (
+  ) : role === "MANAGER" ? (
     <span className="inline-flex items-center px-2 py-0.5 rounded-full" style={{ fontSize: 11, fontWeight: 600, background: "#FFF5EE", color: "#854F0B" }}>
       Manager
     </span>
+  ) : (
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full" style={{ fontSize: 11, fontWeight: 600, background: "#EBFDF5", color: "#107C41" }}>
+      {role}
+    </span>
   );
-} 
+}
 
-// ── Invite Modal ───────────────────────────────────────────────────────────────
 function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [email,   setEmail]   = useState("");
-  const [role,    setRole]    = useState<MemberRole>("Sales Rep");
+  const [role,    setRole]    = useState<string>("SALES_REP");
   const [message, setMessage] = useState("");
 
   const createMutation = useCreateInvitation();
 
+  const { data: roles = [] } = useQuery({
+    queryKey: ["roles"],
+    queryFn: usersService.getRoles,
+  });
+
+  useEffect(() => {
+    if (roles.length > 0 && !roles.some((r: any) => r.name === role)) {
+      const defaultRole = roles.find((r: any) => r.name === "SALES_REP") || roles[0];
+      setRole(defaultRole.name);
+    }
+  }, [roles, role]);
+
   const handleSend = async () => {
     if (!email.trim()) return;
-    const backendRole = role === "Admin" ? "ADMIN" : role === "Manager" ? "MANAGER" : "SALES_REP";
     try {
-      await createMutation.mutateAsync({ email, role: backendRole });
+      await createMutation.mutateAsync({ email, role });
       setEmail("");
       onClose();
     } catch {
@@ -113,68 +135,36 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) 
             <Label className="text-[#1A1A18]" style={{ fontSize: 13 }}>Vai trò</Label>
             <RadioGroup
               value={role}
-              onValueChange={(v) => setRole(v as MemberRole)}
+              onValueChange={(v) => setRole(v)}
               className="gap-2"
             >
-              {/* Admin card */}
-              <label
-                className="flex items-start gap-3 p-4 rounded-[10px] border cursor-pointer transition-all"
-                style={{
-                  borderColor: role === "Admin" ? "#534AB7" : "#E8E7E2",
-                  background:  role === "Admin" ? "#EEEDFE" : "white",
-                }}
-              >
-                <RadioGroupItem value="Admin" className="mt-0.5 shrink-0 border-[#534AB7] text-[#534AB7]" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <Crown size={14} style={{ color: role === "Admin" ? "#534AB7" : "#6B6B67" }} />
-                    <p className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 500 }}>Admin</p>
-                  </div>
-                  <p className="text-[#6B6B67]" style={{ fontSize: 12 }}>
-                    Quản lý workspace, quản lý thành viên và cấu hình cài đặt hệ thống.
-                  </p>
-                </div>
-              </label>
-
-              {/* Manager card */}
-              <label
-                className="flex items-start gap-3 p-4 rounded-[10px] border cursor-pointer transition-all"
-                style={{
-                  borderColor: role === "Manager" ? "#534AB7" : "#E8E7E2",
-                  background:  role === "Manager" ? "#EEEDFE" : "white",
-                }}
-              >
-                <RadioGroupItem value="Manager" className="mt-0.5 shrink-0 border-[#534AB7] text-[#534AB7]" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <ChartIcon size={14} style={{ color: role === "Manager" ? "#534AB7" : "#6B6B67" }} />
-                    <p className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 500 }}>Manager</p>
-                  </div>
-                  <p className="text-[#6B6B67]" style={{ fontSize: 12 }}>
-                    Quản lý toàn bộ khách hàng, cơ hội bán hàng và xem báo cáo thống kê của workspace.
-                  </p>
-                </div>
-              </label>
-
-              {/* Sales Rep card */}
-              <label
-                className="flex items-start gap-3 p-4 rounded-[10px] border cursor-pointer transition-all"
-                style={{
-                  borderColor: role === "Sales Rep" ? "#534AB7" : "#E8E7E2",
-                  background:  role === "Sales Rep" ? "#EEEDFE" : "white",
-                }}
-              >
-                <RadioGroupItem value="Sales Rep" className="mt-0.5 shrink-0 border-[#534AB7] text-[#534AB7]" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <ChartIcon size={14} style={{ color: role === "Sales Rep" ? "#534AB7" : "#6B6B67" }} />
-                    <p className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 500 }}>Sales Rep</p>
-                  </div>
-                  <p className="text-[#6B6B67]" style={{ fontSize: 12 }}>
-                    Xem và quản lý các cơ hội bán hàng, khách hàng, hoạt động được phân công.
-                  </p>
-                </div>
-              </label>
+              {roles.map((r: any) => {
+                const isSelected = role === r.name;
+                const Icon = r.name === "ADMIN" ? Crown : r.name === "MANAGER" ? ChartIcon : Info;
+                return (
+                  <label
+                    key={r.id}
+                    className="flex items-start gap-3 p-4 rounded-[10px] border cursor-pointer transition-all"
+                    style={{
+                      borderColor: isSelected ? "#534AB7" : "#E8E7E2",
+                      background:  isSelected ? "#EEEDFE" : "white",
+                    }}
+                  >
+                    <RadioGroupItem value={r.name} className="mt-0.5 shrink-0 border-[#534AB7] text-[#534AB7]" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <Icon size={14} style={{ color: isSelected ? "#534AB7" : "#6B6B67" }} />
+                        <p className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 500 }}>
+                          {formatRoleDisplayName(r.name)}
+                        </p>
+                      </div>
+                      <p className="text-[#6B6B67]" style={{ fontSize: 12 }}>
+                        {r.description || `Vai trò ${r.name} trong hệ thống.`}
+                      </p>
+                    </div>
+                  </label>
+                );
+              })}
             </RadioGroup>
           </div>
 
@@ -220,7 +210,6 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) 
             </Button>
           </div>
         </DialogFooter>
-
       </DialogContent>
     </Dialog>
   );
@@ -242,7 +231,7 @@ export function MembersRoles() {
   const pendingInvitations = (invitations || []).filter((i) => i.status === "PENDING");
 
   const membersList: Member[] = activeUsers.map((u, index) => {
-    const roleMapped = u.role === "ADMIN" ? "Admin" : u.role === "MANAGER" ? "Manager" : "Sales Rep";
+    const roleMapped = u.role;
     const initials = u.name
       ? u.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
       : "U";
@@ -539,7 +528,12 @@ function EditMemberDialog({
 }) {
   const updateMutation = useUpdateUser();
   const [name, setName] = useState("");
-  const [role, setRole] = useState<MemberRole>("Sales Rep");
+  const [role, setRole] = useState<string>("SALES_REP");
+
+  const { data: roles = [] } = useQuery({
+    queryKey: ["roles"],
+    queryFn: usersService.getRoles,
+  });
 
   useEffect(() => {
     if (member) {
@@ -554,12 +548,11 @@ function EditMemberDialog({
       toast.error("Họ và tên không được để trống");
       return;
     }
-    const backendRole = role === "Admin" ? "ADMIN" : role === "Manager" ? "MANAGER" : "SALES_REP";
     try {
       await updateMutation.mutateAsync({
         id: member.id,
         name: name.trim(),
-        role: backendRole,
+        role,
       });
       onClose();
     } catch {
@@ -595,14 +588,16 @@ function EditMemberDialog({
 
           <div className="flex flex-col gap-1.5">
             <Label className="text-[#1A1A18]" style={{ fontSize: 13 }}>Vai trò</Label>
-            <Select value={role} onValueChange={(v) => setRole(v as MemberRole)}>
+            <Select value={role} onValueChange={(v) => setRole(v)}>
               <SelectTrigger className="h-10 rounded-[10px] border-[#E8E7E2] focus:ring-[#534AB7]/30 focus:border-[#534AB7]" style={{ fontSize: 13 }}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-[10px] border-[#E8E7E2]">
-                <SelectItem value="Admin" style={{ fontSize: 13 }}>Admin</SelectItem>
-                <SelectItem value="Manager" style={{ fontSize: 13 }}>Manager</SelectItem>
-                <SelectItem value="Sales Rep" style={{ fontSize: 13 }}>Sales Rep</SelectItem>
+                {roles.map((r: any) => (
+                  <SelectItem key={r.id} value={r.name} style={{ fontSize: 13 }}>
+                    {formatRoleDisplayName(r.name)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

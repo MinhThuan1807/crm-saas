@@ -1,50 +1,56 @@
 import { Injectable } from '@nestjs/common'
-import { RoleType } from 'src/common/constants/role.constanst'
 import { PrismaService } from 'src/common/services/prisma.service'
 
 @Injectable()
 export class InvitationRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  // ─── CREATE ───────────────────────────────────────────────────────────────
-
   async create(payload: {
     email: string
-    role: RoleType
+    roleId: string
     tenantId: string
     token: string
     expiresAt: Date
   }) {
     return this.prismaService.invitation.create({
       data: { ...payload, status: 'PENDING' },
+      include: { role: true },
     })
   }
 
-  // ─── READ ─────────────────────────────────────────────────────────────────
-
   async findManyByTenant(tenantId: string) {
-    return this.prismaService.invitation.findMany({
+    const invitations = await this.prismaService.invitation.findMany({
       where: { tenantId },
+      include: { role: true },
       orderBy: { createdAt: 'desc' },
     })
+    return invitations.map((inv) => ({
+      ...inv,
+      role: inv.role.name, // Map sang string
+    }))
   }
 
   async findByIdAndTenant(id: string, tenantId: string) {
     return this.prismaService.invitation.findFirst({
       where: { id, tenantId },
+      include: { role: true },
     })
   }
 
   async findByToken(token: string) {
     return this.prismaService.invitation.findUnique({
       where: { token },
-      include: { tenant: { select: { name: true } } },
+      include: { 
+        tenant: { select: { name: true } },
+        role: true 
+      },
     })
   }
 
   async findByTokenOnly(token: string) {
     return this.prismaService.invitation.findUnique({
       where: { token },
+      include: { role: true },
     })
   }
 
@@ -58,8 +64,6 @@ export class InvitationRepository {
     })
   }
 
-  // ─── UPDATE ───────────────────────────────────────────────────────────────
-
   async updateStatus(id: string, status: 'PENDING' | 'ACCEPTED' | 'EXPIRED' | 'REVOKED') {
     return this.prismaService.invitation.update({
       where: { id },
@@ -67,14 +71,13 @@ export class InvitationRepository {
     })
   }
 
-  async update(id: string, data: Partial<{ email: string; role: RoleType; token: string; expiresAt: Date }>) {
+  async update(id: string, data: any) {
     return this.prismaService.invitation.update({
       where: { id },
       data,
+      include: { role: true },
     })
   }
-
-  // ─── DELETE ───────────────────────────────────────────────────────────────
 
   async deleteManyByEmail(email: string) {
     return this.prismaService.invitation.deleteMany({
