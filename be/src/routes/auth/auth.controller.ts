@@ -51,7 +51,6 @@ export class AuthController {
       ...COOKIE_OPTIONS,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
-    console.log(refreshToken)
     return { message: 'Đăng nhập thành công' }
   }
 
@@ -72,7 +71,6 @@ export class AuthController {
   @ZodSerializerDto(MessageDto)
   async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies.refreshToken
-     console.log('=== REFRESH TOKEN FROM COOKIE ===', refreshToken)
     return this.authService.refreshToken(refreshToken, res)
   }
 

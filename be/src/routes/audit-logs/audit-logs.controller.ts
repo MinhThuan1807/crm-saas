@@ -8,11 +8,13 @@ import { AuditLogsService } from './audit-logs.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { GetAuditLogsQueryDto } from './audit-logs.dto';
 import { AccessTokenPayload } from 'src/common/types/jwt.type';
+import { SkipThrottle } from '@nestjs/throttler';
 
 
 @ApiTags('Audit Logs')
 @Controller('audit-logs')
 @UseGuards(JwtAuthGuard, RolesGuard)
+@SkipThrottle()
 @Roles(ROLE.ADMIN, ROLE.MANAGER)
 export class AuditLogsController {
   constructor(private readonly auditLogsService: AuditLogsService) {}  

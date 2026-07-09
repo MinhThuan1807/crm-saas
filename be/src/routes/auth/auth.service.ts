@@ -55,7 +55,7 @@ export class AuthService {
     const user = await this.authRepository.findUserByEmail(body.email)
 
     if (!user) {
-      throw new UnauthorizedException('Email không tồn tại!')
+      throw new UnauthorizedException('Email hoặc mật khẩu không đúng')
     }
 
     const isPasswordValid = await this.hashingService.compare(body.password, user.password)

@@ -6,10 +6,12 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AccessTokenPayload } from 'src/common/types/jwt.type';
 import { CreateContactBodyDto, CreateContactResDto, GetContactResDto, GetContactsQueryDto, GetContactsResDto, UpdateContactBodyDto } from './contacts.dto';
 import { ZodSerializerDto } from 'nestjs-zod';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @ApiTags('Contacts')
 @Controller('contacts')
 @UseGuards(JwtAuthGuard)
+@SkipThrottle()
 export class ContactsController {
   constructor(private readonly contactService: ContactsService) {}
 
