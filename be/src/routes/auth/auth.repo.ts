@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { RefreshTokenType } from './auth.model'
 import { UserType } from 'src/routes/auth/auth.model'
 import { PrismaService } from 'src/common/services/prisma.service'
+import { ROLE } from 'src/common/constants/role.constanst'
 
 @Injectable()
 export class AuthRepository {

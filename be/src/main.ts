@@ -4,9 +4,11 @@ import envConfig from './common/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { cleanupOpenApiDoc } from 'nestjs-zod';
 import  cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(helmet()) 
   app.use(cookieParser());
   app.enableCors({
     origin: envConfig.FRONTEND_URL || 'http://localhost:3000',
@@ -35,7 +37,6 @@ async function bootstrap() {
   await app.listen(port);
   console.log("Server running on port:", port);
   console.log(`Swagger: http://localhost:${port}/api-docs`);
-  console.log(envConfig.NODE_ENV)
 }
 bootstrap();
 

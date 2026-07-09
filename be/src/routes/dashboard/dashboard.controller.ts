@@ -6,10 +6,12 @@ import { AccessTokenPayload } from 'src/common/types/jwt.type'
 import { ZodSerializerDto } from 'nestjs-zod'
 import { DashboardService } from './dashboard.service'
 import { GetDashboardQueryDto, DashboardResDto } from './dashboard.dto'
+import { SkipThrottle } from '@nestjs/throttler';
 
 @UseGuards(JwtAuthGuard)
 @ApiTags('Dashboard')
 @Controller('dashboard')
+@SkipThrottle()
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 

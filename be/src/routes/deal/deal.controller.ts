@@ -37,10 +37,12 @@ import { AiRateLimitGuard } from 'src/common/guards/ai-rate-limit.guard'
 import { subscribeToAiStream } from '../ai/ai.sse'
 import { Res } from '@nestjs/common'
 import { Response } from 'express'
+import { SkipThrottle } from '@nestjs/throttler'
 
 @UseGuards(JwtAuthGuard)
 @ApiTags('Deals')
 @Controller('deals')
+@SkipThrottle()
 export class DealController {
   constructor(
     private readonly dealService: DealService,

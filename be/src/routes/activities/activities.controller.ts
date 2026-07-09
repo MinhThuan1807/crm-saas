@@ -15,11 +15,13 @@ import {
   GetActivitiesPaginatedResDto,
   UpdateActivityBodyDto,
 } from './activities.dto'
+import { SkipThrottle } from '@nestjs/throttler'
 
 // ─── 1. CONTACT ACTIVITIES ────────────────────────────────────────────────────
 @ApiTags('Activities - Contact')
 @Controller('contacts/:contactId/activities')
 @UseGuards(JwtAuthGuard)
+@SkipThrottle()
 export class ContactActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
@@ -48,6 +50,7 @@ export class ContactActivitiesController {
 @ApiTags('Activities - Deal')
 @Controller('deals/:dealId/activities')
 @UseGuards(JwtAuthGuard)
+@SkipThrottle()
 export class DealActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 
@@ -76,6 +79,7 @@ export class DealActivitiesController {
 @ApiTags('Activities')
 @Controller('activities')
 @UseGuards(JwtAuthGuard)
+@SkipThrottle()
 export class ActivitiesController {
   constructor(private readonly activitiesService: ActivitiesService) {}
 

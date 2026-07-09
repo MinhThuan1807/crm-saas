@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { CommonModule } from './common/common.module'
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core/constants'
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core/constants'
 import { ZodSerializerInterceptor } from 'nestjs-zod'
 import { APP_PIPE } from '@nestjs/core/constants'
 import { MyZodValidationPipe } from './common/pipe/custom-zod-validation.pipe'
@@ -18,12 +18,21 @@ import { ReportsModule } from './routes/reports/reports.module';
 import { AiModule } from './routes/ai/ai.module';
 import { TenantInterceptor } from './common/interceptors/tenant.interceptor'
 import { AuditLogsModule } from './routes/audit-logs/audit-logs.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 @Module({
   imports: [
     CommonModule, AuthModule, ContactsModule, 
     ActivitiesModule, DealModule, UsersModule, 
     InvitationsModule, DashboardModule, ReportsModule,
-    AiModule, AuditLogsModule
+    AiModule, AuditLogsModule,
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 10,
+        },
+      ],
+    }),
   ],
   controllers: [AppController],
   providers: [
@@ -37,7 +46,11 @@ import { AuditLogsModule } from './routes/audit-logs/audit-logs.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: TenantInterceptor,
-    },
+    },  
+    {
+        provide: APP_GUARD,
+        useClass: ThrottlerGuard
+    }
   ],
 })
 export class AppModule { }
