@@ -56,11 +56,11 @@ const NAV_GROUPS: {
 function ComingSoonContent({ label }: { label: string }) {
   return (
     <div className="flex flex-col items-center justify-center" style={{ minHeight: 420 }}>
-      <div className="size-14 rounded-full flex items-center justify-center mb-4" style={{ background: "#EEEDFE" }}>
-        <BarChart2 size={24} style={{ color: "#534AB7" }} />
+      <div className="size-14 rounded-full flex items-center justify-center mb-4 bg-[#EEEDFE] dark:bg-secondary">
+        <BarChart2 size={24} className="text-[#534AB7] dark:text-primary" />
       </div>
-      <p className="text-[#1A1A18] mb-1.5" style={{ fontSize: 15, fontWeight: 600 }}>{label}</p>
-      <p className="text-[#6B6B67]" style={{ fontSize: 13 }}>Tính năng này đang được phát triển</p>
+      <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontSize: 15, fontWeight: 600 }}>{label}</p>
+      <p className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 13 }}>Tính năng này đang được phát triển</p>
     </div>
   );
 }
@@ -76,31 +76,31 @@ export default function SettingsPage() {
 
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
       <header
-        className="shrink-0 border-b border-[#E8E7E2] bg-white flex items-center px-6 gap-3"
+        className="shrink-0 border-b border-[#E8E7E2] dark:border-border bg-white dark:bg-card flex items-center px-6 gap-3"
         style={{ height: 56 }}
       >
-        <h1 className="text-[#1A1A18] tracking-tight" style={{ fontSize: 15, fontWeight: 600, lineHeight: 1 }}>
+        <h1 className="text-[#1A1A18] dark:text-foreground tracking-tight" style={{ fontSize: 15, fontWeight: 600, lineHeight: 1 }}>
           Settings
         </h1>
       </header>
 
       {/* ── Body ─────────────────────────────────────────────────────────────── */}
-      <div className="flex flex-1 overflow-hidden bg-[#F8F8F7]">
+      <div className="flex flex-1 overflow-hidden bg-[#F8F8F7] dark:bg-background">
 
         {/* ── Settings sub-nav ────────────────────────────────────────────────── */}
         <aside
-          className="shrink-0 overflow-y-auto border-r border-[#E8E7E2] bg-white"
+          className="shrink-0 overflow-y-auto border-r border-[#E8E7E2] dark:border-border bg-white dark:bg-card"
           style={{ width: 220 }}
         >
           <div className="p-4">
-            <p className="text-[#1A1A18] mb-4" style={{ fontSize: 16, fontWeight: 500 }}>Settings</p>
+            <p className="text-[#1A1A18] dark:text-foreground mb-4" style={{ fontSize: 16, fontWeight: 500 }}>Settings</p>
 
             <div className="flex flex-col gap-5">
               {NAV_GROUPS.map((group) => (
                 <div key={group.label}>
                   {/* Group label */}
                   <p
-                    className="text-[#6B6B67] mb-1.5 tracking-wider"
+                    className="text-[#6B6B67] dark:text-muted-foreground mb-1.5 tracking-wider"
                     style={{ fontSize: 10, fontWeight: 600, textTransform: "uppercase" }}
                   >
                     {group.label}
@@ -117,10 +117,10 @@ export default function SettingsPage() {
                           className={cn(
                             "flex items-center gap-2 w-full px-2.5 py-2 rounded-lg transition-colors text-left cursor-pointer",
                             active
-                              ? "bg-[#EEEDFE] text-[#534AB7]"
-                              : "text-[#6B6B67] hover:bg-[#F8F8F7] hover:text-[#1A1A18]"
+                              ? "bg-[#EEEDFE] dark:bg-secondary text-[#534AB7] dark:text-primary"
+                              : "text-[#6B6B67] dark:text-muted-foreground hover:bg-[#F8F8F7] dark:hover:bg-muted hover:text-[#1A1A18] dark:hover:text-foreground"
                           )}
-                          style={{ fontSize: 13, fontWeight: active ? 500 : 400, border: "none", background: active ? "#EEEDFE" : undefined }}
+                          style={{ fontSize: 13, fontWeight: active ? 500 : 400, border: "none" }}
                         >
                           <Icon size={15} strokeWidth={active ? 2.2 : 1.8} />
                           {label}

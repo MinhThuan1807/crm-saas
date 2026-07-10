@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
+import logoImg from "@/app/icon.png";
 import { useMe } from "@/hooks/useAuth";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { gsap } from "gsap";
@@ -28,7 +30,13 @@ import {
   CheckCircle2,
   ChevronRight,
   Play,
-  RotateCcw
+  RotateCcw,
+  FileSpreadsheet,
+  Settings,
+  Lock,
+  ArrowDown,
+  ShieldAlert,
+  FolderSync
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -39,15 +47,28 @@ export default function LandingPage() {
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // AI Simulation State
-  const [aiStep, setAiStep] = useState(0); // 0: Idle, 1: Typing Raw, 2: Analyzing, 3: Completed
-  const [typedText, setTypedText] = useState("");
-  const rawTranscript = "Cuộc gọi với anh Minh công ty ABC lúc 10h sáng. Anh ấy muốn nâng cấp lên gói Enterprise cho 12 users, báo giá chiết khấu 15tr/tháng. Deal này rất tiềm năng, anh ấy hẹn thứ Hai tuần sau gửi hợp đồng để ký kết và thanh toán.";
-  const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // AI Simulation Tab State
+  const [activeDemoTab, setActiveDemoTab] = useState<"notes" | "excel">("notes");
+
+  // Architecture Mode Switch (Business vs Tech)
+  const [archMode, setArchMode] = useState<"business" | "tech">("business");
+
+  // 1. AI Meeting Notes State
+  const [aiNotesStep, setAiNotesStep] = useState(0); // 0: Idle, 1: Typing Raw, 2: Analyzing, 3: Completed
+  const [typedNotesText, setTypedNotesText] = useState("");
+  const rawNotesTranscript = "Cuộc gọi với anh Minh công ty ABC lúc 10h sáng. Anh ấy muốn nâng cấp lên gói Enterprise cho 12 users, báo giá chiết khấu 15tr/tháng. Deal này rất tiềm năng, anh ấy hẹn thứ Hai tuần sau gửi hợp đồng để ký kết và thanh toán.";
+  const typingNotesTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 2. AI Excel Mapping State
+  const [aiExcelStep, setAiExcelStep] = useState(0); // 0: Idle, 1: Scanning, 2: Mapping, 3: Completed
+  const [excelMappingProgress, setExcelMappingProgress] = useState(0);
+
+  // 3. Dynamic Roles Matrix State
+  const [selectedMatrixRole, setSelectedMatrixRole] = useState<"ADMIN" | "MANAGER" | "SALES_REP">("SALES_REP");
 
   // SVG lines ref for GSAP animation
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const pulseNodeRefs = useRef<Array<SVGGElement | null>>([]);
+  const excelLinesSvgRef = useRef<SVGSVGElement | null>(null);
 
   // Perspective tilt effect for Hero Mockup
   const x = useMotionValue(0);
@@ -82,14 +103,14 @@ export default function LandingPage() {
     // Bounce effect for elements
     gsap.fromTo(
       ".arch-node",
-      { scale: 0.9, opacity: 0.7 },
+      { scale: 0.96, opacity: 0.8 },
       {
         scale: 1,
         opacity: 1,
         duration: 1.5,
         repeat: -1,
         yoyo: true,
-        stagger: 0.2,
+        stagger: 0.15,
         ease: "power1.inOut"
       }
     );
@@ -111,32 +132,76 @@ export default function LandingPage() {
     y.set(0);
   };
 
-  // AI Interactive Demo Actions
-  const startAiSimulation = () => {
-    if (typingTimerRef.current) clearInterval(typingTimerRef.current);
-    setTypedText("");
-    setAiStep(1);
+  // AI Interactive Notes Simulator Actions
+  const startAiNotesSimulation = () => {
+    if (typingNotesTimerRef.current) clearInterval(typingNotesTimerRef.current);
+    setTypedNotesText("");
+    setAiNotesStep(1);
 
     let charIndex = 0;
-    typingTimerRef.current = setInterval(() => {
-      if (charIndex < rawTranscript.length) {
-        setTypedText((prev) => prev + rawTranscript.charAt(charIndex));
+    typingNotesTimerRef.current = setInterval(() => {
+      if (charIndex < rawNotesTranscript.length) {
+        setTypedNotesText((prev) => prev + rawNotesTranscript.charAt(charIndex));
         charIndex++;
       } else {
-        if (typingTimerRef.current) clearInterval(typingTimerRef.current);
-        setAiStep(2);
+        if (typingNotesTimerRef.current) clearInterval(typingNotesTimerRef.current);
+        setAiNotesStep(2);
         // Simulate progress timer
         setTimeout(() => {
-          setAiStep(3);
-        }, 2200);
+          setAiNotesStep(3);
+        }, 1800);
       }
-    }, 25);
+    }, 20);
   };
 
-  const resetAiSimulation = () => {
-    if (typingTimerRef.current) clearInterval(typingTimerRef.current);
-    setTypedText("");
-    setAiStep(0);
+  const resetAiNotesSimulation = () => {
+    if (typingNotesTimerRef.current) clearInterval(typingNotesTimerRef.current);
+    setTypedNotesText("");
+    setAiNotesStep(0);
+  };
+
+  // AI Excel Mapping Simulator Actions
+  const startAiExcelSimulation = () => {
+    setAiExcelStep(1);
+    setExcelMappingProgress(0);
+    
+    // Simulate reading headers
+    setTimeout(() => {
+      setAiExcelStep(2);
+      // Animate progress bar
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += 10;
+        setExcelMappingProgress(progress);
+        if (progress >= 100) {
+          clearInterval(progressInterval);
+          // Wait briefly then show mapping done
+          setTimeout(() => {
+            setAiExcelStep(3);
+            // Draw matching lines using GSAP
+            setTimeout(() => {
+              const lines = excelLinesSvgRef.current?.querySelectorAll(".mapping-line");
+              if (lines) {
+                lines.forEach((line) => {
+                  gsap.fromTo(line, { strokeDashoffset: 100 }, { strokeDashoffset: 0, duration: 1.2, ease: "power2.out" });
+                });
+              }
+            }, 100);
+          }, 400);
+        }
+      }, 150);
+    }, 1200);
+  };
+
+  const resetAiExcelSimulation = () => {
+    setAiExcelStep(0);
+    setExcelMappingProgress(0);
+  };
+
+  // Framer Motion scroll animation config
+  const revealVariants = {
+    hidden: { opacity: 0, y: 35 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } }
   };
 
   if (!mounted) return null;
@@ -146,19 +211,22 @@ export default function LandingPage() {
       
       {/* ── BACKGROUND ORNAMENT ────────────────────────────────────────── */}
       <div className="absolute top-0 left-0 right-0 h-[600px] bg-gradient-to-b from-primary/10 via-transparent to-transparent pointer-events-none z-0" />
-      <div className="absolute top-[10%] left-[5%] w-[350px] h-[350px] bg-primary/20 rounded-full blur-[120px] pointer-events-none z-0 dark:bg-primary/15" />
-      <div className="absolute top-[40%] right-[10%] w-[300px] h-[300px] bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none z-0 dark:bg-indigo-500/5" />
+      <div className="absolute top-[8%] left-[4%] w-[380px] h-[380px] bg-primary/20 rounded-full blur-[140px] pointer-events-none z-0 dark:bg-primary/12" />
+      <div className="absolute top-[35%] right-[8%] w-[320px] h-[320px] bg-indigo-500/10 rounded-full blur-[110px] pointer-events-none z-0 dark:bg-indigo-500/6" />
 
       {/* ── HEADER / NAVBAR ────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 w-full backdrop-blur-md bg-background/80 border-b border-border/40 transition-all">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="size-8 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300">
-              <svg width="18" height="18" viewBox="0 0 13 13" fill="none">
-                <path d="M2 10L6.5 3L11 10H2Z" fill="white" fillOpacity="0.95" />
-              </svg>
-            </div>
-            <span className="text-lg font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-primary/80">
+            <Image
+              src={logoImg}
+              alt="salesFlow"
+              width={32}
+              height={32}
+              unoptimized
+              className="rounded-lg shadow-md group-hover:scale-105 transition-transform duration-300 shrink-0"
+            />
+            <span className="text-lg font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-primary/80 pr-1.5">
               SalesFlow
             </span>
           </Link>
@@ -167,6 +235,7 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Tính năng</a>
             <a href="#ai-demo" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Trải nghiệm AI</a>
+            <a href="#roles-matrix" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Phân quyền</a>
             <a href="#architecture" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Kiến trúc</a>
           </div>
 
@@ -239,27 +308,10 @@ export default function LandingPage() {
               transition={{ duration: 0.2 }}
               className="absolute top-16 left-0 right-0 bg-background border-b border-border/80 p-5 flex flex-col gap-4 shadow-xl md:hidden z-40"
             >
-              <a
-                href="#features"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground border-b border-border/40"
-              >
-                Tính năng
-              </a>
-              <a
-                href="#ai-demo"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground border-b border-border/40"
-              >
-                Trải nghiệm AI
-              </a>
-              <a
-                href="#architecture"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground border-b border-border/40"
-              >
-                Kiến trúc
-              </a>
+              <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground border-b border-border/40">Tính năng</a>
+              <a href="#ai-demo" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground border-b border-border/40">Trải nghiệm AI</a>
+              <a href="#roles-matrix" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground border-b border-border/40">Phân quyền</a>
+              <a href="#architecture" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground border-b border-border/40">Kiến trúc</a>
               <div className="flex flex-col gap-2 pt-2">
                 {me ? (
                   <Button
@@ -301,7 +353,7 @@ export default function LandingPage() {
       </nav>
 
       {/* ── HERO SECTION ───────────────────────────────────────────────── */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-24 md:pt-24 md:pb-32 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-20 md:pt-20 md:pb-28 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         
         {/* Left column info */}
         <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
@@ -312,7 +364,7 @@ export default function LandingPage() {
             className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 rounded-full border border-primary/20"
           >
             <Sparkles className="size-3.5 text-primary" />
-            <span className="text-xs font-semibold text-primary uppercase tracking-wide">CRM Multi-Tenant SaaS</span>
+            <span className="text-xs font-semibold text-primary uppercase tracking-wide">CRM Multi-Tenant SaaS v2.0</span>
           </motion.div>
           
           <motion.h1
@@ -469,7 +521,7 @@ export default function LandingPage() {
                       </p>
                       <div className="flex justify-between items-center text-[9px] text-primary font-bold">
                         <span>15.0tr/tháng</span>
-                        <span className="text-[8px] bg-primary text-white px-1.5 py-0.5 rounded-full font-semibold">AI Suggested</span>
+                        <span className="text-[8px] bg-primary text-white px-1.5 py-0.5 rounded-full font-semibold font-mono">AI Match</span>
                       </div>
                     </motion.div>
                   </div>
@@ -497,8 +549,8 @@ export default function LandingPage() {
                   <Bot className="size-4.5" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">AI Phân tích</p>
-                  <p className="text-xs font-semibold text-foreground truncate mt-0.5">Đề xuất nâng cấp stage</p>
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">AI Auto-Map</p>
+                  <p className="text-xs font-semibold text-foreground truncate mt-0.5">So khớp cột Excel</p>
                 </div>
               </div>
             </motion.div>
@@ -506,8 +558,15 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── CORE FEATURES SHOWCASE ─────────────────────────────────────── */}
-      <section id="features" className="bg-muted/40 py-20 md:py-24 border-y border-border/40 relative z-10 transition-colors duration-300">
+      {/* ── CORE FEATURES SHOWCASE (Scroll Reveal) ────────────────────── */}
+      <motion.section
+        id="features"
+        variants={revealVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        className="bg-muted/40 py-20 md:py-24 border-y border-border/40 relative z-10 transition-colors duration-300"
+      >
         <div className="max-w-7xl mx-auto px-6">
           
           <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
@@ -590,22 +649,29 @@ export default function LandingPage() {
                 <div className="size-10 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-500">
                   <TrendingUp className="size-5" />
                 </div>
-                <h3 className="text-lg font-bold text-foreground">Báo cáo & Phân quyền</h3>
+                <h3 className="text-lg font-bold text-foreground">AI Import & Phân quyền</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  Phân quyền linh hoạt theo hành động và điều kiện (ABAC/RBAC). Dashboard báo cáo trực quan hiệu năng làm việc của đội ngũ sales.
+                  Tải lên Excel nạp dữ liệu hàng loạt khớp cột tự động bằng AI. Quản lý phân quyền động trực quan với ma trận phân quyền tối tân.
                 </p>
               </div>
               <div className="pt-4 flex items-center gap-1 text-xs text-purple-600 font-semibold">
-                Theo dõi thời gian thực
+                Nhập liệu nhanh chóng
                 <ChevronRight className="size-3" />
               </div>
             </motion.div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* ── AI INTERACTIVE DEMO ────────────────────────────────────────── */}
-      <section id="ai-demo" className="py-20 md:py-24 relative z-10">
+      {/* ── AI INTERACTIVE DEMO (2 TABS - Notes vs Excel Mapping) ───────── */}
+      <motion.section
+        id="ai-demo"
+        variants={revealVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        className="py-20 md:py-24 relative z-10"
+      >
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
@@ -616,45 +682,105 @@ export default function LandingPage() {
                 Trợ lý AI SalesFlow
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-                Tự động hóa tác vụ thô chỉ trong 1 nốt nhạc
+                Động cơ Tự động hóa tích hợp Trí tuệ Nhân tạo
               </h2>
               <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-                Rút ngắn thời gian ghi chép họp hành. Nhập ghi chú thô của buổi họp hoặc tóm tắt nhanh cuộc điện thoại, trợ lý AI sẽ tự động phân loại Deal, liệt kê danh sách công việc cần làm và soạn thư nháp chăm sóc khách hàng.
+                Chúng tôi cung cấp các công cụ AI đột phá để loại bỏ các thao tác thủ công phức tạp nhất trong quy trình quản trị khách hàng. Hãy chọn và trải nghiệm các tính năng AI dưới đây:
               </p>
+
+              {/* Tab Selector Buttons */}
+              <div className="bg-muted p-1 rounded-xl flex gap-1 border border-border/60 max-w-sm">
+                <button
+                  onClick={() => {
+                    setActiveDemoTab("notes");
+                    resetAiNotesSimulation();
+                    resetAiExcelSimulation();
+                  }}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                    activeDemoTab === "notes"
+                      ? "bg-background text-primary shadow-xs"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  AI Phân Tích Ghi Chú
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveDemoTab("excel");
+                    resetAiNotesSimulation();
+                    resetAiExcelSimulation();
+                  }}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                    activeDemoTab === "excel"
+                      ? "bg-background text-primary shadow-xs"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  AI Excel Mapping (AI Match)
+                </button>
+              </div>
+
+              {/* Action Buttons based on Tab */}
               <div className="flex gap-4 pt-2">
-                {aiStep === 0 || aiStep === 3 ? (
-                  <Button
-                    onClick={startAiSimulation}
-                    className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl px-5 py-5 flex items-center gap-2 cursor-pointer shadow-lg shadow-primary/10"
-                  >
-                    <Play className="size-4 fill-white" />
-                    Chạy thử AI Demo
-                  </Button>
-                ) : null}
-                {aiStep > 0 ? (
-                  <Button
-                    variant="outline"
-                    onClick={resetAiSimulation}
-                    className="border-border rounded-xl font-semibold px-4 cursor-pointer"
-                  >
-                    <RotateCcw className="size-4 mr-1.5" />
-                    Đặt lại
-                  </Button>
-                ) : null}
+                {activeDemoTab === "notes" ? (
+                  <>
+                    {(aiNotesStep === 0 || aiNotesStep === 3) && (
+                      <Button
+                        onClick={startAiNotesSimulation}
+                        className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl px-5 py-5 flex items-center gap-2 cursor-pointer shadow-lg shadow-primary/10"
+                      >
+                        <Play className="size-4 fill-white" />
+                        Chạy thử phân tích cuộc gọi
+                      </Button>
+                    )}
+                    {aiNotesStep > 0 && (
+                      <Button
+                        variant="outline"
+                        onClick={resetAiNotesSimulation}
+                        className="border-border rounded-xl font-semibold px-4 cursor-pointer"
+                      >
+                        <RotateCcw className="size-4 mr-1.5" />
+                        Đặt lại
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {(aiExcelStep === 0 || aiExcelStep === 3) && (
+                      <Button
+                        onClick={startAiExcelSimulation}
+                        className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl px-5 py-5 flex items-center gap-2 cursor-pointer shadow-lg shadow-primary/10"
+                      >
+                        <Play className="size-4 fill-white" />
+                        Chạy thử AI Match cột Excel
+                      </Button>
+                    )}
+                    {aiExcelStep > 0 && (
+                      <Button
+                        variant="outline"
+                        onClick={resetAiExcelSimulation}
+                        className="border-border rounded-xl font-semibold px-4 cursor-pointer"
+                      >
+                        <RotateCcw className="size-4 mr-1.5" />
+                        Đặt lại
+                      </Button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
 
             {/* Right Interactive Showcase */}
             <div className="lg:col-span-7">
-              <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xl min-h-[380px] flex flex-col">
+              <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-xl min-h-[420px] flex flex-col">
                 
                 {/* Visual Header */}
                 <div className="h-11 bg-muted shrink-0 border-b border-border px-4 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-muted-foreground flex items-center gap-2">
+                  <span className="text-xs font-semibold text-muted-foreground flex items-center gap-2 font-mono">
                     <span className="size-2 rounded-full bg-primary animate-pulse" />
-                    AI Action Items Generator
+                    {activeDemoTab === "notes" ? "AI Meeting Notes Analyzer" : "AI Spreadsheet Column Matcher"}
                   </span>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1.5">
                     <span className="size-2.5 rounded-full bg-border" />
                     <span className="size-2.5 rounded-full bg-border" />
                   </div>
@@ -663,85 +789,196 @@ export default function LandingPage() {
                 {/* Display Body */}
                 <div className="flex-1 p-5 space-y-4 flex flex-col justify-between">
                   
-                  {/* Step 0: Idle */}
-                  {aiStep === 0 && (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center space-y-3 py-10">
-                      <div className="size-16 rounded-full bg-primary/5 flex items-center justify-center text-primary/70 animate-bounce">
-                        <Bot className="size-8" />
-                      </div>
-                      <p className="text-sm font-medium text-muted-foreground max-w-sm">
-                        Nhấp vào nút <strong className="text-primary font-bold">Chạy thử AI Demo</strong> ở bên trái để xem cách AI tự động chuyển hóa ghi chú thô của nhân viên Sales.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Step 1: Typing Raw Info */}
-                  {aiStep === 1 && (
-                    <div className="space-y-2 flex-1">
-                      <label className="text-xs font-bold text-muted-foreground uppercase">Ghi chú thô của cuộc gọi (Nhân viên nhập)</label>
-                      <div className="bg-[#F8F8F7] dark:bg-background/40 border border-border p-4 rounded-xl text-xs sm:text-sm font-medium text-foreground min-h-[120px] font-mono leading-relaxed relative">
-                        {typedText}
-                        <span className="w-1.5 h-4.5 bg-primary inline-block ml-0.5 animate-ping absolute" />
-                      </div>
-                      <p className="text-[11px] text-muted-foreground animate-pulse">SalesFlow AI đang nhập tự động ghi chép thô...</p>
-                    </div>
-                  )}
-
-                  {/* Step 2: Processing Spinner */}
-                  {aiStep === 2 && (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center space-y-3 py-10">
-                      <div className="relative">
-                        <div className="size-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-                        <Bot className="size-5 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">AI Đang phân tích dữ liệu...</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">Trích xuất action items và soạn thảo email follow-up</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Step 3: Analysis Results */}
-                  {aiStep === 3 && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="space-y-4 flex-1"
-                    >
-                      {/* Deal suggestion alert */}
-                      <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="size-4.5 text-primary" />
-                          <span className="text-xs font-semibold text-foreground">Đề xuất Stage: <span className="text-primary font-bold">Negotiation (Đàm phán)</span></span>
-                        </div>
-                        <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-full font-bold">Tự tin 95%</span>
-                      </div>
-
-                      {/* Extracted tasks checklist */}
-                      <div className="space-y-2">
-                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Việc cần làm (Action Items)</p>
-                        <div className="space-y-1.5">
-                          <div className="flex items-center gap-2.5 bg-background border border-border p-2.5 rounded-lg text-xs sm:text-sm">
-                            <CheckCircle2 className="size-4 text-green-500 shrink-0" />
-                            <span className="font-semibold text-foreground">Soạn thảo & gửi hợp đồng Enterprise (12 users, 15tr/tháng)</span>
+                  {/* ───────────────── TAB 1: NOTES SHOWCASE ───────────────── */}
+                  {activeDemoTab === "notes" && (
+                    <>
+                      {/* Step 0: Idle */}
+                      {aiNotesStep === 0 && (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-3 py-10">
+                          <div className="size-16 rounded-full bg-primary/5 flex items-center justify-center text-primary/70 animate-bounce">
+                            <Bot className="size-8" />
                           </div>
-                          <div className="flex items-center gap-2.5 bg-background border border-border p-2.5 rounded-lg text-xs sm:text-sm">
-                            <CheckCircle2 className="size-4 text-green-500 shrink-0" />
-                            <span className="font-semibold text-foreground">Follow-up khách hàng để ký hợp đồng và thanh toán vào thứ Hai</span>
+                          <p className="text-sm font-medium text-muted-foreground max-w-sm">
+                            Nhấp vào nút <strong className="text-primary font-bold">Chạy thử phân tích cuộc gọi</strong> để xem AI bóc tách thông tin từ đoạn ghi chú thô của Sales.
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Step 1: Typing Raw Info */}
+                      {aiNotesStep === 1 && (
+                        <div className="space-y-2 flex-1">
+                          <label className="text-xs font-bold text-muted-foreground uppercase">Ghi chép cuộc gọi thô</label>
+                          <div className="bg-[#F8F8F7] dark:bg-background/40 border border-border p-4 rounded-xl text-xs sm:text-sm font-medium text-foreground min-h-[140px] font-mono leading-relaxed relative">
+                            {typedNotesText}
+                            <span className="w-1.5 h-4.5 bg-primary inline-block ml-0.5 animate-ping absolute" />
+                          </div>
+                          <p className="text-[11px] text-muted-foreground animate-pulse">SalesFlow AI đang gõ tự động văn bản thô...</p>
+                        </div>
+                      )}
+
+                      {/* Step 2: Processing Spinner */}
+                      {aiNotesStep === 2 && (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-3 py-10">
+                          <div className="relative">
+                            <div className="size-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                            <Bot className="size-5 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">AI Đang phân tích ghi chú...</p>
+                            <p className="text-xs text-muted-foreground mt-0.5 font-mono">Model: GPT-4o-mini / Llama-3.3-70b</p>
                           </div>
                         </div>
-                      </div>
+                      )}
 
-                      {/* Generated Email Draft */}
-                      <div className="space-y-2">
-                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Bản nháp Email soạn bởi AI</p>
-                        <div className="bg-[#F8F8F7] dark:bg-background/40 border border-border p-3.5 rounded-xl text-xs leading-relaxed font-sans text-muted-foreground relative">
-                          <strong className="text-foreground block mb-1">Tiêu đề: SalesFlow - Đề xuất nâng cấp Enterprise & Hợp đồng dịch vụ</strong>
-                          Chào anh Minh,<br />
-                          Cảm ơn anh vì cuộc trao đổi hữu ích sáng nay. Như đã thống nhất, em gửi thông tin gói Enterprise cho 12 users với đơn giá ưu đãi 15tr/tháng. Em đính kèm dự thảo hợp đồng dưới đây để anh duyệt...
+                      {/* Step 3: Analysis Results */}
+                      {aiNotesStep === 3 && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="space-y-4 flex-1"
+                        >
+                          <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Sparkles className="size-4.5 text-primary" />
+                              <span className="text-xs font-semibold text-foreground">Đề xuất Stage: <span className="text-primary font-bold">Negotiation (Đàm phán)</span></span>
+                            </div>
+                            <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-full font-bold font-mono">Tự tin 95%</span>
+                          </div>
+
+                          <div className="space-y-2">
+                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Tác vụ bóc tách (Action Items)</p>
+                            <div className="space-y-1.5">
+                              <div className="flex items-center gap-2.5 bg-background border border-border p-2.5 rounded-lg text-xs">
+                                <CheckCircle2 className="size-4 text-green-500 shrink-0" />
+                                <span className="font-semibold text-foreground">Soạn thảo & gửi hợp đồng Enterprise (12 users, 15tr/tháng)</span>
+                              </div>
+                              <div className="flex items-center gap-2.5 bg-background border border-border p-2.5 rounded-lg text-xs">
+                                <CheckCircle2 className="size-4 text-green-500 shrink-0" />
+                                <span className="font-semibold text-foreground">Follow-up khách hàng để ký hợp đồng và thanh toán vào thứ Hai tuần sau</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Thư nháp đề xuất</p>
+                            <div className="bg-[#F8F8F7] dark:bg-background/40 border border-border p-3.5 rounded-xl text-[11px] leading-relaxed text-muted-foreground font-sans">
+                              <strong className="text-foreground block mb-0.5">Tiêu đề: SalesFlow - Đề xuất nâng cấp Enterprise & Dự thảo hợp đồng</strong>
+                              Chào anh Minh, Cảm ơn anh đã dành thời gian trao đổi. Em gửi kèm dự thảo hợp đồng Enterprise cho 12 users ưu đãi 15tr/tháng để anh duyệt...
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </>
+                  )}
+
+                  {/* ───────────────── TAB 2: EXCEL SHOWCASE ───────────────── */}
+                  {activeDemoTab === "excel" && (
+                    <>
+                      {/* Step 0: Idle */}
+                      {aiExcelStep === 0 && (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-3 py-10">
+                          <div className="size-16 rounded-full bg-green-500/5 flex items-center justify-center text-green-600 animate-bounce">
+                            <FileSpreadsheet className="size-8" />
+                          </div>
+                          <p className="text-sm font-medium text-muted-foreground max-w-sm">
+                            Nhấp vào nút <strong className="text-primary font-bold">Chạy thử AI Match cột Excel</strong> để xem AI phân tích tiêu đề cột tùy chỉnh từ file Excel thô của khách hàng.
+                          </p>
                         </div>
-                      </div>
-                    </motion.div>
+                      )}
+
+                      {/* Step 1: Scanning / Reading */}
+                      {aiExcelStep === 1 && (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-4 py-8">
+                          <div className="flex gap-2">
+                            <motion.div animate={{ y: [-5, 5, -5] }} transition={{ repeat: -1, duration: 1 }} className="size-8 bg-green-500/10 rounded-lg flex items-center justify-center text-green-600"><FileSpreadsheet className="size-5" /></motion.div>
+                            <motion.div animate={{ y: [5, -5, 5] }} transition={{ repeat: -1, duration: 1 }} className="size-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary"><FolderSync className="size-5 animate-spin" /></motion.div>
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">Đang tải tệp Excel lên...</p>
+                            <p className="text-xs text-muted-foreground mt-0.5 font-mono">Đang đọc các cột: "Họ tên KH", "Hòm thư", "Số điện thoại", "Dự án"...</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step 2: Mapping columns with progress */}
+                      {aiExcelStep === 2 && (
+                        <div className="flex-1 flex flex-col items-center justify-center space-y-4 py-8 px-6">
+                          <div className="w-full bg-muted rounded-full h-2 overflow-hidden border border-border">
+                            <motion.div
+                              className="bg-primary h-full"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${excelMappingProgress}%` }}
+                              transition={{ duration: 0.1 }}
+                            />
+                          </div>
+                          <div className="text-center">
+                            <p className="text-sm font-semibold text-foreground">Trợ lý AI đang ánh xạ tự động...</p>
+                            <p className="text-xs text-muted-foreground mt-0.5 font-mono">Gọi contactsService.aiMapColumns() [ Tiến trình: {excelMappingProgress}% ]</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Step 3: Excel Mapping Results Visual GSAP */}
+                      {aiExcelStep === 3 && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="flex-1 flex flex-col justify-between"
+                        >
+                          <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-3 flex items-center justify-between text-xs mb-2">
+                            <span className="font-semibold text-green-700 dark:text-green-400 flex items-center gap-1.5">
+                              <Sparkles className="size-4 text-green-500 animate-pulse" />
+                              Tự động ánh xạ thành công 6 cột (Độ chính xác cao)
+                            </span>
+                            <span className="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded-full font-bold">AI Match 100%</span>
+                          </div>
+
+                          {/* Graphical mapping connection matrix */}
+                          <div className="grid grid-cols-12 gap-2 py-2 items-center relative">
+                            {/* SVG Connection Lines Overlay */}
+                            <div className="absolute inset-0 pointer-events-none z-0">
+                              <svg ref={excelLinesSvgRef} className="w-full h-full" viewBox="0 0 460 140" fill="none">
+                                {/* Connectors */}
+                                <path d="M140 15 L320 15" stroke="#534AB7" strokeWidth="1.5" strokeDasharray="3,3" strokeDashoffset="100" className="mapping-line" />
+                                <path d="M140 45 L320 45" stroke="#534AB7" strokeWidth="1.5" strokeDasharray="3,3" strokeDashoffset="100" className="mapping-line" />
+                                <path d="M140 75 L320 75" stroke="#534AB7" strokeWidth="1.5" strokeDasharray="3,3" strokeDashoffset="100" className="mapping-line" />
+                                <path d="M140 105 L320 105" stroke="#534AB7" strokeWidth="1.5" strokeDasharray="3,3" strokeDashoffset="100" className="mapping-line" />
+                              </svg>
+                            </div>
+
+                            {/* Left Side: Raw File Headers */}
+                            <div className="col-span-5 space-y-2 z-10">
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1">Cột trong File của bạn</p>
+                              <div className="bg-background border border-border rounded-lg p-1.5 text-xs text-foreground font-semibold font-mono truncate shadow-xs">Họ tên KH</div>
+                              <div className="bg-background border border-border rounded-lg p-1.5 text-xs text-foreground font-semibold font-mono truncate shadow-xs">Hòm thư</div>
+                              <div className="bg-background border border-border rounded-lg p-1.5 text-xs text-foreground font-semibold font-mono truncate shadow-xs">Số phone</div>
+                              <div className="bg-background border border-border rounded-lg p-1.5 text-xs text-foreground font-semibold font-mono truncate shadow-xs">Dự án quan tâm</div>
+                            </div>
+
+                            {/* Center separator label */}
+                            <div className="col-span-2 flex flex-col justify-center items-center gap-6">
+                              <div className="text-[8px] font-bold text-primary bg-primary/10 rounded px-1 py-0.5">Match</div>
+                              <div className="text-[8px] font-bold text-primary bg-primary/10 rounded px-1 py-0.5">Match</div>
+                              <div className="text-[8px] font-bold text-primary bg-primary/10 rounded px-1 py-0.5">Match</div>
+                              <div className="text-[8px] font-bold text-primary bg-primary/10 rounded px-1 py-0.5">Match</div>
+                            </div>
+
+                            {/* Right Side: System Database fields */}
+                            <div className="col-span-5 space-y-2 z-10">
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider pl-1 text-right">Trường chuẩn hệ thống</p>
+                              <div className="bg-primary/5 border border-primary/20 text-primary rounded-lg p-1.5 text-xs font-bold text-right font-mono truncate shadow-xs">name (Bắt buộc)</div>
+                              <div className="bg-primary/5 border border-primary/20 text-primary rounded-lg p-1.5 text-xs font-bold text-right font-mono truncate shadow-xs">email</div>
+                              <div className="bg-primary/5 border border-primary/20 text-primary rounded-lg p-1.5 text-xs font-bold text-right font-mono truncate shadow-xs">phone</div>
+                              <div className="bg-primary/5 border border-primary/20 text-primary rounded-lg p-1.5 text-xs font-bold text-right font-mono truncate shadow-xs">dealTitle</div>
+                            </div>
+                          </div>
+
+                          <div className="bg-muted p-2 rounded-lg text-center mt-2">
+                            <span className="text-[10px] text-muted-foreground">Ấn nút "Xác nhận Import" sẽ kích hoạt logic ghi nhận trùng lặp, gán Owner và tự động lưu vào DB.</span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </>
                   )}
 
                 </div>
@@ -750,23 +987,203 @@ export default function LandingPage() {
             
           </div>
         </div>
-      </section>
+      </motion.section>
+
+      {/* ── NEW SECTION: WORKSPACE ROLES & ABAC PERMISSIONS MATRIX ──────── */}
+      <motion.section
+        id="roles-matrix"
+        variants={revealVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        className="bg-muted/40 py-20 md:py-24 border-y border-border/40 relative z-10 transition-colors duration-300"
+      >
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* Left Column Interactive Table Mock */}
+            <div className="lg:col-span-7 bg-card border border-border rounded-2xl p-5 shadow-lg overflow-hidden flex flex-col justify-between min-h-[380px]">
+              
+              <div className="space-y-4">
+                {/* Title inside card */}
+                <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="size-5 text-primary" />
+                    <span className="text-sm font-bold text-foreground">Bảng Quyền Hạn: 
+                      <span className="text-primary font-extrabold ml-1">
+                        {selectedMatrixRole === "ADMIN" ? "Quản Trị Viên (ADMIN)" : selectedMatrixRole === "MANAGER" ? "Quản Lý (MANAGER)" : "Nhân viên Sales (SALES_REP)"}
+                      </span>
+                    </span>
+                  </div>
+                  
+                  {/* Selector in header */}
+                  <div className="flex bg-muted p-0.5 rounded-lg border border-border text-[10px] font-bold">
+                    <button
+                      onClick={() => setSelectedMatrixRole("ADMIN")}
+                      className={`px-2 py-1 rounded ${selectedMatrixRole === "ADMIN" ? "bg-background text-primary" : "text-muted-foreground"}`}
+                    >
+                      ADMIN
+                    </button>
+                    <button
+                      onClick={() => setSelectedMatrixRole("MANAGER")}
+                      className={`px-2 py-1 rounded ${selectedMatrixRole === "MANAGER" ? "bg-background text-primary" : "text-muted-foreground"}`}
+                    >
+                      MANAGER
+                    </button>
+                    <button
+                      onClick={() => setSelectedMatrixRole("SALES_REP")}
+                      className={`px-2 py-1 rounded ${selectedMatrixRole === "SALES_REP" ? "bg-background text-primary" : "text-muted-foreground"}`}
+                    >
+                      SALES_REP
+                    </button>
+                  </div>
+                </div>
+
+                {/* Matrix table mock */}
+                <div className="border border-border/60 rounded-xl overflow-hidden bg-background">
+                  <table className="w-full text-left border-collapse text-[11px] sm:text-xs">
+                    <thead>
+                      <tr className="border-b border-border bg-muted/50 font-semibold text-muted-foreground">
+                        <th className="p-2.5 pl-4">Tài nguyên</th>
+                        <th className="p-2.5 text-center">Xem</th>
+                        <th className="p-2.5 text-center">Thêm</th>
+                        <th className="p-2.5 text-center">Sửa</th>
+                        <th className="p-2.5 text-center">Xóa</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/40 font-medium">
+                      {/* Contacts Row */}
+                      <tr className="hover:bg-muted/10 transition-colors">
+                        <td className="p-2.5 pl-4 font-bold text-foreground">Khách Hàng (Contact)</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" || selectedMatrixRole === "MANAGER" ? "✅" : <span title="Chỉ xem dữ liệu sở hữu">🔒 ✅</span>}</td>
+                        <td className="p-2.5 text-center">✅</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" || selectedMatrixRole === "MANAGER" ? "✅" : <span title="Chỉ sửa dữ liệu sở hữu">🔒 ✅</span>}</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" ? "✅" : selectedMatrixRole === "MANAGER" ? "✅" : <span title="Chỉ xóa dữ liệu sở hữu">🔒 ✅</span>}</td>
+                      </tr>
+                      {/* Deals Row */}
+                      <tr className="hover:bg-muted/10 transition-colors">
+                        <td className="p-2.5 pl-4 font-bold text-foreground">Cơ Hội Bán Hàng (Deal)</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" || selectedMatrixRole === "MANAGER" ? "✅" : <span title="Chỉ xem deal sở hữu">🔒 ✅</span>}</td>
+                        <td className="p-2.5 text-center">✅</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" || selectedMatrixRole === "MANAGER" ? "✅" : <span title="Chỉ sửa deal sở hữu">🔒 ✅</span>}</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" ? "✅" : selectedMatrixRole === "MANAGER" ? "✅" : <span title="Chỉ xóa deal sở hữu">🔒 ✅</span>}</td>
+                      </tr>
+                      {/* Tasks Row */}
+                      <tr className="hover:bg-muted/10 transition-colors">
+                        <td className="p-2.5 pl-4 font-bold text-foreground">Công Việc (Task)</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" || selectedMatrixRole === "MANAGER" ? "✅" : <span title="Chỉ xem tác vụ sở hữu">🔒 ✅</span>}</td>
+                        <td className="p-2.5 text-center">✅</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" || selectedMatrixRole === "MANAGER" ? "✅" : <span title="Chỉ sửa tác vụ sở hữu">🔒 ✅</span>}</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" ? "✅" : selectedMatrixRole === "MANAGER" ? "✅" : <span title="Chỉ xóa tác vụ sở hữu">🔒 ✅</span>}</td>
+                      </tr>
+                      {/* Users Row */}
+                      <tr className="hover:bg-muted/10 transition-colors">
+                        <td className="p-2.5 pl-4 font-bold text-foreground">Thành Viên (User)</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" || selectedMatrixRole === "MANAGER" ? "✅" : "❌"}</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" ? "✅" : "❌"}</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" ? "✅" : "❌"}</td>
+                        <td className="p-2.5 text-center">{selectedMatrixRole === "ADMIN" ? "✅" : "❌"}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Explanatory notes */}
+              <div className="bg-primary/5 border border-primary/20 p-2.5 rounded-xl flex items-start gap-2 text-[10px] text-muted-foreground mt-3">
+                <Lock className="size-3.5 text-primary shrink-0 mt-0.5 animate-pulse" />
+                <div>
+                  <strong className="text-foreground">Ký hiệu 🔒 biểu trưng cho ABAC (Attribute-Based Access Control):</strong> Hệ thống sẽ tự động ghép bộ lọc an toàn vào SQL thông qua Prisma để người dùng chỉ được quyền thao tác trên các bản ghi mà họ là người sở hữu trực tiếp.
+                </div>
+              </div>
+            </div>
+
+            {/* Right column intro info */}
+            <div className="lg:col-span-5 space-y-6">
+              <span className="text-xs font-bold text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+                <ShieldCheck className="size-3.5" />
+                Kiểm Soát Quyền Chuyên Sâu
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+                Quản trị vai trò động & Bảo mật cấp dòng
+              </h2>
+              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                Đảm bảo an toàn thông tin tối đa cho tổ chức của bạn. Hệ thống nâng cấp toàn diện từ phân quyền vai trò tĩnh truyền thống sang phân quyền động linh hoạt thông qua Giao diện Bảng Ma trận trực quan.
+              </p>
+              
+              <ul className="space-y-3 pt-2">
+                <li className="flex items-start gap-2.5 text-xs sm:text-sm">
+                  <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-foreground font-semibold">Tạo vai trò tùy biến:</strong> Dễ dàng bổ sung vai trò mới (ví dụ: Cộng tác viên, Hỗ trợ kỹ thuật) và phân quyền chi tiết.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2.5 text-xs sm:text-sm">
+                  <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-foreground font-semibold">Lọc dữ liệu thông minh (ABAC):</strong> Nhân viên Sales chỉ nhìn thấy và chăm sóc khách hàng của chính họ, ngăn rò rỉ cơ hội bán hàng chéo.
+                  </div>
+                </li>
+                <li className="flex items-start gap-2.5 text-xs sm:text-sm">
+                  <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-foreground font-semibold">Tốc độ tức thì với Redis:</strong> Quyền hạn của User được cache trên bộ nhớ đệm giúp các lượt gọi API kiểm tra quyền không bị chậm trễ.
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </motion.section>
 
       {/* ── TECH STACK & ARCHITECTURE SECTION ──────────────────────────── */}
-      <section id="architecture" className="bg-muted/40 py-20 md:py-24 border-y border-border/40 relative z-10 transition-colors duration-300">
+      <motion.section
+        id="architecture"
+        variants={revealVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        className="py-20 md:py-24 relative z-10 transition-colors duration-300"
+      >
         <div className="max-w-7xl mx-auto px-6">
           
-          <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
+          <div className="text-center max-w-2xl mx-auto space-y-3 mb-8">
             <span className="text-xs font-bold text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
               <Cpu className="size-3.5" />
-              Cơ sở kỹ thuật & Triển khai
+              Công nghệ & Sự Vận Hành
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-              Kiến trúc hệ thống chuẩn doanh nghiệp
+              {archMode === "business" ? "Nền tảng công nghệ tối tân bảo vệ bạn" : "Kiến trúc hệ thống chuẩn doanh nghiệp"}
             </h2>
             <p className="text-muted-foreground text-sm sm:text-base">
-              Chúng tôi sử dụng mô hình client-server hiện đại kết hợp với kiến trúc xử lý tác vụ nền hàng đợi (Message Queue) hiệu năng cao.
+              {archMode === "business" 
+                ? "Chúng tôi chuyển hóa những công nghệ kỹ thuật phức tạp thành lợi ích thực tế cho doanh nghiệp: An toàn, nhanh chóng và không bao giờ đơ máy."
+                : "Chúng tôi sử dụng mô hình client-server hiện đại kết hợp với kiến trúc xử lý tác vụ nền hàng đợi (Message Queue) hiệu năng cao."}
             </p>
+          </div>
+
+          {/* Dual mode selector */}
+          <div className="flex bg-muted p-1 rounded-xl border border-border/60 max-w-xs mx-auto mb-12">
+            <button
+              onClick={() => setArchMode("business")}
+              className={`flex-1 py-1.5 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                archMode === "business"
+                  ? "bg-background text-primary shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              💼 Cho Doanh Nghiệp
+            </button>
+            <button
+              onClick={() => setArchMode("tech")}
+              className={`flex-1 py-1.5 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                archMode === "tech"
+                  ? "bg-background text-primary shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              💻 Cho Kỹ Thuật
+            </button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -833,77 +1250,126 @@ export default function LandingPage() {
                 {/* NODE: Next.js Client */}
                 <g className="arch-node cursor-pointer">
                   <rect x="15" y="125" width="85" height="70" rx="14" fill="var(--background)" stroke="#534AB7" strokeWidth="2" />
-                  <text x="57" y="155" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">Next.js 16</text>
-                  <text x="57" y="172" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">Frontend</text>
+                  <text x="57" y="155" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">
+                    {archMode === "tech" ? "Next.js 16" : "Giao diện mượt"}
+                  </text>
+                  <text x="57" y="172" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">
+                    {archMode === "tech" ? "Frontend" : "Trải nghiệm KH"}
+                  </text>
                   <circle cx="57" cy="115" r="4" fill="#534AB7" />
                 </g>
 
                 {/* NODE: NestJS Gateway */}
                 <g className="arch-node cursor-pointer">
                   <rect x="180" y="125" width="85" height="70" rx="14" fill="var(--background)" stroke="url(#primary-grad)" strokeWidth="2" />
-                  <text x="222" y="155" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">NestJS API</text>
-                  <text x="222" y="172" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">Gateway</text>
+                  <text x="222" y="155" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">
+                    {archMode === "tech" ? "NestJS API" : "Bộ não xử lý"}
+                  </text>
+                  <text x="222" y="172" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">
+                    {archMode === "tech" ? "Gateway" : "Hệ thống lõi"}
+                  </text>
                 </g>
 
                 {/* NODE: Redis Queue */}
                 <g className="arch-node cursor-pointer">
                   <rect x="400" y="45" width="85" height="65" rx="14" fill="var(--background)" stroke="#EF4444" strokeWidth="2" />
-                  <text x="442" y="75" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">Upstash Redis</text>
-                  <text x="442" y="90" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">BullMQ Queue</text>
+                  <text x="442" y="75" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">
+                    {archMode === "tech" ? "Upstash Redis" : "Hàng chờ ngầm"}
+                  </text>
+                  <text x="442" y="90" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">
+                    {archMode === "tech" ? "BullMQ Queue" : "Tránh đơ lag"}
+                  </text>
                 </g>
 
                 {/* NODE: AI Worker */}
                 <g className="arch-node cursor-pointer">
                   <rect x="400" y="210" width="85" height="65" rx="14" fill="var(--background)" stroke="#EC4899" strokeWidth="2" />
-                  <text x="442" y="238" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">AI Worker</text>
-                  <text x="442" y="253" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">OpenAI / Groq</text>
+                  <text x="442" y="238" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">
+                    {archMode === "tech" ? "AI Worker" : "Trợ lý AI"}
+                  </text>
+                  <text x="442" y="253" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">
+                    {archMode === "tech" ? "OpenAI / Groq" : "Siêu máy tính"}
+                  </text>
                 </g>
 
                 {/* NODE: PostgreSQL Database */}
                 <g className="arch-node cursor-pointer">
                   <rect x="290" y="225" width="85" height="65" rx="14" fill="var(--background)" stroke="#10B981" strokeWidth="2" />
-                  <text x="332" y="255" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">RDS Postgres</text>
-                  <text x="332" y="270" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">Tenant Isolation</text>
+                  <text x="332" y="255" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">
+                    {archMode === "tech" ? "RDS Postgres" : "Kho dữ liệu"}
+                  </text>
+                  <text x="332" y="270" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">
+                    {archMode === "tech" ? "Tenant Isolation" : "Khóa cô lập 🔒"}
+                  </text>
                 </g>
               </svg>
 
               <div className="absolute bottom-4 right-4 bg-background/90 text-[10px] text-muted-foreground border border-border px-2.5 py-1 rounded-md">
-                ⚡ Sơ đồ dữ liệu không đồng bộ
+                {archMode === "business" ? "⚡ Mô phỏng quy trình xử lý an toàn" : "⚡ Sơ đồ dữ liệu không đồng bộ"}
               </div>
             </div>
 
             {/* Right Tech Info */}
             <div className="lg:col-span-5 space-y-6">
-              <h3 className="text-xl font-bold text-foreground">Hạ tầng mạng lưới tin cậy</h3>
+              <h3 className="text-xl font-bold text-foreground">
+                {archMode === "business" ? "Vì sao SalesFlow ổn định vượt trội?" : "Hạ tầng mạng lưới tin cậy"}
+              </h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Chúng tôi thiết kế ứng dụng chạy trên nền tảng VPS cô lập hoặc cụm dịch vụ AWS (ECS + RDS). Sử dụng hàng đợi Redis kết hợp BullMQ giúp giảm tải tối đa cho luồng xử lý API chính khi chạy các lệnh phân tích trí tuệ nhân tạo (AI).
+                {archMode === "business" 
+                  ? "Mọi thiết kế kỹ thuật của chúng tôi đều hướng tới mục tiêu mang lại sự yên tâm tuyệt đối cho khách hàng doanh nghiệp về tốc độ và độ bảo mật."
+                  : "Chúng tôi thiết kế ứng dụng chạy trên nền tảng VPS cô lập hoặc cụm dịch vụ AWS (ECS + RDS). Sử dụng hàng đợi Redis kết hợp BullMQ giúp giảm tải tối đa cho API chính."}
               </p>
 
               <ul className="space-y-3 pt-2">
-                <li className="flex items-start gap-2.5 text-xs sm:text-sm">
-                  <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <strong className="text-foreground font-semibold">Bảo mật thông tin:</strong> Tự động phân tách dữ liệu theo tenantId thông qua Prisma query middleware mở rộng.
-                  </div>
-                </li>
-                <li className="flex items-start gap-2.5 text-xs sm:text-sm">
-                  <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <strong className="text-foreground font-semibold">Tối ưu hóa chi phí:</strong> Sử dụng Upstash Serverless Redis bên ngoài VPC giúp linh hoạt thanh toán theo lượng sử dụng thực tế.
-                  </div>
-                </li>
-                <li className="flex items-start gap-2.5 text-xs sm:text-sm">
-                  <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <strong className="text-foreground font-semibold">Tốc độ cao:</strong> Next.js deploy CDN Edge tối ưu hóa thời gian tải trang đầu tiên trên toàn cầu.
-                  </div>
-                </li>
+                {archMode === "business" ? (
+                  <>
+                    <li className="flex items-start gap-2.5 text-xs sm:text-sm">
+                      <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-foreground font-semibold">Bảo mật tuyệt đối (PostgreSQL Isolation):</strong> Dữ liệu của bạn được cô lập hoàn toàn như sở hữu căn hộ riêng biệt, không lo rò rỉ dữ liệu sang công ty khác.
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2.5 text-xs sm:text-sm">
+                      <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-foreground font-semibold">Không bao giờ đơ máy (Task Queue):</strong> Khi AI chạy phân tích hoặc bạn tải lên file Excel lớn, tác vụ sẽ được xử lý ngầm, giúp bạn tiếp tục làm việc bình thường.
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2.5 text-xs sm:text-sm">
+                      <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-foreground font-semibold">Tải trang tức thì (Edge Delivery):</strong> Hệ thống sử dụng mạng lưới phân phối biên toàn cầu giúp thời gian chờ gần như bằng không.
+                      </div>
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    <li className="flex items-start gap-2.5 text-xs sm:text-sm">
+                      <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-foreground font-semibold">Bảo mật thông tin:</strong> Tự động phân tách dữ liệu theo tenantId thông qua Prisma query middleware mở rộng.
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2.5 text-xs sm:text-sm">
+                      <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-foreground font-semibold">Tối ưu hóa chi phí:</strong> Sử dụng Upstash Serverless Redis bên ngoài VPC giúp linh hoạt thanh toán theo lượng sử dụng thực tế.
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-2.5 text-xs sm:text-sm">
+                      <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <strong className="text-foreground font-semibold">Tốc độ cao:</strong> Next.js deploy CDN Edge tối ưu hóa thời gian tải trang đầu tiên trên toàn cầu.
+                      </div>
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
 
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── CALL TO ACTION & FOOTER ────────────────────────────────────── */}
       <section className="relative z-10 py-20 bg-gradient-to-b from-transparent to-primary/5">
@@ -948,9 +1414,14 @@ export default function LandingPage() {
         {/* Footer */}
         <div className="max-w-7xl mx-auto px-6 pt-20 pb-8 mt-10 border-t border-border/40 text-center space-y-4">
           <div className="flex justify-center items-center gap-2 text-primary font-bold">
-            <svg width="15" height="15" viewBox="0 0 13 13" fill="none">
-              <path d="M2 10L6.5 3L11 10H2Z" fill="currentColor" />
-            </svg>
+            <Image
+              src={logoImg}
+              alt="salesFlow"
+              width={16}
+              height={16}
+              unoptimized
+              className="rounded shrink-0"
+            />
             <span>SalesFlow CRM</span>
           </div>
           <p className="text-xs text-muted-foreground">

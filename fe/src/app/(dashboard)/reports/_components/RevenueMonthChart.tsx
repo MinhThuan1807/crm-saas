@@ -8,13 +8,13 @@ import { formatVndShort } from "@/lib/helper";
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-[#E8E7E2] rounded-lg shadow-md px-3 py-2.5 text-xs">
-      <p className="text-[#1A1A18] mb-1.5" style={{ fontWeight: 600 }}>{label}</p>
+    <div className="bg-white dark:bg-card border border-[#E8E7E2] dark:border-border rounded-lg shadow-md px-3 py-2.5 text-xs">
+      <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontWeight: 600 }}>{label}</p>
       {payload.map((p: any) => (
         <div key={p.dataKey} className="flex items-center gap-2 mb-0.5">
           <span className="size-2 rounded-full shrink-0" style={{ background: p.color ?? p.fill }} />
-          <span className="text-[#6B6B67]">{p.name}:</span>
-          <span className="text-[#1A1A18]" style={{ fontWeight: 500 }}>{formatVndShort(p.value)}</span>
+          <span className="text-[#6B6B67] dark:text-muted-foreground">{p.name}:</span>
+          <span className="text-[#1A1A18] dark:text-foreground" style={{ fontWeight: 500 }}>{formatVndShort(p.value)}</span>
         </div>
       ))}
     </div>
@@ -60,7 +60,7 @@ export function RevenueMonthChart({ data = [] }: RevenueMonthChartProps) {
                     <line x1="0" y1="4" x2="16" y2="4" stroke={l.color} strokeWidth="2" strokeDasharray="4 2" />
                   </svg>
                 )}
-                <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>{l.label}</span>
+                <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 11 }}>{l.label}</span>
               </div>
             ))}
           </div>
@@ -77,9 +77,9 @@ export function RevenueMonthChart({ data = [] }: RevenueMonthChartProps) {
       ) : (
         <ResponsiveContainer width="100%" height={220}>
           <ComposedChart data={data} margin={{ top: 5, right: 16, left: 0, bottom: 5 }}>
-            <CartesianGrid key="rm-grid"  strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
-            <XAxis         key="rm-xaxis" dataKey="month" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
-            <YAxis         key="rm-yaxis" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={formatVndShort} width={44} domain={[0, yDomainMax]} />
+            <CartesianGrid key="rm-grid"  strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+            <XAxis         key="rm-xaxis" dataKey="month" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+            <YAxis         key="rm-yaxis" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} tickFormatter={formatVndShort} width={44} domain={[0, yDomainMax]} />
             <Tooltip       key="rm-tt"    content={<CustomTooltip />} />
             <Bar  key="rm-bar"  dataKey="actual" name="Thực tế" fill="#534AB7" radius={[4, 4, 0, 0]} maxBarSize={36} />
             <Line key="rm-line" type="monotone" dataKey="target" name="Target" stroke="#FBBF24" strokeWidth={2} strokeDasharray="5 3" dot={false} />

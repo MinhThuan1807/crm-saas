@@ -252,7 +252,7 @@ export default function RolesPage() {
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-background">
       <header className="h-14 shrink-0 border-b flex items-center justify-between px-6 bg-background">
-        <h1 className="text-[#1A1A18] text-sm font-semibold tracking-tight">Workspace Roles</h1>
+        <h1 className="text-[#1A1A18] dark:text-foreground text-sm font-semibold tracking-tight">Workspace Roles</h1>
         {isAdmin && (
           <Button
             onClick={() => setIsCreateOpen(true)}
@@ -264,7 +264,7 @@ export default function RolesPage() {
         )}
       </header>
 
-      <main className="flex-1 overflow-y-auto bg-[#F8F8F7] p-5">
+      <main className="flex-1 overflow-y-auto bg-[#F8F8F7] dark:bg-background p-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
           {roles.map((item: any) => {
             const { icon: Icon, color, bgColor } = getRoleIcon(item.name);
@@ -283,7 +283,7 @@ export default function RolesPage() {
                         <Icon size={20} />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-base text-[#1A1A18] flex items-center gap-1.5">
+                        <h3 className="font-semibold text-base text-[#1A1A18] dark:text-foreground flex items-center gap-1.5">
                           {item.name}
                           {isSystemRole && (
                             <span className="text-[10px] font-normal px-1.5 py-0.5 rounded bg-muted text-muted-foreground border">
@@ -301,7 +301,7 @@ export default function RolesPage() {
                   <hr className="border-border/50" />
 
                   <div className="space-y-2">
-                    <span className="text-xs font-semibold text-[#868E96] uppercase tracking-wider block">
+                    <span className="text-xs font-semibold text-[#868E96] dark:text-muted-foreground uppercase tracking-wider block">
                       Quyền hạn ({item.permissions.length})
                     </span>
                     {item.name === "ADMIN" ? (
@@ -312,7 +312,7 @@ export default function RolesPage() {
                     ) : item.permissions.length === 0 ? (
                       <span className="text-xs text-muted-foreground italic block">Chưa có quyền nào được gán</span>
                     ) : (
-                      <ul className="space-y-1.5 pl-4 list-disc text-xs text-[#495057] leading-relaxed">
+                      <ul className="space-y-1.5 pl-4 list-disc text-xs text-[#495057] dark:text-muted-foreground leading-relaxed">
                         {summarizedPermissions.map((txt, idx) => (
                           <li key={idx}>
                             {txt.includes("manage:all") ? (
@@ -331,7 +331,7 @@ export default function RolesPage() {
                   <div className="pt-3 flex gap-2 border-t border-border/30">
                     <Button
                       variant="outline"
-                      className="flex-1 text-xs h-9 gap-1.5 text-[#534AB7] border-[#534AB7]/20 hover:bg-[#EEEDFE] hover:text-[#534AB7]"
+                      className="flex-1 text-xs h-9 gap-1.5 text-[#534AB7] dark:text-primary border-[#534AB7]/20 hover:bg-[#EEEDFE] dark:hover:bg-muted hover:text-[#534AB7] dark:hover:text-primary"
                       onClick={() => handleEditPermsClick(item)}
                       disabled={item.name === "ADMIN"}
                     >
@@ -344,7 +344,7 @@ export default function RolesPage() {
                         <Button
                           variant="outline"
                           size="icon"
-                          className="size-9 shrink-0 text-[#6B6B67] hover:bg-[#EEEDFE] hover:text-[#534AB7] border-border/70"
+                          className="size-9 shrink-0 text-[#6B6B67] dark:text-muted-foreground hover:bg-[#EEEDFE] dark:hover:bg-muted hover:text-[#534AB7] dark:hover:text-primary border-border/70"
                           onClick={() => handleEditRoleClick(item)}
                           title="Sửa vai trò"
                         >
@@ -353,7 +353,7 @@ export default function RolesPage() {
                         <Button
                           variant="outline"
                           size="icon"
-                          className="size-9 shrink-0 text-[#6B6B67] hover:bg-[#FEE2E2] hover:text-[#A32D2D] border-border/70"
+                          className="size-9 shrink-0 text-[#6B6B67] dark:text-muted-foreground hover:bg-[#FEE2E2] dark:hover:bg-destructive/20 hover:text-[#A32D2D] dark:hover:text-destructive border-border/70"
                           onClick={() => handleDeleteRoleClick(item)}
                           title="Xóa vai trò"
                         >
@@ -381,28 +381,28 @@ export default function RolesPage() {
 
           {/* Body bọc scroll area ma trận quyền hạn */}
           <div className="flex-1 overflow-y-auto p-6 max-h-[50vh]">
-            <div className="border border-slate-200 rounded-lg overflow-hidden bg-background">
+            <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden bg-background">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50/75">
-                    <th className="p-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider w-1/4">Tài nguyên</th>
-                    <th className="p-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center w-[15%]">Xem</th>
-                    <th className="p-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center w-[15%]">Thêm</th>
-                    <th className="p-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center w-[15%]">Sửa</th>
-                    <th className="p-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center w-[15%]">Xóa</th>
-                    <th className="p-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center w-[15%]">Toàn quyền</th>
+                  <tr className="border-b border-slate-200 dark:border-border bg-slate-50/75 dark:bg-muted/50">
+                    <th className="p-3.5 text-xs font-semibold text-slate-500 dark:text-muted-foreground uppercase tracking-wider w-1/4">Tài nguyên</th>
+                    <th className="p-3.5 text-xs font-semibold text-slate-500 dark:text-muted-foreground uppercase tracking-wider text-center w-[15%]">Xem</th>
+                    <th className="p-3.5 text-xs font-semibold text-slate-500 dark:text-muted-foreground uppercase tracking-wider text-center w-[15%]">Thêm</th>
+                    <th className="p-3.5 text-xs font-semibold text-slate-500 dark:text-muted-foreground uppercase tracking-wider text-center w-[15%]">Sửa</th>
+                    <th className="p-3.5 text-xs font-semibold text-slate-500 dark:text-muted-foreground uppercase tracking-wider text-center w-[15%]">Xóa</th>
+                    <th className="p-3.5 text-xs font-semibold text-slate-500 dark:text-muted-foreground uppercase tracking-wider text-center w-[15%]">Toàn quyền</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-border">
                   {subjects.map((subj) => (
-                    <tr key={subj} className="hover:bg-slate-50/20 transition-colors">
-                      <td className="p-4 text-xs font-bold text-slate-700 bg-slate-50/10 border-b border-slate-100">
+                    <tr key={subj} className="hover:bg-slate-50/20 dark:hover:bg-muted/30 transition-colors">
+                      <td className="p-4 text-xs font-bold text-slate-700 dark:text-foreground bg-slate-50/10 dark:bg-muted/10 border-b border-slate-100 dark:border-border">
                         {formatSubject(subj)}
                       </td>
                       {actions.map((act) => {
                         const perm = allPermissions.find(p => p.subject === subj && p.action === act);
                         if (!perm) {
-                          return <td key={act} className="p-4 text-center text-slate-300 text-xs font-semibold border-b border-slate-100">—</td>;
+                          return <td key={act} className="p-4 text-center text-slate-300 dark:text-muted/40 text-xs font-semibold border-b border-slate-100 dark:border-border">—</td>;
                         }
                         const isChecked = selectedPermIds.includes(perm.id);
                         const isABAC = selectedRole?.name === 'SALES_REP' && 
@@ -412,13 +412,12 @@ export default function RolesPage() {
                         return (
                           <td
                             key={act}
-                            className="p-4 text-center align-middle border-b border-slate-100 cursor-pointer hover:bg-slate-50/80 transition-colors"
+                            className="p-4 text-center align-middle border-b border-slate-100 dark:border-border cursor-pointer hover:bg-slate-50/80 dark:hover:bg-muted/40 transition-colors"
                             onClick={() => handleTogglePermission(perm.id)}
                           >
                             <div className="flex items-center justify-center gap-1.5 pointer-events-none">
                               <Checkbox
                                 checked={isChecked}
-                                readOnly
                               />
                               {isABAC && isChecked && (
                                 <span className="text-amber-500 text-xs shrink-0 select-none" title="Chỉ áp dụng đối với dữ liệu sở hữu">
@@ -436,7 +435,7 @@ export default function RolesPage() {
             </div>
           </div>
 
-          <DialogFooter className="p-6 border-t shrink-0 flex items-center justify-end gap-2 bg-[#F8F8F7]">
+          <DialogFooter className="p-6 border-t shrink-0 flex items-center justify-end gap-2 bg-[#F8F8F7] dark:bg-muted/30">
             <Button variant="ghost" onClick={() => setIsPermDialogOpen(false)} disabled={updatePermsMutation.isPending}>
               Hủy bỏ
             </Button>
@@ -451,40 +450,40 @@ export default function RolesPage() {
       {/* Dialog: Tạo vai trò mới */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="sm:max-w-[460px] p-0 rounded-[10px] overflow-hidden" aria-describedby={undefined}>
-          <DialogHeader className="px-6 pt-6 pb-4 border-b border-[#E8E7E2]">
-            <DialogTitle className="text-[#1A1A18]" style={{ fontSize: 16, fontWeight: 600 }}>
+          <DialogHeader className="px-6 pt-6 pb-4 border-b border-[#E8E7E2] dark:border-border">
+            <DialogTitle className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 16, fontWeight: 600 }}>
               Tạo vai trò mới
             </DialogTitle>
           </DialogHeader>
 
           <div className="px-6 py-5 flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-[#1A1A18]" style={{ fontSize: 13 }}>Tên vai trò (Viết liền, không dấu, in hoa)</Label>
+              <Label className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 13 }}>Tên vai trò (Viết liền, không dấu, in hoa)</Label>
               <Input
                 type="text"
                 placeholder="Ví dụ: SUPPORT, TELEMARKETER"
                 value={newRoleName}
                 onChange={(e) => setNewRoleName(e.target.value)}
-                className="h-10 rounded-[10px] border-[#E8E7E2] text-[#1A1A18] focus-visible:ring-[#534AB7]/30 focus-visible:border-[#534AB7]"
+                className="h-10 rounded-[10px] border-[#E8E7E2] dark:border-border text-[#1A1A18] dark:text-foreground focus-visible:ring-[#534AB7]/30 focus-visible:border-[#534AB7]"
                 style={{ fontSize: 13 }}
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="text-[#1A1A18]" style={{ fontSize: 13 }}>Mô tả vai trò</Label>
+              <Label className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 13 }}>Mô tả vai trò</Label>
               <Input
                 type="text"
                 placeholder="Nhập mô tả nhiệm vụ của vai trò..."
                 value={newRoleDesc}
                 onChange={(e) => setNewRoleDesc(e.target.value)}
-                className="h-10 rounded-[10px] border-[#E8E7E2] text-[#1A1A18] focus-visible:ring-[#534AB7]/30 focus-visible:border-[#534AB7]"
+                className="h-10 rounded-[10px] border-[#E8E7E2] dark:border-border text-[#1A1A18] dark:text-foreground focus-visible:ring-[#534AB7]/30 focus-visible:border-[#534AB7]"
                 style={{ fontSize: 13 }}
               />
             </div>
           </div>
 
           <DialogFooter className="px-6 pb-6 gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setIsCreateOpen(false)} className="h-9 rounded-[10px] border-[#E8E7E2] text-[#6B6B67] hover:bg-[#F8F8F7]" style={{ fontSize: 13 }}>Hủy</Button>
+            <Button variant="outline" onClick={() => setIsCreateOpen(false)} className="h-9 rounded-[10px] border-[#E8E7E2] dark:border-border text-[#6B6B67] dark:text-muted-foreground hover:bg-[#F8F8F7] dark:hover:bg-muted" style={{ fontSize: 13 }}>Hủy</Button>
             <Button
               onClick={handleCreateRole}
               disabled={createRoleMutation.isPending}
@@ -500,38 +499,38 @@ export default function RolesPage() {
       {/* Dialog: Sửa thông tin vai trò (Tên/Mô tả) */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent className="sm:max-w-[460px] p-0 rounded-[10px] overflow-hidden" aria-describedby={undefined}>
-          <DialogHeader className="px-6 pt-6 pb-4 border-b border-[#E8E7E2]">
-            <DialogTitle className="text-[#1A1A18]" style={{ fontSize: 16, fontWeight: 600 }}>
+          <DialogHeader className="px-6 pt-6 pb-4 border-b border-[#E8E7E2] dark:border-border">
+            <DialogTitle className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 16, fontWeight: 600 }}>
               Chỉnh sửa vai trò
             </DialogTitle>
           </DialogHeader>
 
           <div className="px-6 py-5 flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-[#1A1A18]" style={{ fontSize: 13 }}>Tên vai trò (Viết liền, không dấu, in hoa)</Label>
+              <Label className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 13 }}>Tên vai trò (Viết liền, không dấu, in hoa)</Label>
               <Input
                 type="text"
                 value={editingRoleName}
                 onChange={(e) => setEditingRoleName(e.target.value)}
-                className="h-10 rounded-[10px] border-[#E8E7E2] text-[#1A1A18] focus-visible:ring-[#534AB7]/30 focus-visible:border-[#534AB7]"
+                className="h-10 rounded-[10px] border-[#E8E7E2] dark:border-border text-[#1A1A18] dark:text-foreground focus-visible:ring-[#534AB7]/30 focus-visible:border-[#534AB7]"
                 style={{ fontSize: 13 }}
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="text-[#1A1A18]" style={{ fontSize: 13 }}>Mô tả vai trò</Label>
+              <Label className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 13 }}>Mô tả vai trò</Label>
               <Input
                 type="text"
                 value={editingRoleDesc}
                 onChange={(e) => setEditingRoleDesc(e.target.value)}
-                className="h-10 rounded-[10px] border-[#E8E7E2] text-[#1A1A18] focus-visible:ring-[#534AB7]/30 focus-visible:border-[#534AB7]"
+                className="h-10 rounded-[10px] border-[#E8E7E2] dark:border-border text-[#1A1A18] dark:text-foreground focus-visible:ring-[#534AB7]/30 focus-visible:border-[#534AB7]"
                 style={{ fontSize: 13 }}
               />
             </div>
           </div>
 
           <DialogFooter className="px-6 pb-6 gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setIsEditOpen(false)} className="h-9 rounded-[10px] border-[#E8E7E2] text-[#6B6B67] hover:bg-[#F8F8F7]" style={{ fontSize: 13 }}>Hủy</Button>
+            <Button variant="outline" onClick={() => setIsEditOpen(false)} className="h-9 rounded-[10px] border-[#E8E7E2] dark:border-border text-[#6B6B67] dark:text-muted-foreground hover:bg-[#F8F8F7] dark:hover:bg-muted" style={{ fontSize: 13 }}>Hủy</Button>
             <Button
               onClick={handleSaveRole}
               disabled={updateRoleMutation.isPending}
@@ -546,19 +545,19 @@ export default function RolesPage() {
 
       {/* Dialog: Xác nhận Xóa vai trò */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="sm:max-w-[400px] rounded-[10px]" aria-describedby={undefined}>
+        <DialogContent className="sm:max-w-[400px] rounded-[10px] bg-background" aria-describedby={undefined}>
           <DialogHeader>
-            <DialogTitle className="text-[#1A1A18]" style={{ fontSize: 15, fontWeight: 600 }}>
+            <DialogTitle className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 15, fontWeight: 600 }}>
               Xóa vai trò: {deletingRole?.name}
             </DialogTitle>
           </DialogHeader>
           <div className="py-2">
-            <p className="text-[#6B6B67]" style={{ fontSize: 13 }}>
+            <p className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 13 }}>
               Bạn có chắc chắn muốn xóa vai trò này? Mọi liên kết quyền hạn của vai trò sẽ bị hủy bỏ vĩnh viễn. Hành động này không thể hoàn tác.
             </p>
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setIsDeleteOpen(false)} className="h-9 rounded-[10px] border-[#E8E7E2] text-[#6B6B67] hover:bg-[#F8F8F7]" style={{ fontSize: 13 }}>Hủy bỏ</Button>
+            <Button variant="outline" onClick={() => setIsDeleteOpen(false)} className="h-9 rounded-[10px] border-[#E8E7E2] dark:border-border text-[#6B6B67] dark:text-muted-foreground hover:bg-[#F8F8F7] dark:hover:bg-muted" style={{ fontSize: 13 }}>Hủy bỏ</Button>
             <Button
               onClick={handleConfirmDelete}
               disabled={deleteRoleMutation.isPending}

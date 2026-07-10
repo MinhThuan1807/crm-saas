@@ -43,7 +43,7 @@ function CopyLinkButton({ token }: { token: string }) {
       variant="outline"
       size="sm"
       onClick={handleCopy}
-      className="h-7 px-2 rounded-lg gap-1 border-[#E8E7E2] text-[#6B6B67] hover:bg-[#F1EFE8] hover:text-[#1A1A18]"
+      className="h-7 px-2 rounded-lg gap-1 border-[#E8E7E2] dark:border-border text-[#6B6B67] dark:text-muted-foreground hover:bg-[#F1EFE8] dark:hover:bg-muted hover:text-[#1A1A18] dark:hover:text-foreground"
       style={{ fontSize: 11 }}
     >
       {copied ? (
@@ -66,26 +66,26 @@ function InvitationStatusBadge({ status }: { status: string }) {
   switch (status) {
     case "PENDING":
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ fontSize: 11, fontWeight: 600, background: "#FAEEDA", color: "#854F0B" }}>
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FAEEDA] dark:bg-amber-950/20 text-[#854F0B] dark:text-amber-400" style={{ fontSize: 11, fontWeight: 600 }}>
           <Clock size={10} />
           Chờ kích hoạt
         </span>
       );
     case "ACCEPTED":
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full" style={{ fontSize: 11, fontWeight: 600, background: "#EBFDF5", color: "#107C41" }}>
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#EBFDF5] dark:bg-green-950/20 text-[#107C41] dark:text-green-400" style={{ fontSize: 11, fontWeight: 600 }}>
           Đã tham gia
         </span>
       );
     case "EXPIRED":
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full" style={{ fontSize: 11, fontWeight: 600, background: "#FEE2E2", color: "#A32D2D" }}>
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#FEE2E2] dark:bg-red-950/20 text-[#A32D2D] dark:text-red-400" style={{ fontSize: 11, fontWeight: 600 }}>
           Hết hạn
         </span>
       );
     case "REVOKED":
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full" style={{ fontSize: 11, fontWeight: 600, background: "#F1EFE8", color: "#6B6B67" }}>
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#F1EFE8] dark:bg-muted text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 11, fontWeight: 600 }}>
           Đã hủy
         </span>
       );
@@ -122,9 +122,9 @@ export function InvitationsList() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 bg-white rounded-[10px] border border-[#E8E7E2]" style={{ minHeight: 300 }}>
-        <RefreshCw size={24} className="animate-spin text-[#534AB7] mb-2" />
-        <p className="text-[#6B6B67]" style={{ fontSize: 13 }}>Đang tải danh sách lời mời...</p>
+      <div className="flex flex-col items-center justify-center p-8 bg-white dark:bg-card rounded-[10px] border border-[#E8E7E2] dark:border-border" style={{ minHeight: 300 }}>
+        <RefreshCw size={24} className="animate-spin text-[#534AB7] dark:text-primary mb-2" />
+        <p className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 13 }}>Đang tải danh sách lời mời...</p>
       </div>
     );
   }
@@ -136,13 +136,13 @@ export function InvitationsList() {
       {/* Tab Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-[#1A1A18]" style={{ fontSize: 16, fontWeight: 600, lineHeight: 1 }}>Lời mời thành viên</h2>
-          <p className="text-[#6B6B67] mt-1" style={{ fontSize: 13 }}>Theo dõi và quản lý các liên kết mời tham gia workspace</p>
+          <h2 className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 16, fontWeight: 600, lineHeight: 1 }}>Lời mời thành viên</h2>
+          <p className="text-[#6B6B67] dark:text-muted-foreground mt-1" style={{ fontSize: 13 }}>Theo dõi và quản lý các liên kết mời tham gia workspace</p>
         </div>
         <Button
           variant="outline"
           onClick={() => refetch()}
-          className="h-8 px-3 rounded-lg border-[#E8E7E2] hover:bg-[#F8F8F7] text-[#6B6B67] hover:text-[#1A1A18]"
+          className="h-8 px-3 rounded-lg border-[#E8E7E2] dark:border-border hover:bg-[#F8F8F7] dark:hover:bg-muted text-[#6B6B67] dark:text-muted-foreground hover:text-[#1A1A18] dark:hover:text-foreground"
           style={{ fontSize: 12 }}
         >
           <RefreshCw size={12} className="mr-1.5" />
@@ -151,24 +151,24 @@ export function InvitationsList() {
       </div>
 
       {activeInvitations.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-10 bg-white rounded-[10px] border border-[#E8E7E2]" style={{ minHeight: 300 }}>
-          <div className="size-12 rounded-full flex items-center justify-center mb-3" style={{ background: "#EEEDFE" }}>
-            <Mail size={20} style={{ color: "#534AB7" }} />
+        <div className="flex flex-col items-center justify-center p-10 bg-white dark:bg-card rounded-[10px] border border-[#E8E7E2] dark:border-border" style={{ minHeight: 300 }}>
+          <div className="size-12 rounded-full flex items-center justify-center mb-3 bg-[#EEEDFE] dark:bg-secondary">
+            <Mail size={20} className="text-[#534AB7] dark:text-primary" />
           </div>
-          <p className="text-[#1A1A18] mb-1" style={{ fontSize: 14, fontWeight: 600 }}>Chưa có lời mời nào</p>
-          <p className="text-[#6B6B67] text-center max-w-[320px] mb-4" style={{ fontSize: 12 }}>
+          <p className="text-[#1A1A18] dark:text-foreground mb-1" style={{ fontSize: 14, fontWeight: 600 }}>Chưa có lời mời nào</p>
+          <p className="text-[#6B6B67] dark:text-muted-foreground text-center max-w-[320px] mb-4" style={{ fontSize: 12 }}>
             Khi bạn mời một thành viên mới, link mời và trạng thái của họ sẽ được hiển thị tại đây.
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-[10px] border border-[#E8E7E2] overflow-hidden">
+        <div className="bg-white dark:bg-card rounded-[10px] border border-[#E8E7E2] dark:border-border overflow-hidden">
           <table className="w-full" style={{ borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ borderBottom: "1px solid #E8E7E2" }}>
+              <tr style={{ borderBottom: "1px solid var(--border)" }}>
                 {["Email người nhận", "Vai trò", "Trạng thái", "Ngày gửi", "Ngày hết hạn", "Liên kết mời", "Hành động"].map((col) => (
                   <th
                     key={col}
-                    className="text-left text-[#6B6B67] px-5 py-3"
+                    className="text-left text-[#6B6B67] dark:text-muted-foreground px-5 py-3"
                     style={{ fontSize: 11, fontWeight: 500 }}
                   >
                     {col}
@@ -180,20 +180,20 @@ export function InvitationsList() {
               {activeInvitations.map((inv, idx) => (
                 <tr
                   key={inv.id}
-                  className="group hover:bg-[#F8F8F7] transition-colors"
-                  style={{ borderBottom: idx < activeInvitations.length - 1 ? "1px solid #E8E7E2" : "none" }}
+                  className="group hover:bg-[#F8F8F7] dark:hover:bg-muted/50 transition-colors"
+                  style={{ borderBottom: idx < activeInvitations.length - 1 ? "1px solid var(--border)" : "none" }}
                 >
                   {/* Email */}
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
                       <Mail size={14} className="text-[#9A9A95]" />
-                      <span className="text-[#1A1A18] font-medium" style={{ fontSize: 13 }}>{inv.email}</span>
+                      <span className="text-[#1A1A18] dark:text-foreground font-medium" style={{ fontSize: 13 }}>{inv.email}</span>
                     </div>
                   </td>
 
                   {/* Role */}
                   <td className="px-5 py-3">
-                    <span className="text-[#1A1A18]" style={{ fontSize: 13 }}>
+                    <span className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 13 }}>
                       {formatRoleDisplayName(inv.role)}
                     </span>
                   </td>
@@ -205,12 +205,12 @@ export function InvitationsList() {
 
                   {/* Created At */}
                   <td className="px-5 py-3">
-                    <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>{formatDate(inv.createdAt)}</span>
+                    <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 12 }}>{formatDate(inv.createdAt)}</span>
                   </td>
 
                   {/* Expires At */}
                   <td className="px-5 py-3">
-                    <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>{formatDate(inv.expiresAt)}</span>
+                    <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 12 }}>{formatDate(inv.expiresAt)}</span>
                   </td>
 
                   {/* Invitation Link copy */}
@@ -230,7 +230,7 @@ export function InvitationsList() {
                           variant="ghost"
                           size="icon"
                           onClick={() => setEditingInv(inv)}
-                          className="size-7 rounded-lg text-[#6B6B67] hover:bg-[#EEEDFE] hover:text-[#534AB7]"
+                          className="size-7 rounded-lg text-[#6B6B67] dark:text-muted-foreground hover:bg-[#EEEDFE] dark:hover:bg-muted hover:text-[#534AB7] dark:hover:text-primary"
                           title="Chỉnh sửa lời mời"
                         >
                           <Pencil size={13} />
@@ -239,7 +239,7 @@ export function InvitationsList() {
                           variant="ghost"
                           size="icon"
                           onClick={() => setConfirmRevokeId(inv.id)}
-                          className="size-7 rounded-lg text-[#6B6B67] hover:bg-[#FEE2E2] hover:text-[#A32D2D]"
+                          className="size-7 rounded-lg text-[#6B6B67] dark:text-muted-foreground hover:bg-[#FEE2E2] dark:hover:bg-destructive/20 hover:text-[#A32D2D] dark:hover:text-destructive"
                           title="Hủy lời mời"
                         >
                           <Trash2 size={13} />
@@ -256,12 +256,12 @@ export function InvitationsList() {
 
       {/* Confirm Revoke Dialog */}
       <Dialog open={!!confirmRevokeId} onOpenChange={(v) => !v && setConfirmRevokeId(null)}>
-        <DialogContent className="sm:max-w-[400px] rounded-[10px]" aria-describedby={undefined}>
+        <DialogContent className="sm:max-w-[400px] rounded-[10px] bg-background" aria-describedby={undefined}>
           <DialogHeader>
-            <DialogTitle className="text-[#1A1A18]" style={{ fontSize: 15, fontWeight: 600 }}>Hủy lời mời</DialogTitle>
+            <DialogTitle className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 15, fontWeight: 600 }}>Hủy lời mời</DialogTitle>
           </DialogHeader>
           <div className="py-2">
-            <p className="text-[#6B6B67]" style={{ fontSize: 13 }}>
+            <p className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 13 }}>
               Bạn có chắc chắn muốn hủy lời mời này? Người nhận sẽ không thể sử dụng link mời này để kích hoạt tài khoản được nữa.
             </p>
           </div>
@@ -269,7 +269,7 @@ export function InvitationsList() {
             <Button
               variant="outline"
               onClick={() => setConfirmRevokeId(null)}
-              className="h-9 rounded-[10px] border-[#E8E7E2]"
+              className="h-9 rounded-[10px] border-[#E8E7E2] dark:border-border text-[#6B6B67] dark:text-muted-foreground hover:bg-[#F8F8F7] dark:hover:bg-muted"
               style={{ fontSize: 13 }}
             >
               Hủy bỏ
@@ -342,8 +342,8 @@ function EditInvitationDialog({
       <DialogContent className="sm:max-w-[460px] p-0 gap-0 rounded-[10px] overflow-hidden" aria-describedby={undefined}>
         
         {/* Header */}
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-[#E8E7E2]">
-          <DialogTitle className="text-[#1A1A18]" style={{ fontSize: 16, fontWeight: 600 }}>
+        <DialogHeader className="px-6 pt-6 pb-4 border-b border-[#E8E7E2] dark:border-border">
+          <DialogTitle className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 16, fontWeight: 600 }}>
             Chỉnh sửa lời mời
           </DialogTitle>
         </DialogHeader>
@@ -353,25 +353,25 @@ function EditInvitationDialog({
           
           {/* Email */}
           <div className="flex flex-col gap-1.5">
-            <Label className="text-[#1A1A18]" style={{ fontSize: 13 }}>Địa chỉ email</Label>
+            <Label className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 13 }}>Địa chỉ email</Label>
             <Input
               type="email"
               placeholder="email@congtyabc.vn"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-10 rounded-[10px] border-[#E8E7E2] text-[#1A1A18] focus-visible:ring-[#534AB7]/30 focus-visible:border-[#534AB7]"
+              className="h-10 rounded-[10px] border-[#E8E7E2] dark:border-border text-[#1A1A18] dark:text-foreground focus-visible:ring-[#534AB7]/30 focus-visible:border-[#534AB7]"
               style={{ fontSize: 13 }}
             />
           </div>
 
           {/* Role */}
           <div className="flex flex-col gap-1.5">
-            <Label className="text-[#1A1A18]" style={{ fontSize: 13 }}>Vai trò</Label>
+            <Label className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 13 }}>Vai trò</Label>
             <Select value={role} onValueChange={(v) => setRole(v)}>
-              <SelectTrigger className="h-10 rounded-[10px] border-[#E8E7E2] focus:ring-[#534AB7]/30 focus:border-[#534AB7]" style={{ fontSize: 13 }}>
+              <SelectTrigger className="h-10 rounded-[10px] border-[#E8E7E2] dark:border-border text-[#1A1A18] dark:text-foreground focus:ring-[#534AB7]/30 focus:border-[#534AB7]" style={{ fontSize: 13 }}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="rounded-[10px] border-[#E8E7E2]">
+              <SelectContent className="rounded-[10px] border-[#E8E7E2] dark:border-border bg-background">
                 {roles.map((r: any) => (
                   <SelectItem key={r.id} value={r.name} style={{ fontSize: 13 }}>
                     {formatRoleDisplayName(r.name)}
@@ -381,7 +381,7 @@ function EditInvitationDialog({
             </Select>
           </div>
 
-          <p className="text-[#6B6B67] leading-relaxed" style={{ fontSize: 11 }}>
+          <p className="text-[#6B6B67] dark:text-muted-foreground leading-relaxed" style={{ fontSize: 11 }}>
             * Lưu ý: Khi chỉnh sửa, hệ thống sẽ tự động tạo link token mới và vô hiệu hóa link cũ. Một email kích hoạt mới sẽ được tự động gửi đến địa chỉ email này.
           </p>
         </div>
@@ -391,7 +391,7 @@ function EditInvitationDialog({
           <Button
             variant="outline"
             onClick={onClose}
-            className="h-9 rounded-[10px] border-[#E8E7E2] text-[#6B6B67] hover:bg-[#F8F8F7]"
+            className="h-9 rounded-[10px] border-[#E8E7E2] dark:border-border text-[#6B6B67] dark:text-muted-foreground hover:bg-[#F8F8F7] dark:hover:bg-muted"
             style={{ fontSize: 13 }}
           >
             Hủy

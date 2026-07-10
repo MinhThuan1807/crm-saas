@@ -148,9 +148,9 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-[480px] overflow-y-auto p-5">
-        <DialogHeader className="pb-4 border-b mb-4">
-          <DialogTitle style={{ fontSize: 15, fontWeight: 600 }}>
+      <DialogContent className="max-w-[480px] overflow-y-auto p-5 bg-white dark:bg-card border dark:border-border">
+        <DialogHeader className="pb-4 border-b dark:border-border mb-4">
+          <DialogTitle className="text-foreground" style={{ fontSize: 15, fontWeight: 600 }}>
             Thêm deal
           </DialogTitle>
         </DialogHeader>
@@ -170,14 +170,13 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                       placeholder="Tên deal"
                       {...field}
                       style={{ fontSize: 13 }}
-                      className="bg-[#F8F8F7] border-[#E8E7E2]"
+                      className="bg-[#F8F8F7] dark:bg-card border-[#E8E7E2] dark:border-border text-foreground"
                     />
                   </FormControl>
                   <FormMessage style={{ fontSize: 11 }} />
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="contactId"
@@ -192,7 +191,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                     disabled={contactsLoading || isPending}
                   >
                     <FormControl>
-                      <SelectTrigger size="sm" style={{ fontSize: 13 }} className="bg-[#F8F8F7] border-[#E8E7E2]">
+                      <SelectTrigger size="sm" style={{ fontSize: 13 }} className="bg-[#F8F8F7] dark:bg-card border-[#E8E7E2] dark:border-border text-foreground">
                         <SelectValue
                           placeholder={
                             contactsLoading ? "Đang tải..." : "Chọn liên hệ"
@@ -200,7 +199,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                         />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-background border-border">
                       {contacts.map((contact) => (
                         <SelectItem
                           key={contact.id}
@@ -217,7 +216,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="h-7 px-2 text-xs text-primary bg-[#F8F8F7] hover:bg-gray-100 border border-[#E8E7E2] mt-1.5"
+                    className="h-7 px-2 text-xs text-primary bg-[#F8F8F7] dark:bg-muted hover:bg-gray-100 dark:hover:bg-muted/80 border border-[#E8E7E2] dark:border-border mt-1.5"
                     disabled={isPending}
                     onClick={() => setContactDialogOpen(true)}
                   >
@@ -227,7 +226,6 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="ownerId"
@@ -242,7 +240,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                     disabled={usersLoading || isPending}
                   >
                     <FormControl>
-                      <SelectTrigger size="sm" style={{ fontSize: 13 }}>
+                      <SelectTrigger size="sm" style={{ fontSize: 13 }} className="bg-[#F8F8F7] dark:bg-card border-[#E8E7E2] dark:border-border text-foreground">
                         <SelectValue
                           placeholder={
                             usersLoading
@@ -252,7 +250,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                         />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-background border-border">
                       {users.map((user) => (
                         <SelectItem
                           key={user.id}
@@ -285,6 +283,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                           field.onChange(event.target.valueAsNumber)
                         }
                         style={{ fontSize: 13 }}
+                        className="bg-[#F8F8F7] dark:bg-card border-[#E8E7E2] dark:border-border text-foreground"
                       />
                     </FormControl>
                     <FormMessage style={{ fontSize: 11 }} />
@@ -305,7 +304,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                         <FormControl>
                           <Button
                             variant="outline"
-                            className="w-full h-8 pl-3 text-left font-normal text-xs bg-[#F8F8F7] border border-[#E8E7E2] text-foreground hover:bg-gray-100"
+                            className="w-full h-8 pl-3 text-left font-normal text-xs bg-[#F8F8F7] dark:bg-card border border-[#E8E7E2] dark:border-border text-foreground hover:bg-gray-100 dark:hover:bg-muted"
                           >
                             {field.value ? (
                               format(new Date(field.value), "dd/MM/yyyy")
@@ -316,7 +315,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-white" align="start">
+                      <PopoverContent className="w-auto p-0 bg-white dark:bg-card border dark:border-border" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value ? new Date(field.value) : undefined}
@@ -348,7 +347,7 @@ export function CreateDealSheet({ open, onOpenChange }: CreateDealSheetProps) {
                       rows={4}
                       {...field}
                       style={{ fontSize: 13, resize: "none" }}
-                      className="bg-[#F8F8F7] border-[#E8E7E2]"
+                      className="bg-[#F8F8F7] dark:bg-card border-[#E8E7E2] dark:border-border text-foreground"
                     />
                   </FormControl>
                   <FormMessage style={{ fontSize: 11 }} />

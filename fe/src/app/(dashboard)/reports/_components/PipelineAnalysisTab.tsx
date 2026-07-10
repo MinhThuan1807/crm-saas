@@ -24,19 +24,19 @@ const FunnelTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null;
   const data = payload[0].payload;
   return (
-    <div className="bg-white border border-[#E8E7E2] rounded-lg shadow-md px-3 py-2.5 text-xs text-left">
-      <p className="text-[#1A1A18] mb-1.5" style={{ fontWeight: 600 }}>{data.stage}</p>
+    <div className="bg-white dark:bg-card border border-[#E8E7E2] dark:border-border rounded-lg shadow-md px-3 py-2.5 text-xs text-left">
+      <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontWeight: 600 }}>{data.stage}</p>
       <div className="space-y-1">
         <div className="flex justify-between gap-6">
-          <span className="text-[#6B6B67]">Số lượng deal:</span>
-          <span className="text-[#1A1A18] font-semibold">{data.count} deals</span>
+          <span className="text-[#6B6B67] dark:text-muted-foreground">Số lượng deal:</span>
+          <span className="text-[#1A1A18] dark:text-foreground font-semibold">{data.count} deals</span>
         </div>
         <div className="flex justify-between gap-6">
-          <span className="text-[#6B6B67]">Tổng giá trị:</span>
-          <span className="text-[#1A1A18] font-semibold">{formatVndShort(data.value)}</span>
+          <span className="text-[#6B6B67] dark:text-muted-foreground">Tổng giá trị:</span>
+          <span className="text-[#1A1A18] dark:text-foreground font-semibold">{formatVndShort(data.value)}</span>
         </div>
         <div className="flex justify-between gap-6">
-          <span className="text-[#6B6B67]">Tỷ lệ chuyển đổi:</span>
+          <span className="text-[#6B6B67] dark:text-muted-foreground">Tỷ lệ chuyển đổi:</span>
           <span className="text-[#1E90FF] font-semibold">{data.percentage}%</span>
         </div>
       </div>
@@ -47,15 +47,15 @@ const FunnelTooltip = ({ active, payload }: any) => {
 const ForecastTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-[#E8E7E2] rounded-lg shadow-md px-3 py-2.5 text-xs text-left">
-      <p className="text-[#1A1A18] mb-1.5" style={{ fontWeight: 600 }}>Tháng {label.replace("T", "")}</p>
+    <div className="bg-white dark:bg-card border border-[#E8E7E2] dark:border-border rounded-lg shadow-md px-3 py-2.5 text-xs text-left">
+      <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontWeight: 600 }}>Tháng {label.replace("T", "")}</p>
       {payload.map((p: any) => (
         <div key={p.dataKey} className="flex justify-between items-center gap-6 mb-1 last:mb-0">
           <div className="flex items-center gap-1.5">
             <span className="size-2 rounded-full shrink-0" style={{ background: p.color ?? p.fill }} />
-            <span className="text-[#6B6B67]">{p.name}:</span>
+            <span className="text-[#6B6B67] dark:text-muted-foreground">{p.name}:</span>
           </div>
-          <span className="text-[#1A1A18] font-semibold">{formatVndShort(p.value)}</span>
+          <span className="text-[#1A1A18] dark:text-foreground font-semibold">{formatVndShort(p.value)}</span>
         </div>
       ))}
     </div>
@@ -109,7 +109,7 @@ export function PipelineAnalysisTab() {
                   <YAxis
                     dataKey="stage"
                     type="category"
-                    tick={{ fontSize: 11, fill: "#1A1A18", fontWeight: 500 }}
+                    tick={{ fontSize: 11, fill: "var(--foreground)", fontWeight: 500 }}
                     axisLine={false}
                     tickLine={false}
                     width={110}
@@ -119,7 +119,7 @@ export function PipelineAnalysisTab() {
                     dataKey="percentage"
                     radius={[0, 4, 4, 0]}
                     maxBarSize={22}
-                    background={{ fill: "#F1EFE8", radius: 4 }}
+                    background={{ fill: "var(--muted)", radius: 4 }}
                   >
                     {data.conversionFunnel.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={getFunnelColor(entry.stage)} />
@@ -129,11 +129,11 @@ export function PipelineAnalysisTab() {
               </ResponsiveContainer>
 
               {/* Funnel breakdown legends */}
-              <div className="grid grid-cols-4 border-t border-[#E8E7E2] pt-4 text-center">
+              <div className="grid grid-cols-4 border-t border-[#E8E7E2] dark:border-border pt-4 text-center">
                 {data.conversionFunnel.map((d) => (
-                  <div key={d.stage} className="flex flex-col gap-1 border-r border-[#E8E7E2] last:border-0">
-                    <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>{d.stage.split(" (")[0].split(". ")[1] || d.stage}</span>
-                    <span className="text-[#1A1A18] font-bold" style={{ fontSize: 13 }}>{d.count}</span>
+                  <div key={d.stage} className="flex flex-col gap-1 border-r border-[#E8E7E2] dark:border-border last:border-0">
+                    <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 10 }}>{d.stage.split(" (")[0].split(". ")[1] || d.stage}</span>
+                    <span className="text-[#1A1A18] dark:text-foreground font-bold" style={{ fontSize: 13 }}>{d.count}</span>
                     <span className="font-semibold" style={{ fontSize: 10, color: getFunnelColor(d.stage) }}>{d.percentage}%</span>
                   </div>
                 ))}
@@ -144,26 +144,26 @@ export function PipelineAnalysisTab() {
 
         {/* Funnel bottlenecks summary cards */}
         <div className="flex flex-col gap-4 justify-between">
-          <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-5 flex flex-col gap-3 flex-1 shadow-sm">
-            <h4 className="text-[#1A1A18] font-bold text-xs" style={{ fontSize: 13 }}>Phân tích điểm nghẽn (Bottlenecks)</h4>
+          <div className="bg-white dark:bg-card rounded-[10px] border border-[#E8E7E2] dark:border-border p-5 flex flex-col gap-3 flex-1 shadow-sm">
+            <h4 className="text-[#1A1A18] dark:text-foreground font-bold text-xs" style={{ fontSize: 13 }}>Phân tích điểm nghẽn (Bottlenecks)</h4>
             <div className="space-y-3 mt-1.5">
               {isFunnelEmpty ? (
-                <p className="text-[#6B6B67] text-xs">Chưa có đủ dữ liệu phễu chuyển đổi để phân tích điểm nghẽn hiện tại.</p>
+                <p className="text-[#6B6B67] dark:text-muted-foreground text-xs">Chưa có đủ dữ liệu phễu chuyển đổi để phân tích điểm nghẽn hiện tại.</p>
               ) : data.bottlenecks.length === 0 ? (
-                <p className="text-[#6B6B67] text-xs">Không phát hiện điểm nghẽn nghiêm trọng nào trong phễu chuyển đổi hiện tại.</p>
+                <p className="text-[#6B6B67] dark:text-muted-foreground text-xs">Không phát hiện điểm nghẽn nghiêm trọng nào trong phễu chuyển đổi hiện tại.</p>
               ) : (
                 data.bottlenecks.map((b, idx) => (
                   <div key={idx} className="flex items-start gap-2.5">
                     <span className={`size-5 rounded-full font-bold flex items-center justify-center text-xs shrink-0 ${
-                      b.type === "warning" ? "bg-[#FEE2E2] text-[#A32D2D]" : "bg-[#E6F6F0] text-[#1D9E75]"
+                      b.type === "warning" ? "bg-[#FEE2E2] dark:bg-destructive/20 text-[#A32D2D] dark:text-destructive" : "bg-[#E6F6F0] dark:bg-secondary text-[#1D9E75] dark:text-primary"
                     }`}>
                       {b.type === "warning" ? "!" : "✓"}
                     </span>
                     <div>
-                      <p className="text-[#1A1A18] font-medium text-xs" style={{ fontSize: 12 }}>
+                      <p className="text-[#1A1A18] dark:text-foreground font-medium text-xs" style={{ fontSize: 12 }}>
                         {b.title}
                       </p>
-                      <p className="text-[#6B6B67]" style={{ fontSize: 11 }}>
+                      <p className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 11 }}>
                         {b.description}
                       </p>
                     </div>
@@ -194,17 +194,17 @@ export function PipelineAnalysisTab() {
             <div className="flex items-center gap-3 mr-1">
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm shrink-0" style={{ background: "#534AB7" }} />
-                <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Đã đạt</span>
+                <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 11 }}>Đà đạt</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded-sm shrink-0" style={{ background: "#877EF2" }} />
-                <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Dự báo (Weighted)</span>
+                <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 11 }}>Dự báo (Weighted)</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <svg width="16" height="8">
                   <line x1="0" y1="4" x2="16" y2="4" stroke="#FBBF24" strokeWidth="2" strokeDasharray="4 2" />
                 </svg>
-                <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Chỉ tiêu Target</span>
+                <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 11 }}>Chỉ tiêu Target</span>
               </div>
             </div>
           )
@@ -220,9 +220,9 @@ export function PipelineAnalysisTab() {
         ) : (
           <ResponsiveContainer width="100%" height={260}>
             <ComposedChart data={data.weightedForecast} margin={{ top: 10, right: 16, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={formatVndShort} width={50} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} tickFormatter={formatVndShort} width={50} />
               <Tooltip content={<ForecastTooltip />} />
               
               {/* Cum Actual Area */}

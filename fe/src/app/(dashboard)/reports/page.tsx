@@ -38,9 +38,9 @@ interface KpiProps {
 
 function KpiCard({ label, value, delta, up, subtext }: KpiProps) {
   return (
-    <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-2.5 shadow-sm">
-      <p className="text-[#6B6B67]" style={{ fontSize: 11 }}>{label}</p>
-      <p className="text-[#1A1A18]" style={{ fontSize: 22, fontWeight: 700, lineHeight: 1 }}>
+    <div className="bg-white dark:bg-card rounded-[10px] border border-[#E8E7E2] dark:border-border p-4 flex flex-col gap-2.5 shadow-sm">
+      <p className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 11 }}>{label}</p>
+      <p className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 22, fontWeight: 700, lineHeight: 1 }}>
         {value}
       </p>
       <div className="flex items-center gap-1.5">
@@ -51,7 +51,7 @@ function KpiCard({ label, value, delta, up, subtext }: KpiProps) {
           {delta}
         </span>
         {subtext && (
-          <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>{subtext}</span>
+          <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 10 }}>{subtext}</span>
         )}
       </div>
     </div>
@@ -74,18 +74,18 @@ export default function ReportsPage() {
   });
 
   return (
-    <div className="flex flex-col flex-1 min-w-0 overflow-hidden bg-[#F8F8F7]">
+    <div className="flex flex-col flex-1 min-w-0 overflow-hidden bg-[#F8F8F7] dark:bg-background">
 
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
       <header
-        className="shrink-0 border-b border-[#E8E7E2] bg-white flex items-center justify-between px-6 gap-4"
+        className="shrink-0 border-b border-[#E8E7E2] dark:border-border bg-white dark:bg-card flex items-center justify-between px-6 gap-4"
         style={{ height: 64 }}
       >
         <div>
-          <h1 className="text-[#1A1A18] tracking-tight" style={{ fontSize: 15, fontWeight: 600, lineHeight: 1 }}>
+          <h1 className="text-[#1A1A18] dark:text-foreground tracking-tight" style={{ fontSize: 15, fontWeight: 600, lineHeight: 1 }}>
             Reports
           </h1>
-          <p className="text-[#6B6B67] mt-1" style={{ fontSize: 12 }}>
+          <p className="text-[#6B6B67] dark:text-muted-foreground mt-1" style={{ fontSize: 12 }}>
             Phân tích &amp; Báo cáo chuyên sâu
           </p>
         </div>
@@ -93,18 +93,18 @@ export default function ReportsPage() {
         <div className="flex items-center gap-2 shrink-0">
           {/* Date range pill */}
           <button
-            className="flex items-center gap-2 h-8 px-3 rounded-lg border border-[#E8E7E2] bg-white hover:bg-[#F8F8F7] transition-colors cursor-pointer"
-            style={{ fontSize: 12, color: "#1A1A18" }}
+            className="flex items-center gap-2 h-8 px-3 rounded-lg border border-[#E8E7E2] dark:border-border bg-white dark:bg-card hover:bg-[#F8F8F7] dark:hover:bg-muted transition-colors cursor-pointer"
+            style={{ fontSize: 12, color: "var(--foreground)" }}
           >
-            <Calendar size={13} className="text-[#6B6B67]" />
+            <Calendar size={13} className="text-[#6B6B67] dark:text-muted-foreground" />
             <span>01/01/2026 – 31/12/2026</span>
-            <ChevronDown size={12} className="text-[#6B6B67]" />
+            <ChevronDown size={12} className="text-[#6B6B67] dark:text-muted-foreground" />
           </button>
 
           {/* Export CSV */}
           <button
-            className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#E8E7E2] bg-white hover:bg-[#F8F8F7] transition-colors cursor-pointer"
-            style={{ fontSize: 12, color: "#6B6B67" }}
+            className="flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#E8E7E2] dark:border-border bg-white dark:bg-card hover:bg-[#F8F8F7] dark:hover:bg-muted transition-colors cursor-pointer"
+            style={{ fontSize: 12, color: "var(--muted-foreground)" }}
           >
             <Download size={13} />
             Xuất CSV
@@ -125,7 +125,7 @@ export default function ReportsPage() {
 
       {/* ── Tab bar ─────────────────────────────────────────────────────────── */}
       <div
-        className="shrink-0 bg-white border-b border-[#E8E7E2] flex items-end px-6 gap-0"
+        className="shrink-0 bg-white dark:bg-card border-b border-[#E8E7E2] dark:border-border flex items-end px-6 gap-0"
         style={{ height: 44 }}
       >
         {TABS.map((tab) => {
@@ -138,10 +138,10 @@ export default function ReportsPage() {
               style={{
                 fontSize: 13,
                 fontWeight: active ? 500 : 400,
-                color: active ? "#534AB7" : "#6B6B67",
+                color: active ? "var(--primary)" : "var(--muted-foreground)",
                 background: "transparent",
                 border: "none",
-                borderBottom: active ? "2px solid #534AB7" : "2px solid transparent",
+                borderBottom: active ? "2px solid var(--primary)" : "2px solid transparent",
               }}
             >
               <tab.Icon size={13} />
@@ -208,20 +208,20 @@ export default function ReportsPage() {
                   <div className="col-span-2">
                     <WinLossChart data={overviewData.winLossData} />
                   </div>
-                  <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-5 flex flex-col justify-between">
+                  <div className="bg-white dark:bg-card rounded-[10px] border border-[#E8E7E2] dark:border-border p-5 flex flex-col justify-between">
                     <div>
-                      <h4 className="text-[#1A1A18] font-bold text-xs" style={{ fontSize: 13 }}>Tỷ lệ chốt Sales</h4>
-                      <p className="text-[#6B6B67] mt-1.5" style={{ fontSize: 11 }}>
+                      <h4 className="text-[#1A1A18] dark:text-foreground font-bold text-xs" style={{ fontSize: 13 }}>Tỷ lệ chốt Sales</h4>
+                      <p className="text-[#6B6B67] dark:text-muted-foreground mt-1.5" style={{ fontSize: 11 }}>
                         Thống kê tỷ lệ thắng (Win) và thua (Loss) của các Deal đã đóng trong kỳ.
                       </p>
                     </div>
                     
                     {/* Hiển thị chỉ số KPI Win Rate thực tế để lấp khoảng trống ở giữa */}
                     <div className="flex flex-col items-center justify-center py-6">
-                      <span className="text-[#534AB7] text-4xl font-bold tracking-tight">
+                      <span className="text-[#534AB7] dark:text-primary text-4xl font-bold tracking-tight">
                         {overviewData.kpis.winRate.value}%
                       </span>
-                      <span className="text-[#6B6B67] mt-1" style={{ fontSize: 11 }}>
+                      <span className="text-[#6B6B67] dark:text-muted-foreground mt-1" style={{ fontSize: 11 }}>
                         Tỷ lệ thắng trung bình kỳ này
                       </span>
                       <div className="flex items-center gap-1 mt-2">
@@ -234,11 +234,11 @@ export default function ReportsPage() {
                         >
                           {overviewData.kpis.winRate.delta}
                         </span>
-                        <span className="text-[#6B6B67] text-[10px]">so với kỳ trước</span>
+                        <span className="text-[#6B6B67] dark:text-muted-foreground text-[10px]">so với kỳ trước</span>
                       </div>
                     </div>
 
-                    <div className="text-[#1A1A18] font-semibold text-xs border-t border-[#E8E7E2] pt-4" style={{ fontSize: 11 }}>
+                    <div className="text-[#1A1A18] dark:text-foreground font-semibold text-xs border-t border-[#E8E7E2] dark:border-border pt-4" style={{ fontSize: 11 }}>
                       Tỷ lệ thắng là tỷ trọng phần trăm số lượng Deal chốt thành công trên tổng số Deal đã kết thúc.
                     </div>
                   </div>

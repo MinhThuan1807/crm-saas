@@ -293,7 +293,7 @@ export function DealAiAnalyzer({ dealId }: DealAiAnalyzerProps) {
             rows={phase === "idle" ? 10 : 5}
             className={cn(
               "resize-none border-border focus-visible:border-primary transition-all duration-300",
-              (isStreaming || phase === "analyzing") && "bg-[#F8F8F7] text-muted-foreground"
+              (isStreaming || phase === "analyzing") && "bg-[#F8F8F7] dark:bg-muted text-muted-foreground"
             )}
             style={{ fontSize: 12, lineHeight: 1.75 }}
           />
@@ -321,7 +321,7 @@ export function DealAiAnalyzer({ dealId }: DealAiAnalyzerProps) {
             )}
           </Button>
           {errorMsg && (
-            <div className="mt-2 text-xs text-red-500 bg-red-50/50 border border-red-100 rounded-lg p-2.5 animate-in fade-in duration-300">
+            <div className="mt-2 text-xs text-red-500 bg-red-50/50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/50 rounded-lg p-2.5 animate-in fade-in duration-300">
               {errorMsg}
             </div>
           )}
@@ -386,7 +386,7 @@ export function DealAiAnalyzer({ dealId }: DealAiAnalyzerProps) {
                     "flex items-start gap-2.5 px-3 py-2.5 rounded-lg border cursor-pointer transition-all",
                     "animate-in fade-in slide-in-from-bottom-1 duration-300",
                     task.done
-                      ? "border-green-100 bg-green-50/50"
+                      ? "border-green-100 dark:border-green-950/60 bg-green-50/50 dark:bg-green-950/20"
                       : "border-border bg-background hover:bg-muted/20"
                   )}
                   style={{ animationDelay: `${i * 50}ms` }}
@@ -445,7 +445,7 @@ export function DealAiAnalyzer({ dealId }: DealAiAnalyzerProps) {
                     variant={tasksAccepted ? "outline" : "default"}
                     className={cn(
                       "w-full h-8 text-xs gap-1.5 transition-all",
-                      tasksAccepted && "bg-green-50 text-green-700 hover:bg-green-50 border-green-200"
+                      tasksAccepted && "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/40 border-green-200 dark:border-green-900"
                     )}
                   >
                     {isAccepting ? (
@@ -503,7 +503,7 @@ export function DealAiAnalyzer({ dealId }: DealAiAnalyzerProps) {
                 value={emailText}
                 onChange={(e) => setEmailText(e.target.value)}
                 rows={12}
-                className="resize-none border-primary/50 bg-[#F8F8F7] focus-visible:ring-primary/20"
+                className="resize-none border-primary/50 bg-[#F8F8F7] dark:bg-card text-foreground focus-visible:ring-primary/20"
                 style={{ fontSize: 12, lineHeight: 1.75 }}
                 autoFocus
               />
@@ -544,7 +544,7 @@ export function DealAiAnalyzer({ dealId }: DealAiAnalyzerProps) {
                 variant={copied ? "outline" : "default"}
                 className={cn(
                   "h-7 gap-1 text-xs transition-all",
-                  copied && "bg-green-50 text-green-700 hover:bg-green-50 border-green-200"
+                  copied && "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/40 border-green-200 dark:border-green-900"
                 )}
               >
                 {copied ? <Check size={11} /> : <Copy size={11} />}

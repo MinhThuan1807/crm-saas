@@ -14,15 +14,15 @@ import { reportsService } from "@/services/reports.service";
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-[#E8E7E2] rounded-lg shadow-md px-3 py-2.5 text-xs text-left">
-      <p className="text-[#1A1A18] mb-1.5" style={{ fontWeight: 600 }}>{label}</p>
+    <div className="bg-white dark:bg-card border border-[#E8E7E2] dark:border-border rounded-lg shadow-md px-3 py-2.5 text-xs text-left">
+      <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontWeight: 600 }}>{label}</p>
       {payload.map((p: any) => (
         <div key={p.name} className="flex justify-between items-center gap-6 mb-1 last:mb-0">
           <div className="flex items-center gap-1.5">
             <span className="size-2 rounded-full shrink-0" style={{ background: p.fill }} />
-            <span className="text-[#6B6B67]">{p.name}:</span>
+            <span className="text-[#6B6B67] dark:text-muted-foreground">{p.name}:</span>
           </div>
-          <span className="text-[#1A1A18] font-semibold">{p.value}</span>
+          <span className="text-[#1A1A18] dark:text-foreground font-semibold">{p.value}</span>
         </div>
       ))}
     </div>
@@ -83,25 +83,25 @@ export function ActivityReportTab({ startDate, endDate }: ActivityReportTabProps
     <div className="flex flex-col gap-5">
       {/* Row 1: KPI Cards */}
       <div className="grid grid-cols-4 gap-4">
-        <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-1.5 shadow-sm">
-          <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Tỷ lệ Gọi / Hẹn gặp</span>
-          <span className="text-[#1A1A18] font-bold" style={{ fontSize: 20 }}>{callMeetingRatio} : 1</span>
-          <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>Số cuộc gọi trung bình để có 1 cuộc hẹn</span>
+        <div className="bg-white dark:bg-card rounded-[10px] border border-[#E8E7E2] dark:border-border p-4 flex flex-col gap-1.5 shadow-sm">
+          <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 11 }}>Tỷ lệ Gọi / Hẹn gặp</span>
+          <span className="text-[#1A1A18] dark:text-foreground font-bold" style={{ fontSize: 20 }}>{callMeetingRatio} : 1</span>
+          <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 10 }}>Số cuộc gọi trung bình để có 1 cuộc hẹn</span>
         </div>
-        <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-1.5 shadow-sm">
-          <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Tổng số cuộc hẹn</span>
-          <span className="text-[#1A1A18] font-bold" style={{ fontSize: 20 }}>{totalMeetings}</span>
-          <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>Tổng số cuộc họp đã tổ chức trong kỳ</span>
+        <div className="bg-white dark:bg-card rounded-[10px] border border-[#E8E7E2] dark:border-border p-4 flex flex-col gap-1.5 shadow-sm">
+          <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 11 }}>Tổng số cuộc hẹn</span>
+          <span className="text-[#1A1A18] dark:text-foreground font-bold" style={{ fontSize: 20 }}>{totalMeetings}</span>
+          <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 10 }}>Tổng số cuộc họp đã tổ chức trong kỳ</span>
         </div>
-        <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-1.5 shadow-sm">
-          <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Nhiệm vụ hoàn thành</span>
-          <span className="text-[#1A1A18] font-bold" style={{ fontSize: 20 }}>{totalTasks}</span>
-          <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>Số lượng đầu việc hoàn thành trong kỳ</span>
+        <div className="bg-white dark:bg-card rounded-[10px] border border-[#E8E7E2] dark:border-border p-4 flex flex-col gap-1.5 shadow-sm">
+          <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 11 }}>Nhiệm vụ hoàn thành</span>
+          <span className="text-[#1A1A18] dark:text-foreground font-bold" style={{ fontSize: 20 }}>{totalTasks}</span>
+          <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 10 }}>Số lượng đầu việc hoàn thành trong kỳ</span>
         </div>
-        <div className="bg-white rounded-[10px] border border-[#E8E7E2] p-4 flex flex-col gap-1.5 shadow-sm">
-          <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>Nhiệm vụ trễ hạn (Overdue)</span>
+        <div className="bg-white dark:bg-card rounded-[10px] border border-[#E8E7E2] dark:border-border p-4 flex flex-col gap-1.5 shadow-sm">
+          <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 11 }}>Nhiệm vụ trễ hạn (Overdue)</span>
           <span className="text-[#D85A30] font-bold" style={{ fontSize: 20 }}>{overduePercent}%</span>
-          <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>Cần tập trung giải quyết việc quá hạn</span>
+          <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 10 }}>Cần tập trung giải quyết việc quá hạn</span>
         </div>
       </div>
 
@@ -118,7 +118,7 @@ export function ActivityReportTab({ startDate, endDate }: ActivityReportTabProps
                   {LEGEND.map((l) => (
                     <div key={l.name} className="flex items-center gap-1">
                       <div className="size-2.5 rounded-sm shrink-0" style={{ background: l.color }} />
-                      <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>{l.name}</span>
+                      <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 11 }}>{l.name}</span>
                     </div>
                   ))}
                 </div>
@@ -135,9 +135,9 @@ export function ActivityReportTab({ startDate, endDate }: ActivityReportTabProps
             ) : (
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={data.trend} margin={{ top: 10, right: 16, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
-                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} width={30} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} width={30} />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="Calls" stackId="activities" name="Calls" fill="#534AB7" />
                   <Bar dataKey="Emails" stackId="activities" name="Emails" fill="#7F77DD" />
@@ -188,9 +188,9 @@ export function ActivityReportTab({ startDate, endDate }: ActivityReportTabProps
                   <div key={d.name} className="flex flex-col items-center text-center">
                     <div className="flex items-center gap-1 mb-0.5">
                       <div className="size-2 rounded-full shrink-0" style={{ background: STATUS_COLORS[d.name] || "#6B6B67" }} />
-                      <span className="text-[#6B6B67]" style={{ fontSize: 10 }}>{d.name}</span>
+                      <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 10 }}>{d.name}</span>
                     </div>
-                    <span className="text-[#1A1A18] font-bold" style={{ fontSize: 12 }}>{d.value}%</span>
+                    <span className="text-[#1A1A18] dark:text-foreground font-bold" style={{ fontSize: 12 }}>{d.value}%</span>
                   </div>
                 ))}
               </div>

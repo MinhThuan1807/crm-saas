@@ -59,7 +59,7 @@ export default function ActivityTimeline({
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto bg-[#F8F8F7]">
+    <div className="flex-1 flex flex-col overflow-y-auto bg-[#F8F8F7] dark:bg-background">
       {/* ── Log activity form ── */}
       <LogActivityForm
         onSubmit={onSubmitActivity}
