@@ -1,7 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
-// Dùng Next.js proxy (/api/*) thay vì gọi thẳng cross-origin
-// Giúp cookie sameSite: 'lax' hoạt động vì FE và proxy cùng origin
+// Use Next.js proxy (/api/*) instead of calling directly cross-origin
+// Helps sameSite: 'lax' cookie work since FE and proxy share the same origin
 const baseUrl = "/api/";
 
 type RetryConfig = InternalAxiosRequestConfig & {
@@ -17,7 +17,7 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-// refreshClient dùng cùng baseURL proxy, không cần timeout dài
+// refreshClient uses same proxy baseURL, no need for long timeout
 const refreshClient = axios.create({
   baseURL: baseUrl,
   withCredentials: true,
@@ -26,8 +26,8 @@ const refreshClient = axios.create({
 
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (value?: any) => void;
-  reject: (reason?: any) => void;
+  resolve: (value?: unknown) => void;
+  reject: (reason?: unknown) => void;
 }> = [];
 
 const processQueue = (error: unknown) => {
@@ -46,7 +46,7 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as RetryConfig | undefined;
 
-    // Không phải lỗi 401, không có config, hoặc là request login/register -> reject bình thường
+    // Not a 401 error, no config, or it's a login/register request -> reject normally
     if (
       !originalRequest ||
       error.response?.status !== 401 ||
@@ -56,7 +56,7 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Nếu chính request refresh-token bị 401, hoặc đã retry rồi → logout
+    // If refresh-token request itself is 401, or already retried -> logout
     if (
       originalRequest.url?.includes("auth/refresh-token") ||
       originalRequest._retry
@@ -69,21 +69,21 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Nếu đang refresh, đưa request vào queue chờ
+    // If refreshing, push request to queue
     if (isRefreshing) {
       return new Promise((resolve, reject) => {
         failedQueue.push({ resolve, reject });
       })
         .then(() => {
-          // Đánh dấu _retry SAU khi đã được queue resolve
-          // để tránh redirect nhầm nếu retry này cũng 401
+          // Mark _retry AFTER queue resolved
+          // to avoid wrong redirect if this retry also 401
           originalRequest._retry = true;
           return axiosInstance(originalRequest);
         })
         .catch((err) => Promise.reject(err));
     }
 
-    // Bắt đầu refresh
+    // Start refresh
     originalRequest._retry = true;
     isRefreshing = true;
 

@@ -17,7 +17,7 @@ export const ActivityTypeEnum = z.enum([
   ActivityType.NOTE,
 ]);
 
-// ─── ACTIVITY ITEM — shape đầy đủ từ API (có relations) ──────────────────────
+// ─── ACTIVITY ITEM — full shape from API (with relations) ──────────────────────
 export const ActivityItemSchema = z.object({
   id: z.string(),
   tenantId: z.string(),
@@ -114,7 +114,7 @@ export type CreateActivityForDealBodyType = z.infer<
 >;
 
 // ─── UPDATE — PATCH /activities/:id ──────────────────────────────────────────
-// Partial, ít nhất 1 field — dùng cho ActivityForm (edit mode) + zodResolver
+// Partial, at least 1 field — used for ActivityForm (edit mode) + zodResolver
 export const UpdateActivityBodySchema = z
   .object({
     type: ActivityTypeEnum.optional(),
@@ -129,8 +129,8 @@ export const UpdateActivityBodySchema = z
 
 export type UpdateActivityBodyType = z.infer<typeof UpdateActivityBodySchema>;
 
-// ─── FORM SCHEMA — dùng cho ActivityForm (create + edit) ─────────────────────
-// Không strict vì shadcn Dialog inject thêm fields nội bộ
+// ─── FORM SCHEMA — used for ActivityForm (create + edit) ─────────────────────
+// Not strict because shadcn Dialog injects internal fields
 export const ActivityFormSchema = z.object({
   type: ActivityTypeEnum,
   title: z.string().nullable().optional(),

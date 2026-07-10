@@ -5,7 +5,7 @@ export function relativeTime(dateStr: string | Date): string {
     (now.getTime() - then.getTime()) / (1000 * 60 * 60 * 24),
   );
 
-  // Xử lý các ngày trong tương lai (khi then > now)
+  // Handle future dates (when then > now)
   if (diff < 0) {
     const futureDiff = Math.abs(diff);
     if (futureDiff === 1) return "Ngày mai";
@@ -41,12 +41,12 @@ export function formatDate(dateStr: string | Date): string {
 }
 
 export function getInitials(name: string): string {
-  // Tách tên thành các phần bằng khoảng trắng
+  // Split name into parts by whitespace
   const parts = name.trim().split(/\s+/);
-  // Nếu chỉ có 1 từ, lấy 2 ký tự đầu: "NGUYỄN" → "NG"
+  // If only 1 word, take first 2 characters: "NGUYỄN" -> "NG"
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   
-  // Lấy ký tự đầu của 2 từ cuối: "NGUYỄN MINH THUẬN" → "M" + "T" = "MT"
+  // Take first character of last 2 words: "NGUYỄN MINH THUẬN" -> "M" + "T" = "MT"
   const second = parts[parts.length - 2];
   const last   = parts[parts.length - 1];
   return (second[0] + last[0]).toUpperCase();

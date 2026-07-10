@@ -13,7 +13,7 @@ export const UserSchema = z.object({
   updatedAt: z.coerce.date(),
 })
 
-// createdAt: z.coerce.date() auto convert string to date, nếu ko convert được sẽ lỗi validation. Tương tự với updatedAt
+// createdAt: z.coerce.date() auto convert string to date, if conversion fails it will throw validation error. Same for updatedAt
 // updatedAt: z.coerce.date()
 
 export type UserType = z.infer<typeof UserSchema>;

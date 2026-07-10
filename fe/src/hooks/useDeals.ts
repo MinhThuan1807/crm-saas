@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { dealsService } from "@/services/deals.service";
 import { useDealPipelineStore } from "@/stores/dealCards-store";
 import { useShallow } from 'zustand/react/shallow'
-import { ApiError } from "@/types/error.type";
+import { ApiError } from "@/lib/types/error";
 import {
   CreateDealBodyType,
   DealStage,
@@ -25,7 +25,7 @@ export const dealKeys = {
 };
 
 // ─────────────────────────────────────────
-// GET PIPELINE — fetch và sync vào Zustand
+// GET PIPELINE — fetch and sync to Zustand
 // ─────────────────────────────────────────
 export const useGetPipeline = () => {
 
@@ -64,7 +64,7 @@ export const useGetPipeline = () => {
 };
 
 // ─────────────────────────────────────────
-// GET DEAL DETAIL — dùng ở trang /pipeline/[id]
+// GET DEAL DETAIL — used on /pipeline/[id] page
 // ─────────────────────────────────────────
 export const useGetDealDetail = (id: string) => {
   return useQuery({
@@ -84,7 +84,7 @@ export const useCreateDeal = () => {
   return useMutation({
     mutationFn: (data: CreateDealBodyType) => dealsService.create(data),
     onSuccess: () => {
-      // invalidate pipeline để refetch và sync lại store
+      // invalidate pipeline to refetch and sync back to store
       queryClient.invalidateQueries({ queryKey: dealKeys.pipeline() });
       toast.success("Tạo deal thành công");
     },
@@ -113,8 +113,8 @@ export const useUpdateDealStage = () => {
       data: UpdateDealStageBodyType;
     }) => dealsService.updateStage(id, data),
 
-    // optimistic update đã được gọi trước ở KanbanBoard (moveDeal)
-    // nếu API thất bại → rollback
+    // optimistic update was already called in KanbanBoard (moveDeal)
+    // if API fails -> rollback
     onError: (error: ApiError, { id, from, to }) => {
       rollbackMoveDeal(id, from, to);
       const message = error.response?.data.message ?? "Cập nhật stage thất bại";
@@ -122,7 +122,7 @@ export const useUpdateDealStage = () => {
     },
 
     onSuccess: () => {
-      // invalidate để đảm bảo server state đồng bộ
+      // invalidate to ensure server state is synchronized
       queryClient.invalidateQueries({ queryKey: dealKeys.pipeline() });
     },
   });
@@ -137,7 +137,7 @@ export const useUpdateDeal = (dealId: string) => {
   return useMutation({
     mutationFn: (data: UpdateDealBodyType) => dealsService.update(dealId, data),
     onSuccess: () => {
-      // invalidate cả pipeline lẫn detail
+      // invalidate both pipeline and detail
       queryClient.invalidateQueries({ queryKey: dealKeys.pipeline() });
       queryClient.invalidateQueries({ queryKey: dealKeys.detail(dealId) });
       toast.success("Cập nhật deal thành công");
@@ -160,7 +160,7 @@ export const useDeleteDeal = () => {
     mutationFn: ({ id }: { id: string; stage: DealStage }) =>
       dealsService.delete(id),
 
-    // optimistic: xóa khỏi store ngay lập tức
+    // optimistic: delete from store immediately
     onMutate: ({ id, stage }) => {
       removeDeal(id, stage);
     },
@@ -171,7 +171,7 @@ export const useDeleteDeal = () => {
     },
 
     onError: (error: ApiError) => {
-      // rollback: refetch lại pipeline để restore deal bị xóa nhầm
+      // rollback: refetch pipeline to restore accidentally deleted deal
       queryClient.invalidateQueries({ queryKey: dealKeys.pipeline() });
       const message = error.response?.data.message ?? "Xóa deal thất bại";
       toast.error(message);

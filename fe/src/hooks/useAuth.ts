@@ -16,18 +16,18 @@ export const useLogin = () => {
 
     onSuccess: () => {
       toast.success("Đăng nhập thành công");
-      router.push("/");
+      router.push("/dashboard");
     },
 
     onError: (error: ApiError) => {
       const message = error.response?.data.message || "Đăng nhập thất bại";
-      // let message = "Đăng nhập thất bại";
+      // let message = "Login failed";
 
       // if (typeof data?.message === "string") {
       //   message = data.message;
       // } else if (Array.isArray(data?.message) && data.message.length > 0) {
-      //   // Lấy message từ phần tử đầu tiên trong array
-      //   message = data.message[0]?.message || "Đăng nhập thất bại";
+      //   // Get message from the first element in array
+      //   message = data.message[0]?.message || "Login failed";
       // }
       toast.error(message);
     },

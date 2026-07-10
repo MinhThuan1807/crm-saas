@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/api";
-import { LoginFormValues, RegisterFormValues } from "../types/auth.type";
+import { LoginFormValues, RegisterFormValues } from "@/lib/types/auth";
 import { RegisterBodyType } from "@/lib/validations/auth.schema";
 
 export const authService = {
@@ -21,7 +21,7 @@ export const authService = {
     name: string;
     role: string;
     tenantId: string;
-    permissions: { action: string; subject: string; conditions?: any }[];
+    permissions: { action: string; subject: string; conditions?: Record<string, unknown> | null }[];
   }> => {
     const response = await axiosInstance.get("auth/me");
     return response.data;

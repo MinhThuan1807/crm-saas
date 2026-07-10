@@ -25,7 +25,7 @@ type PipelineActions = {
   setPipeline: (data: PipelineRes) => void;
   moveDeal: (dealId: string, from: DealStage, to: DealStage) => void;
   rollbackMoveDeal: (dealId: string, from: DealStage, to: DealStage) => void;
-  // Reorder trong cùng cột (sort)
+  // Reorder in same column (sort)
   reorderDeal: (stage: DealStage, fromIndex: number, toIndex: number) => void;
   updateDeal: (deal: DealCard) => void;
   removeDeal: (dealId: string, stage: DealStage) => void;
@@ -44,7 +44,7 @@ export const useDealPipelineStore = create<PipelineState>((set, get) => ({
 
   setError: (error) => set({ error }),
 
-  // Optimistic update: di chuyển deal ngay lập tức trên UI
+  // Optimistic update: move deal immediately on UI
   moveDeal: (dealId, from, to) => {
     const pipeline = get().pipeline;
     const deal = pipeline[from].find((d) => d.id === dealId);
@@ -59,9 +59,9 @@ export const useDealPipelineStore = create<PipelineState>((set, get) => ({
     });
   },
 
-  // Rollback: hoàn tác moveDeal khi API thất bại
+  // Rollback: undo moveDeal when API fails
   rollbackMoveDeal: (dealId, from, to) => {
-    // from/to là chiều đã move — rollback ngược lại (to → from)
+    // from/to is the moved direction — rollback in reverse (to -> from)
     const pipeline = get().pipeline;
     const deal = pipeline[to].find((d) => d.id === dealId);
     if (!deal) return;
@@ -75,7 +75,7 @@ export const useDealPipelineStore = create<PipelineState>((set, get) => ({
     });
   },
 
-  // Cập nhật deal trong đúng cột của nó
+  // Update deal in its correct column
   updateDeal: (updatedDeal) => {
     const pipeline = get().pipeline;
     const stage = updatedDeal.stage;
@@ -90,7 +90,7 @@ export const useDealPipelineStore = create<PipelineState>((set, get) => ({
     });
   },
 
-  // Xóa deal khỏi cột sau khi soft delete thành công
+  // Delete deal from column after successful soft delete
   removeDeal: (dealId, stage) => {
     const pipeline = get().pipeline;
     set({
@@ -101,11 +101,11 @@ export const useDealPipelineStore = create<PipelineState>((set, get) => ({
     });
   },
 
-  // Reorder trong cùng cột — dùng arrayMove helper
+  // Reorder in same column — use arrayMove helper
   reorderDeal: (stage, fromIndex, toIndex) => {
     const pipeline = get().pipeline;
     const items = [...pipeline[stage]];
-    // arrayMove: lấy item ra khỏi fromIndex, chèn vào toIndex
+    // arrayMove: take item out of fromIndex, insert into toIndex
     const [moved] = items.splice(fromIndex, 1);
     items.splice(toIndex, 0, moved);
     set({ pipeline: { ...pipeline, [stage]: items } });

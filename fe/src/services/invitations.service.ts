@@ -11,7 +11,15 @@ export interface Invitation {
   createdAt: string;
 }
 
+export interface AcceptInvitationDto {
+  token: string;
+  name: string;
+  password?: string;
+  confirmPassword?: string;
+}
+
 export const invitationsService = {
+  // ... rest of methods
   create: async (email: string, role: string) => {
     const res = await axiosInstance.post("invitations", { email, role });
     return res.data;
@@ -32,7 +40,7 @@ export const invitationsService = {
     return res.data;
   },
 
-  accept: async (data: any) => {
+  accept: async (data: AcceptInvitationDto) => {
     const res = await axiosInstance.post("invitations/accept", data);
     return res.data;
   },
