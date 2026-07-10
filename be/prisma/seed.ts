@@ -36,16 +36,16 @@ function removeDiacritics(str: string): string {
     .replace(/Đ/g, 'D')
 }
 
-// Helper sinh tháng có trọng số: tập trung nhiều ở tháng 5, 6, 7 (May, June, July) và ít hơn ở Jan - Apr
+// Helper to generate weighted month: mostly concentrated in May, June, July and less in Jan - Apr
 function getRandomWeightedMonth(): number {
   const months = [
-    1, 1,             // Tháng 1 (trọng số 2)
-    2, 2,             // Tháng 2 (trọng số 2)
-    3, 3, 3,          // Tháng 3 (trọng số 3)
-    4, 4, 4,          // Tháng 4 (trọng số 3)
-    5, 5, 5, 5, 5,    // Tháng 5 (trọng số 5)
-    6, 6, 6, 6, 6, 6, // Tháng 6 (trọng số 6)
-    7, 7, 7, 7, 7, 7, 7, 7 // Tháng 7 - Tháng hiện tại (trọng số 8)
+    1, 1,             // January (weight 2)
+    2, 2,             // February (weight 2)
+    3, 3, 3,          // March (weight 3)
+    4, 4, 4,          // April (weight 3)
+    5, 5, 5, 5, 5,    // May (weight 5)
+    6, 6, 6, 6, 6, 6, // June (weight 6)
+    7, 7, 7, 7, 7, 7, 7, 7 // July - Current month (weight 8)
   ]
   return getRandomElement(months)
 }
@@ -68,7 +68,7 @@ async function main() {
 
   console.log('🌱 Bắt đầu khởi tạo dữ liệu mẫu...')
 
-  // 1. Tạo Tenant
+  // 1. Create Tenant
   const tenant = await prisma.tenant.create({
     data: {
       name: 'Công ty ABC',
@@ -77,7 +77,7 @@ async function main() {
     },
   })
 
-  // 2. Tạo danh sách các Quyền (Permissions) hệ thống
+  // 2. Create system Permissions list
   const permissionsList = [
     { action: 'manage', subject: 'all', description: 'Quản trị hệ thống toàn quyền' },
     
@@ -100,6 +100,10 @@ async function main() {
     { action: 'read', subject: 'Activity', description: 'Xem Hoạt động' },
     { action: 'update', subject: 'Activity', description: 'Sửa Hoạt động' },
     { action: 'delete', subject: 'Activity', description: 'Xóa Hoạt động' },
+
+    { action: 'read', subject: 'Report', description: 'Xem phân tích & báo cáo chuyên sâu' },
+    { action: 'read', subject: 'KpiTarget', description: 'Xem chỉ tiêu doanh số' },
+    { action: 'update', subject: 'KpiTarget', description: 'Cập nhật chỉ tiêu doanh số' },
   ]
 
   for (const perm of permissionsList) {
@@ -110,7 +114,7 @@ async function main() {
     })
   }
 
-  // 3. Tạo các Role mặc định cho Tenant
+  // 3. Create default Roles for the Tenant
   const adminRole = await prisma.role.create({
     data: { tenantId: tenant.id, name: 'ADMIN', description: 'Quản trị viên' }
   })
@@ -121,7 +125,7 @@ async function main() {
     data: { tenantId: tenant.id, name: 'SALES_REP', description: 'Nhân viên bán hàng' }
   })
 
-  // 4. Liên kết quyền cho ADMIN (manage:all)
+  // 4. Associate permissions for ADMIN (manage:all)
   const dbManageAll = await prisma.permission.findUnique({
     where: { action_subject: { action: 'manage', subject: 'all' } }
   })
@@ -131,7 +135,7 @@ async function main() {
     })
   }
 
-  // 5. Liên kết quyền cho MANAGER (đọc ghi mọi Contact, Deal, Task, Activity)
+  // 5. Associate permissions for MANAGER (read/write all Contacts, Deals, Tasks, Activities)
   const allDomainPerms = await prisma.permission.findMany({
     where: { subject: { in: ['Contact', 'Deal', 'Task', 'Activity'] } }
   })
@@ -141,7 +145,23 @@ async function main() {
     })
   }
 
-  // 6. Phân quyền ABAC cho SALES_REP (Chỉ được xem/sửa các thực thể do mình sở hữu)
+  // Grant additional Report & KpiTarget permissions to MANAGER
+  const managerExtraPerms = await prisma.permission.findMany({
+    where: {
+      OR: [
+        { action: 'read', subject: 'Report' },
+        { action: 'read', subject: 'KpiTarget' },
+        { action: 'update', subject: 'KpiTarget' },
+      ]
+    }
+  })
+  for (const perm of managerExtraPerms) {
+    await prisma.rolePermission.create({
+      data: { roleId: managerRole.id, permissionId: perm.id }
+    })
+  }
+
+  // 6. Set up ABAC permissions for SALES_REP (Only view/edit owned entities)
   for (const perm of allDomainPerms) {
     const isSubjectRestricted = ['Contact', 'Deal', 'Activity'].includes(perm.subject)
     await prisma.rolePermission.create({
@@ -155,7 +175,34 @@ async function main() {
     })
   }
 
-  // 7. Tạo Người dùng mẫu (Sử dụng roleId động)
+  // Grant limited Report & KpiTarget viewing permissions to SALES_REP
+  const readReportPerm = await prisma.permission.findUnique({
+    where: { action_subject: { action: 'read', subject: 'Report' } }
+  })
+  if (readReportPerm) {
+    await prisma.rolePermission.create({
+      data: {
+        roleId: salesRepRole.id,
+        permissionId: readReportPerm.id,
+        conditions: { view: { $in: ['team', 'activity'] } }
+      }
+    })
+  }
+
+  const readKpiTargetPerm = await prisma.permission.findUnique({
+    where: { action_subject: { action: 'read', subject: 'KpiTarget' } }
+  })
+  if (readKpiTargetPerm) {
+    await prisma.rolePermission.create({
+      data: {
+        roleId: salesRepRole.id,
+        permissionId: readKpiTargetPerm.id,
+        conditions: { userId: '${user.id}' }
+      }
+    })
+  }
+
+  // 7. Create mock Users (using dynamic roleId)
   const hashedPassword = await bcrypt.hash('Password123!', 10)
 
   const admin = await prisma.user.create({
@@ -203,7 +250,7 @@ async function main() {
 
   const allTeamUsers = [manager, ...salesReps]
 
-  // 8. Tạo Contacts (30 Contacts) kèm dữ liệu tags
+  // 8. Create Contacts (30 Contacts) with tag data
   const companyNames = [
     'Vingroup', 'Viettel', 'FPT Software', 'Masan Group', 'Techcombank',
     'Vietcombank', 'Vinamilk', 'Thế Giới Di Động', 'VNG Corporation', 'Tập đoàn Hòa Phát'
@@ -225,7 +272,7 @@ async function main() {
     const cleanCompany = removeDiacritics(company).toLowerCase().replace(/[^a-z0-9]/g, '')
     const email = `${cleanFirstName}.${getRandomInt(10, 99)}@${cleanCompany}.com`
 
-    // Chọn ngẫu nhiên 1-3 tags
+    // Select 1-3 random tags
     const tagsCount = getRandomInt(1, 3)
     const selectedTags: string[] = []
     while (selectedTags.length < tagsCount) {
@@ -243,13 +290,13 @@ async function main() {
         phone: getRandomPhone(),
         company,
         position: getRandomElement(positions),
-        tags: selectedTags, // Thêm tags vào cơ sở dữ liệu
+        tags: selectedTags, // Add tags to database
       },
     })
     contacts.push(contact)
   }
 
-  // 9. Tạo Deals (45 Deals) phân bổ theo tháng có trọng số (May-Jul 2026 chiếm đa số)
+  // 9. Create Deals (45 Deals) with weighted monthly distribution (mostly May-Jul 2026)
   const dealStages = [
     DealStage.PROSPECT, DealStage.QUALIFIED, DealStage.PROPOSAL, DealStage.CLOSED_WON, DealStage.CLOSED_LOST
   ]
@@ -267,31 +314,31 @@ async function main() {
     let createdAt: Date
     
     if (i <= 15) {
-      // 15 Deals trong tháng hiện tại (1/7 -> 8/7/2026) để không bị rơi vào tương lai (>9/7)
-      // Mỗi stage có đúng 3 deal
+      // 15 Deals in current month (7/1 -> 7/8/2026) to avoid future dates (>7/9)
+      // Each stage has exactly 3 deals
       const stageIndex = Math.floor((i - 1) / 3)
       stage = dealStages[stageIndex]
       
       const day = getRandomInt(1, 8)
-      createdAt = new Date(currentYear, 6, day) // Tháng 7 (index 6)
+      createdAt = new Date(currentYear, 6, day) // July (index 6)
     } else if (i <= 30) {
-      // 15 Deals trong tháng trước (Tháng 6/2026)
+      // 15 Deals in previous month (June 2026)
       const stageIndex = Math.floor((i - 16) / 3)
       stage = dealStages[stageIndex]
       
       const day = getRandomInt(1, 28)
-      createdAt = new Date(currentYear, 5, day) // Tháng 6 (index 5)
+      createdAt = new Date(currentYear, 5, day) // June (index 5)
     } else {
-      // 15 Deals trong các tháng trước nữa (Tháng 1 -> Tháng 5/2026)
+      // 15 Deals in earlier months (January -> May 2026)
       stage = getRandomElement(dealStages)
-      const month = getRandomInt(1, 5) // Tháng 1 -> 5
+      const month = getRandomInt(1, 5) // Month 1 -> 5
       const day = getRandomInt(1, 28)
       createdAt = new Date(currentYear, month - 1, day)
     }
 
     let closeDate: Date | null = null
     if (stage === DealStage.CLOSED_WON || stage === DealStage.CLOSED_LOST) {
-      // Đảm bảo ngày đóng của các deal tháng 7 nằm trước ngày 9/7
+      // Ensure close date of July deals is before July 9
       const dealDay = createdAt.getDate()
       const closeDay = stage === DealStage.CLOSED_WON && createdAt.getMonth() === 6 
         ? getRandomInt(dealDay, 9) 
@@ -318,7 +365,7 @@ async function main() {
     deals.push(deal)
   }
 
-  // 10. Tạo Activities (60 Activities)
+  // 10. Create Activities (60 Activities)
   const activityTypes = [ActivityType.CALL, ActivityType.EMAIL, ActivityType.MEETING, ActivityType.NOTE]
   const activityNotes = {
     [ActivityType.CALL]: ['Gọi điện giới thiệu dịch vụ và báo giá sơ bộ.', 'Gọi điện thảo luận chi tiết các yêu cầu tùy chỉnh.', 'Follow up sau khi gửi proposal.'],
@@ -336,7 +383,7 @@ async function main() {
     let activityDate: Date
     
     if (dealDate.getMonth() === 6) {
-      // Nếu deal tạo trong tháng 7, giới hạn hoạt động trong khoảng dealDate -> 9/7
+      // If deal was created in July, limit activities to range dealDate -> July 9
       const dealDay = dealDate.getDate()
       activityDate = new Date(2026, 6, getRandomInt(dealDay, 9))
     } else {
@@ -358,7 +405,7 @@ async function main() {
     })
   }
 
-  // 11. Tạo Tasks (60 Tasks)
+  // 11. Create Tasks (60 Tasks)
   const taskTitles = ['Gửi báo giá chính thức', 'Chuẩn bị slide demo', 'Gọi điện follow up', 'Trình duyệt hợp đồng', 'Setup môi trường test']
 
   for (let i = 1; i <= 60; i++) {
@@ -370,7 +417,7 @@ async function main() {
     let dueDate: Date
     
     if (dealDate.getMonth() === 6) {
-      // Một số task của tháng 7 sẽ có hạn chót trong tương lai gần (ví dụ: ngày 10, 11, 12/7) để hiển thị "Hoạt động sắp tới"
+      // Some July tasks will have deadlines in the near future (e.g. July 10, 11, 12) to show "Upcoming activities"
       if (!done) {
         dueDate = new Date(2026, 6, getRandomInt(10, 12))
       } else {
@@ -424,7 +471,7 @@ async function main() {
     }
   }
 
-  // 14. Thống kê dữ liệu mẫu đẹp mắt
+  // 14. Print beautiful sample data statistics
   const usersCount = await prisma.user.count()
   const rolesCount = await prisma.role.count()
   const permissionsCount = await prisma.permission.count()

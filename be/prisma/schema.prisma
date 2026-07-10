@@ -47,8 +47,8 @@ model User {
 
 model Role {
   id          String           @id @default(cuid())
-  tenantId    String           // Đảm bảo tính đa thuê bao (SaaS): Mỗi tenant có thể định nghĩa role riêng
-  name        String           // "ADMIN", "MANAGER", "SALES_REP" hoặc tên tùy chỉnh
+  tenantId    String           // Ensure multi-tenancy (SaaS): Each tenant can define its own role
+  name        String           // "ADMIN", "MANAGER", "SALES_REP" or custom name
   description String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
@@ -75,7 +75,7 @@ model Permission {
 model RolePermission {
   roleId       String
   permissionId String
-  conditions   Json?           // Lưu trữ điều kiện sở hữu (ABAC), ví dụ: {"ownerId": "${user.id}"}
+  conditions   Json?           // Store ownership conditions (ABAC), e.g.: {"ownerId": "${user.id}"}
   
   role         Role            @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission   Permission      @relation(fields: [permissionId], references: [id], onDelete: Cascade)
