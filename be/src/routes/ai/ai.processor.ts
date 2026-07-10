@@ -28,6 +28,13 @@ const AiResponseSchema = z.object({
 
 type AiResponseType = z.infer<typeof AiResponseSchema>
 
+class CustomAiError extends Error {
+  code?: string;
+  raw?: unknown;
+  details?: { first: string; retry: string };
+  status?: number;
+}
+
 function withTimeout<T>(promise: Promise<T>, ms = OPENAI_TIMEOUT_MS) {
   return Promise.race([promise, new Promise<T>((_, rej) => setTimeout(() => rej(new Error('OpenAI timeout')), ms))])
 }
@@ -35,7 +42,16 @@ function withTimeout<T>(promise: Promise<T>, ms = OPENAI_TIMEOUT_MS) {
 const MODEL = AI_MODEL;
 
 async function callOpenAiAndParse(meetingNote: string, jobId: string, dealId: string): Promise<AiResponseType> {
-  const prompt = `You are an assistant that extracts actionable items from a meeting note.\nReturn ONLY a single valid JSON object (no explanation) with keys:\n{\n  "tasks": [{ "title": "<string>", "dueDate": "<ISO-8601 or null>" }],\n  "emailDraft": "<string>",\n  "summary": "<string>"\n}\nNote: You MUST write a detailed follow-up email draft in Vietnamese under "emailDraft", and a brief summary in Vietnamese under "summary". Do not set them to null.\nMeeting Note:\n"""${meetingNote}"""\n`
+  const prompt = `
+    You are an assistant that extracts actionable items from a meeting note.
+    \nReturn ONLY a single valid JSON object (no explanation) with keys:
+    \n{\n  "tasks": [
+    { 
+      "title": "<string>",
+      "dueDate": "<ISO-8601 or null>" 
+    }],
+  "emailDraft": "<string>",
+  "summary": "<string>"\n}\nNote: You MUST write a detailed follow-up email draft in Vietnamese under "emailDraft", and a brief summary in Vietnamese under "summary". Do not set them to null.\nMeeting Note:\n"""${meetingNote}"""\n`
 
   const doCall = async () => {
     const resp = await openai.chat.completions.create({
@@ -53,7 +69,7 @@ async function callOpenAiAndParse(meetingNote: string, jobId: string, dealId: st
   try {
     text = await withTimeout(doCall())
   } catch (err) {
-    const e: any = new Error('OpenAI timeout or network error')
+    const e = new CustomAiError('OpenAI timeout or network error')
     e.code = 'OPENAI_TIMEOUT'
     e.raw = err
     throw e
@@ -71,7 +87,18 @@ async function callOpenAiAndParse(meetingNote: string, jobId: string, dealId: st
     return validated
   } catch (firstErr) {
     try {
-      const retryPrompt = `The previous output was not valid JSON. Reply with only a single valid JSON object matching schema {"tasks":[{"title":"string","dueDate":"ISO-8601 or null"}],"emailDraft":"string","summary":"string"}. All texts must be written in Vietnamese. Meeting note:\n"""${meetingNote}"""`
+      const retryPrompt = `
+      The previous output was not valid JSON. 
+      Reply with only a single valid JSON object matching schema 
+      {
+        "tasks": [
+          {"title":"string","dueDate":"ISO-8601 or null"}
+        ],
+        "emailDraft":"string",
+        "summary":"string"
+      }. 
+      All texts must be written in Vietnamese. Meeting note:\n"""${meetingNote}"""
+      `
       const retryResp = await withTimeout(
         openai.chat.completions.create({
           model: MODEL,
@@ -85,7 +112,7 @@ async function callOpenAiAndParse(meetingNote: string, jobId: string, dealId: st
       const validated2 = AiResponseSchema.parse(parsed2)
       return validated2
     } catch (secondErr) {
-      const e: any = new Error('OpenAI returned invalid JSON after retry')
+      const e = new CustomAiError('OpenAI returned invalid JSON after retry')
       e.details = { first: (firstErr as Error).message, retry: (secondErr as Error).message }
       throw e
     }
@@ -106,13 +133,14 @@ new Worker(
     let aiResult: AiResponseType | null = null
     try {
       aiResult = await callOpenAiAndParse(meetingNote, jobId, dealId)
-    } catch (err: any) {
-      // Map known OpenAI errors to friendly SSE messages and publish to subscribers
-      const status = err?.raw?.status || err?.status
-      let reason = err?.code || status || 'OPENAI_ERROR'
+    } catch (err) {
+      const error = err as CustomAiError
+      const rawErrorObj = error.raw as Record<string, any> | undefined
+      const status = rawErrorObj?.status || error.status
+      let reason = error.code || status || 'OPENAI_ERROR'
 
-      if (err.code === 'OPENAI_TIMEOUT') {
-        console.error('OpenAI timeout', { jobId, dealId, err: err.raw })
+      if (error.code === 'OPENAI_TIMEOUT') {
+        console.error('OpenAI timeout', { jobId, dealId, err: error.raw })
         reason = 'OPENAI_TIMEOUT'
         try {
           publishAiEvent(tenantId, dealId, 'ai-error', {

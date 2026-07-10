@@ -71,7 +71,16 @@ export class InvitationRepository {
     })
   }
 
-  async update(id: string, data: any) {
+  async update(
+    id: string,
+    data: {
+      email?: string;
+      token?: string;
+      expiresAt?: Date;
+      status?: 'PENDING' | 'ACCEPTED' | 'EXPIRED' | 'REVOKED';
+      roleId?: string;
+    },
+  ) {
     return this.prismaService.invitation.update({
       where: { id },
       data,

@@ -20,7 +20,7 @@ export class UsersService {
       id: u.id,
       email: u.email,
       name: u.name,
-      role: u.role.name, // Trả về string tên role
+      role: u.role.name, // Return role name string
     }));
   }
 
@@ -44,7 +44,7 @@ export class UsersService {
 
     let roleId = user.roleId;
     if (body.role) {
-      // Tìm Role động tương ứng trong tenant
+      // Find corresponding dynamic Role in tenant
       const dbRole = await this.prisma.role.findFirst({
         where: { tenantId, name: body.role },
       });
@@ -97,7 +97,7 @@ export class UsersService {
     });
   }
 
-  // Lấy toàn bộ danh sách vai trò kèm theo các permissions được gán của tenant
+  // Get all roles along with assigned permissions of tenant
   async getRolesByTenant(tenantId: string) {
     const roles = await this.prisma.role.findMany({
       where: { tenantId },
@@ -124,7 +124,7 @@ export class UsersService {
     }));
   }
 
-  // Lấy danh sách các quyền hạn hệ thống có sẵn
+  // Get list of available system permissions
   async getAllPermissions() {
     return this.prisma.permission.findMany({
       orderBy: [
@@ -134,9 +134,9 @@ export class UsersService {
     });
   }
 
-  // Cập nhật liên kết quyền cho một vai trò
+  // Update permission associations for a role
   async updateRolePermissions(tenantId: string, roleId: string, permissionIds: string[]) {
-    // 1. Kiểm tra vai trò thuộc tenant
+    // 1. Verify role belongs to tenant
     const role = await this.prisma.role.findFirst({
       where: { id: roleId, tenantId },
     });
@@ -144,43 +144,65 @@ export class UsersService {
       throw new NotFoundException('Không tìm thấy vai trò này');
     }
 
-    // 2. Cập nhật các liên kết quyền hạn bằng transaction
+    // 2. Update permission associations in transaction
     await this.prisma.$transaction(async (tx) => {
-      // Xóa tất cả liên kết quyền cũ của vai trò này
+      // Delete all old permission associations of this role
       await tx.rolePermission.deleteMany({
         where: { roleId },
       });
 
-      // Tạo liên kết mới
+      // Create new associations
       if (permissionIds.length > 0) {
-        await tx.rolePermission.createMany({
-          data: permissionIds.map((pId) => ({
-            roleId,
-            permissionId: pId,
-          })),
+        // Query detailed permissions to get the subject of each permission
+        const permissions = await tx.permission.findMany({
+          where: { id: { in: permissionIds } },
         });
+
+        for (const perm of permissions) {
+          let conditions: Record<string, any> | null = null;
+
+          // Auto-assign default ABAC conditions for the SALES_REP role
+          if (role.name === 'SALES_REP') {
+            if (['Contact', 'Deal'].includes(perm.subject)) {
+              conditions = { ownerId: '${user.id}' };
+            } else if (perm.subject === 'Activity') {
+              conditions = { userId: '${user.id}' };
+            } else if (perm.subject === 'KpiTarget') {
+              conditions = { userId: '${user.id}' };
+            } else if (perm.subject === 'Report') {
+              conditions = { view: { $in: ['team', 'activity'] } };
+            }
+          }
+
+          await tx.rolePermission.create({
+            data: {
+              roleId,
+              permissionId: perm.id,
+              conditions: conditions as any,
+            },
+          });
+        }
       }
     });
 
-    // 3. Xóa cache Redis của vai trò để cập nhật quyền ngay lập tức
-    // 3. Xóa cache Redis của vai trò để cập nhật quyền ngay lập tức
+    // 3. Invalidate Redis cache of the role to update permissions immediately
     const cacheKey = `tenant:${tenantId}:role:${role.name}:permissions`;
     await this.redisService.delete(cacheKey);
 
     return { message: 'Cập nhật quyền hạn thành công' };
   }
 
-  // Tạo vai trò mới cho tenant
+  // Create new role for tenant
   async createRole(tenantId: string, body: { name: string; description?: string }) {
     const formattedName = body.name.trim().toUpperCase();
 
-    // Ràng buộc bảo mật: không được tạo vai trò trùng tên hệ thống
+    // Security constraint: cannot create role matching system role names
     const isSystemRole = ['ADMIN', 'MANAGER', 'SALES_REP'].includes(formattedName);
     if (isSystemRole) {
       throw new BadRequestException('Không được đặt tên trùng với các vai trò mặc định của hệ thống');
     }
 
-    // Kiểm tra trùng lặp trong tenant
+    // Check duplicate in tenant
     const existRole = await this.prisma.role.findFirst({
       where: { tenantId, name: formattedName },
     });
@@ -197,9 +219,9 @@ export class UsersService {
     });
   }
 
-  // Cập nhật tên/mô tả vai trò tùy chỉnh
+  // Update custom role name/description
   async updateRole(tenantId: string, roleId: string, body: { name: string; description?: string }) {
-    // 1. Kiểm tra vai trò thuộc tenant
+    // 1. Verify role belongs to tenant
     const role = await this.prisma.role.findFirst({
       where: { id: roleId, tenantId },
     });
@@ -207,7 +229,7 @@ export class UsersService {
       throw new NotFoundException('Không tìm thấy vai trò này');
     }
 
-    // Ràng buộc bảo mật: không được chỉnh sửa 3 vai trò mặc định
+    // Security constraint: cannot edit the 3 default roles
     const isSystemRole = ['ADMIN', 'MANAGER', 'SALES_REP'].includes(role.name);
     if (isSystemRole) {
       throw new BadRequestException('Không thể chỉnh sửa các vai trò mặc định của hệ thống');
@@ -219,7 +241,7 @@ export class UsersService {
       throw new BadRequestException('Không được đổi tên trùng với các vai trò mặc định');
     }
 
-    // Kiểm tra trùng lặp với vai trò khác cùng tenant
+    // Check duplicate with another role in same tenant
     if (formattedName !== role.name) {
       const existOther = await this.prisma.role.findFirst({
         where: {
@@ -242,16 +264,16 @@ export class UsersService {
       },
     });
 
-    // Invalidate Redis cache cho cả tên cũ và tên mới
+    // Invalidate Redis cache for both old and new names
     await this.redisService.delete(`tenant:${tenantId}:role:${oldName}:permissions`);
     await this.redisService.delete(`tenant:${tenantId}:role:${formattedName}:permissions`);
 
     return updatedRole;
   }
 
-  // Xóa vai trò tùy chỉnh
+  // Delete custom role
   async deleteRole(tenantId: string, roleId: string) {
-    // 1. Kiểm tra vai trò thuộc tenant
+    // 1. Verify role belongs to tenant
     const role = await this.prisma.role.findFirst({
       where: { id: roleId, tenantId },
     });
@@ -259,13 +281,13 @@ export class UsersService {
       throw new NotFoundException('Không tìm thấy vai trò này');
     }
 
-    // Ràng buộc bảo mật: không được xóa 3 vai trò mặc định
+    // Security constraint: cannot delete the 3 default roles
     const isSystemRole = ['ADMIN', 'MANAGER', 'SALES_REP'].includes(role.name);
     if (isSystemRole) {
       throw new BadRequestException('Không thể xóa các vai trò mặc định của hệ thống');
     }
 
-    // Kiểm tra xem có thành viên nào đang sử dụng vai trò này không
+    // Check if any member is using this role
     const usersCount = await this.prisma.user.count({
       where: { roleId },
     });
@@ -275,7 +297,7 @@ export class UsersService {
       );
     }
 
-    // Kiểm tra xem có thư mời nào chưa kích hoạt sử dụng vai trò này không
+    // Check if any pending invitation is using this role
     const invCount = await this.prisma.invitation.count({
       where: { roleId },
     });
@@ -285,7 +307,7 @@ export class UsersService {
       );
     }
 
-    // 2. Xóa các liên kết quyền hạn trước, sau đó xóa vai trò bằng transaction
+    // 2. Delete permission associations first, then delete role in transaction
     await this.prisma.$transaction(async (tx) => {
       await tx.rolePermission.deleteMany({
         where: { roleId },
@@ -295,7 +317,7 @@ export class UsersService {
       });
     });
 
-    // 3. Xóa cache permissions của vai trò này trong Redis
+    // 3. Invalidate permission cache of this role in Redis
     await this.redisService.delete(`tenant:${tenantId}:role:${role.name}:permissions`);
 
     return { message: 'Xóa vai trò thành công' };

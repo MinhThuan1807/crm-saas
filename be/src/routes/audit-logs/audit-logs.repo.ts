@@ -14,7 +14,7 @@ export class AuditLogsRepository {
     targetType: string,
     targetId: string,
     targetName?: string | null,
-    changes: any;
+    changes: Record<string, unknown>;
   }
   )  {
     return this.prismaService.auditLog.create({
@@ -25,7 +25,8 @@ export class AuditLogsRepository {
         targetType: params.targetType,
         targetId: params.targetId,
         targetName: params.targetName ?? null,
-        changes: params.changes
+        // Prisma Json field requires InputJsonValue; Record<string,unknown> is structurally compatible — cast via unknown
+        changes: params.changes as unknown as object,
       }
     })
   }

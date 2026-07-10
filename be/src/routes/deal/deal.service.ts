@@ -19,14 +19,17 @@ import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { CaslAbilityFactory } from 'src/common/casl/casl-ability.factory'
 import { subject } from '@casl/ability'
 
-export function getChangesDiff(oldObj: any, newObj: any): Record<string, { old: any; new: any }> {
-  const diff: Record<string, { old: any; new: any }> = {};
+export function getChangesDiff(
+  oldObj: Record<string, unknown>,
+  newObj: Record<string, unknown>
+): Record<string, { old: unknown; new: unknown }> {
+  const diff: Record<string, { old: unknown; new: unknown }> = {};
   const ignoredFields = ['updatedAt', 'createdAt', 'deletedAt', 'tenantId', 'id'];
   for (const key of Object.keys(newObj)) {
     if (ignoredFields.includes(key)) continue;
     const oldVal = oldObj[key];
     const newVal = newObj[key];
-    // So sánh chuỗi/đối tượng hoặc Decimal
+    // Compare string/object or Decimal
     const strOld = oldVal !== null && oldVal !== undefined ? String(oldVal) : '';
     const strNew = newVal !== null && newVal !== undefined ? String(newVal) : '';
     if (strOld !== strNew) {
@@ -55,18 +58,18 @@ export class DealService {
   async create(tenantId: string, data: CreateDealBodyType, user: { userId: string; role: string; tenantId: string }) {
     const ability = await this.caslAbilityFactory.createForUser(user);
 
-    // Kiểm tra quyền tạo Deal
+    // Check Deal creation permission
     if (ability.cannot('create', 'Deal')) {
       throw new ForbiddenException('Bạn không có quyền tạo deal');
     }
 
-    // Nếu chỉ được tạo deal của mình sở hữu
+    // If only allowed to create deals owned by oneself
     if (ability.cannot('manage', 'all')) {
       if (data.ownerId !== user.userId) {
         throw new ForbiddenException('Bạn chỉ có thể tạo deal do chính mình sở hữu');
       }
       const contact = await this.contactsRepo.findOne(data.contactId);
-      if (!contact || ability.cannot('read', subject('Contact', contact as any))) {
+      if (!contact || ability.cannot('read', subject('Contact', contact as unknown as Record<string, unknown>))) {
         throw new NotFoundException('Liên hệ không tồn tại');
       }
     }
@@ -74,7 +77,7 @@ export class DealService {
     const deal = await this.dealRepo.create(data)
     await this.redisService.invalidateTenantCache(tenantId)
 
-    const changes: any = {};
+    const changes: Record<string, { old: unknown; new: unknown }> = {};
     for (const [key, val] of Object.entries(deal)) {
       if (['createdAt', 'updatedAt', 'deletedAt', 'id', 'tenantId'].includes(key)) continue;
       changes[key] = { old: null, new: val };
@@ -94,9 +97,12 @@ export class DealService {
 
   async getPipleline(tenantId: string, user: { userId: string; role: string; tenantId: string }) {
     const ability = await this.caslAbilityFactory.createForUser(user);
-    const filters: any = {};
-
+    const filters: { ownerId?: string } = {};
     if (ability.cannot('read', 'Deal')) {
+      throw new ForbiddenException('Bạn không có quyền xem cơ hội bán hàng');
+    }
+
+    if (ability.cannot('read', subject('Deal', { ownerId: 'other' } as any))) {
       filters.ownerId = user.userId;
     }
 
@@ -123,8 +129,8 @@ export class DealService {
     }
 
     const ability = await this.caslAbilityFactory.createForUser(user);
-    if (ability.cannot('read', subject('Deal', deal as any))) {
-      throw new NotFoundException('Không tìm thấy deal') // 404 chống rà quét
+    if (ability.cannot('read', subject('Deal', deal as unknown as Record<string, unknown>))) {
+      throw new NotFoundException('Không tìm thấy deal') // 404 to prevent scanning
     }
     return deal
   }
@@ -136,7 +142,7 @@ export class DealService {
     }
 
     const ability = await this.caslAbilityFactory.createForUser(user);
-    if (ability.cannot('update', subject('Deal', oldDeal as any))) {
+    if (ability.cannot('update', subject('Deal', oldDeal as unknown as Record<string, unknown>))) {
       throw new NotFoundException('Không tìm thấy deal')
     }
 
@@ -165,7 +171,7 @@ export class DealService {
     }
 
     const ability = await this.caslAbilityFactory.createForUser(user);
-    if (ability.cannot('update', subject('Deal', oldDeal as any))) {
+    if (ability.cannot('update', subject('Deal', oldDeal as unknown as Record<string, unknown>))) {
       throw new NotFoundException('Không tìm thấy deal')
     }
 
@@ -199,14 +205,14 @@ export class DealService {
     }
 
     const ability = await this.caslAbilityFactory.createForUser(user);
-    if (ability.cannot('delete', subject('Deal', deal as any))) {
+    if (ability.cannot('delete', subject('Deal', deal as unknown as Record<string, unknown>))) {
       throw new NotFoundException('Không tìm thấy deal')
     }
 
     await this.dealRepo.softDelete(dealId)
     await this.redisService.invalidateTenantCache(tenantId)
 
-    const changes: any = {};
+    const changes: Record<string, { old: unknown; new: unknown }> = {};
     for (const [key, val] of Object.entries(deal)) {
       if (['createdAt', 'updatedAt', 'deletedAt', 'id', 'tenantId'].includes(key)) continue;
       changes[key] = { old: val, new: null };
@@ -255,7 +261,7 @@ export class DealService {
     return { jobId }
   }
 
-  // ─── TẬP BẢO MẬT HÀNH ĐỘNG TRÊN TASK DỰA TRÊN QUYỀN TRÊN DEAL ───
+  // ─── SECURITY RULES FOR TASK OPERATIONS BASED ON DEAL PERMISSIONS ───
 
   async createTask(dealId: string, tenantId: string, data: CreateTaskBodyType, user: { userId: string; role: string; tenantId: string }) {
     const deal = await this.dealRepo.findOne(dealId)
@@ -266,7 +272,7 @@ export class DealService {
       throw new NotFoundException('Không tìm thấy deal')
     }
 
-    const task = await this.taskRepo.create(dealId, data)
+    const task = await this.taskRepo.create(dealId, tenantId, data)
     await this.redisService.invalidateTenantCache(tenantId)
     return task
   }
@@ -280,7 +286,7 @@ export class DealService {
       throw new NotFoundException('Không tìm thấy deal')
     }
 
-    const result = await this.taskRepo.createMany(dealId, tasks)
+    const result = await this.taskRepo.createMany(dealId, tenantId, tasks)
     await this.redisService.invalidateTenantCache(tenantId)
     return result
   }

@@ -125,7 +125,7 @@ export const GetContactsWithDealsActivitiesResSchema = z.object({
 export type GetContactsQueryType = z.infer<typeof GetContactsQuerySchema>
 export type GetContactsResType   = z.infer<typeof GetContactsWithDealsActivitiesResSchema>
 
-// Schema validate cho từng dòng contact được import từ Excel
+// Validation schema for each contact row imported from Excel
 export const BulkImportContactItemSchema = z.object({
   name: z.string().min(2, "Tên phải có ít nhất 2 ký tự"),
   email: z.string().email("Email không đúng định dạng").optional().nullable().or(z.literal('')),
@@ -147,7 +147,7 @@ export const BulkImportContactItemSchema = z.object({
   dealNote: z.string().optional().nullable().or(z.literal('')),
 });
 
-// Schema validate cho body request gửi lên API
+// Validation schema for the request body sent to the API
 export const BulkImportContactsBodySchema = z.object({
   contacts: z.array(BulkImportContactItemSchema),
 });

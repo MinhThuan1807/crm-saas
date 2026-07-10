@@ -147,7 +147,7 @@ export class AuthService {
     })
     if (!user) return null;
 
-    // Lấy danh sách permissions thông qua vai trò của user (Sử dụng Redis Cache)
+    // Fetch permissions list via user's role (Using Redis Cache)
     const cacheKey = `tenant:${user.tenantId}:role:${user.role.name}:permissions`;
     let permissions = await this.redisService.get(cacheKey);
 
@@ -167,7 +167,7 @@ export class AuthService {
         conditions: rp.conditions,
       }));
 
-      // Cache lại trong Redis (TTL: 1 giờ)
+      // Cache in Redis (TTL: 1 hour)
       await this.redisService.set(cacheKey, permissions, 3600);
     }
 
@@ -177,13 +177,13 @@ export class AuthService {
       name: user.name,
       role: user.role.name, // Map string
       tenantId: user.tenantId,
-      permissions, // Đính kèm mảng quyền hạn
+      permissions, // Attach permissions array
     }
   }
 
  async validateGoogleUser(profile: { provider: string; providerAccountId: string; email: string; name: string }) {
     const { provider, providerAccountId, email, name } = profile;
-    // 1. Kiểm tra tài khoản liên kết Google
+    // 1. Check Google linked account
     const account = await this.prismaService.account.findUnique({
       where: { provider_providerAccountId: { provider, providerAccountId } },
       include: { user: { include: { role: true } } },
@@ -194,7 +194,7 @@ export class AuthService {
         role: account.user.role.name as any,
       };
     }
-    // 2. Tìm người dùng theo email
+    // 2. Find user by email
     let user = await this.prismaService.user.findUnique({
       where: { email },
       include: { role: true },
@@ -212,7 +212,7 @@ export class AuthService {
         role: user.role.name as any,
       };
     }
-    // 3. Nếu là tài khoản mới hoàn toàn
+    // 3. If it's a completely new account
     const invitation = await this.prismaService.invitation.findFirst({
       where: {
         email,
@@ -231,13 +231,13 @@ export class AuthService {
         data: { status: 'ACCEPTED' },
       });
     } else {
-      // Đăng ký mới công ty
+      // Register new company
       const slug = slugify(name + '-' + Math.floor(Math.random() * 1000));
       return this.prismaService.$transaction(async (tx) => {
         const tenant = await tx.tenant.create({
           data: { name: `${name}'s Company`, slug },
         });
-        // Seed 3 Role mặc định cho Tenant mới
+        // Seed 3 default Roles for new Tenant
         const adminRole = await tx.role.create({
           data: { tenantId: tenant.id, name: 'ADMIN', description: 'Quản trị viên' }
         });
@@ -247,12 +247,12 @@ export class AuthService {
         const salesRepRole = await tx.role.create({
           data: { tenantId: tenant.id, name: 'SALES_REP', description: 'Nhân viên kinh doanh' }
         });
-        // Gán quyền cho ADMIN
+        // Assign permissions for ADMIN
         const systemManageAll = await tx.permission.findFirst({ where: { action: 'manage', subject: 'all' } });
         if (systemManageAll) {
           await tx.rolePermission.create({ data: { roleId: adminRole.id, permissionId: systemManageAll.id } });
         }
-        // Gán quyền cho các role khác
+        // Assign permissions for other roles
         const allDomainPerms = await tx.permission.findMany({ where: { subject: { in: ['Contact', 'Deal', 'Task', 'Activity'] } } });
         for (const perm of allDomainPerms) {
           await tx.rolePermission.create({ data: { roleId: managerRole.id, permissionId: perm.id } });
@@ -275,7 +275,7 @@ export class AuthService {
         return { ...newUser, role: 'ADMIN' as any };
       });
     }
-    // Nếu vào qua thư mời
+    // If joining via invitation
     const newUser = await this.prismaService.user.create({
       data: { email, name, tenantId, password: null, roleId },
       include: { role: true },

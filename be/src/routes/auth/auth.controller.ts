@@ -22,6 +22,17 @@ import { COOKIE_OPTIONS } from './auth.constants'
 import { AccessTokenPayload } from 'src/common/types/jwt.type'
 import { AuthGuard } from '@nestjs/passport'
 
+interface GoogleAuthRequest extends Request {
+  user: {
+    provider: string;
+    providerAccountId: string;
+    email: string;
+    name: string;
+    picture?: string;
+    accessToken: string;
+  };
+}
+
 // COOKIE_OPTIONS moved to auth.constants to avoid circular imports
 
 @ApiTags('Auth')
@@ -94,7 +105,7 @@ export class AuthController {
   }
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req: any, @Res({ passthrough: true }) res: Response) {
+  async googleAuthRedirect(@Req() req: GoogleAuthRequest, @Res({ passthrough: true }) res: Response) {
     // req.user contains info returned by GoogleStrategy in validate()
     const user = await this.authService.validateGoogleUser(req.user);
     // Generate accessToken and refreshToken similar to traditional login

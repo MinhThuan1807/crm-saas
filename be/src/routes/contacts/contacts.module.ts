@@ -8,7 +8,7 @@ import { AiModule } from '../ai/ai.module';
 @Module({
   imports: [AiModule],
   controllers: [ContactsController],
-  providers: [ContactsService, ContactsRepository, DealRepository] // Thêm DealRepository vào đây
+  providers: [ContactsService, ContactsRepository, DealRepository] // Add DealRepository here
 })
 export class ContactsModule {}
 

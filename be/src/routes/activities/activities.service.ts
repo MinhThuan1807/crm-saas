@@ -103,7 +103,7 @@ export class ActivitiesService {
     if (!deal) throw new NotFoundException('Deal không tồn tại')
 
     const ability = await this.caslAbilityFactory.createForUser(user)
-    if (ability.cannot('read', subject('Deal', deal as any))) {
+    if (ability.cannot('read', subject('Deal', deal as unknown as Record<string, unknown>))) {
       throw new NotFoundException('Deal không tồn tại')
     }
 
@@ -117,10 +117,13 @@ export class ActivitiesService {
     user: { userId: string; role: string; tenantId: string },
   ): Promise<GetActivitiesPaginatedResType> {
     const ability = await this.caslAbilityFactory.createForUser(user)
-    const filters: any = {}
+    const filters: { userId?: string } = {}
 
-    // Nếu Sales Rep, chỉ xem hoạt động của mình
     if (ability.cannot('read', 'Activity')) {
+      throw new ForbiddenException('Bạn không có quyền xem hoạt động')
+    }
+
+    if (ability.cannot('read', subject('Activity', { userId: 'other' } as any))) {
       filters.userId = user.userId
     }
 

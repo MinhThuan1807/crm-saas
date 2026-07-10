@@ -229,7 +229,7 @@
 //       const result = await service.delete(DEAL_ID, TENANT_ID)
 
 //       expect(mockDealRepo.softDelete).toHaveBeenCalledWith(DEAL_ID, TENANT_ID)
-//       expect(result).toEqual({ message: 'Xóa deal thành công' })
+//       expect(result).toEqual({ message: 'Delete deal successfully' })
 //     })
 
 //     it('should throw NotFoundException when deal not found', async () => {

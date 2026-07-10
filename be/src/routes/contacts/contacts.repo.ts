@@ -91,14 +91,14 @@ export class ContactsRepository {
     })
   }
 
-  // Tìm kiếm User theo email để gán làm Owner
+  // Find User by email to assign as Owner
   findUserByEmail(email: string) {
     return this.prismaService.user.findFirst({
       where: { email },
     });
   }
 
-  // Tìm kiếm Contact đã tồn tại dựa theo email hoặc số điện thoại
+  // Search for existing Contact by email or phone number
   findByEmailOrPhone(email?: string | null, phone?: string | null) {
     if (!email && !phone) return null;
     return this.prismaService.contact.findFirst({

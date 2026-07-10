@@ -38,7 +38,7 @@ async createInvitation(body: CreateInvitationType, tenantId: string) {
     if (!tenant) {
       throw new NotFoundException('Không tìm thấy workspace')
     }
-    // Tìm Role trong tenant dựa trên tên gửi lên
+    // Find Role in tenant based on submitted name
     const dbRole = await this.prismaService.role.findFirst({
       where: { tenantId, name: body.role }
     })
@@ -103,7 +103,7 @@ async verifyInvitationToken(token: string) {
     }
     return {
       email: invitation.email,
-      role: invitation.role.name, // Trả về chuỗi tên role
+      role: invitation.role.name, // Return role name string
       companyName: invitation.tenant.name,
       token: invitation.token,
     }
@@ -125,15 +125,15 @@ async verifyInvitationToken(token: string) {
       email: invitation.email,
       name: body.name,
       hashedPassword,
-      roleId: invitation.roleId, // Truyền roleId của thư mời
+      roleId: invitation.roleId, // Pass invitation roleId
       tenantId: invitation.tenantId,
       invitationId: invitation.id,
     })
-    // Ký tokens
+    // Sign tokens
     const [accessToken, refreshToken] = await Promise.all([
       this.tokenService.signAccessToken({
         userId: newUser.id,
-        role: newUser.role, // Đây đã là chuỗi được map từ sharedUserRepo
+        role: newUser.role, // This is already the mapped string from sharedUserRepo
         tenantId: newUser.tenantId,
       }),
       this.tokenService.signRefreshToken({ userId: newUser.id }),
@@ -162,7 +162,12 @@ async verifyInvitationToken(token: string) {
     if (invitation.status !== 'PENDING') {
       throw new BadRequestException('Chỉ có thể chỉnh sửa lời mời đang ở trạng thái chờ kích hoạt')
     }
-    const updateData: any = {
+    const updateData: {
+      token: string;
+      expiresAt: Date;
+      email?: string;
+      roleId?: string;
+    } = {
       token: uuidv4(),
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     }

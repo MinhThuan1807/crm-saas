@@ -77,18 +77,18 @@ export class ReportsRepository {
     })
   }
 
-  upsertKpiTarget(userId: string, month: number, year: number, target: number) {
+  upsertKpiTarget(tenantId: string, userId: string, month: number, year: number, target: number) {
     return this.prisma.kpiTarget.upsert({
       where: {
-        // we cast where as any to bypass unique compound requirement of tenantId in compiler
         tenantId_userId_month_year: {
+          tenantId,
           userId,
           month,
           year,
         },
-      } as any,
+      },
       update: { target },
-      create: { userId, month, year, target } as any,
+      create: { tenantId, userId, month, year, target },
     })
   }
 

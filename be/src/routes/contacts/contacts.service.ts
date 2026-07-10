@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { ContactsRepository } from './contacts.repo';
-import { CreateContactBodyType, GetContactsQueryType } from './contacts.model';
+import { CreateContactBodyType, ContactTagType, GetContactsQueryType } from './contacts.model';
 import { RedisService } from 'src/common/services/redis.service';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
 import { getChangesDiff } from '../deal/deal.service';
@@ -8,6 +8,9 @@ import { CaslAbilityFactory } from 'src/common/casl/casl-ability.factory';
 import { subject } from '@casl/ability';
 import { DealRepository } from '../deal/deal.repo';
 import { AiService } from '../ai/ai.service';
+import { PrismaService } from 'src/common/services/prisma.service';
+import { DealStageType } from '../deal/deal.model';
+import { BulkImportContactsBodyDto } from './contacts.dto';
 
 
 @Injectable()
@@ -25,9 +28,12 @@ export class ContactsService {
       const { limit } = query;
       const ability = await this.caslAbilityFactory.createForUser(user);
 
-      // Nếu không có quyền đọc toàn bộ Contact, chèn filter ownerId tự động
-      const filters: any = {};
       if (ability.cannot('read', 'Contact')) {
+        throw new ForbiddenException('Bạn không có quyền xem danh sách liên hệ');
+      }
+
+      const filters: { ownerId?: string } = {};
+      if (ability.cannot('read', subject('Contact', { ownerId: 'other' } as any))) {
         filters.ownerId = user.userId;
       }
 
@@ -48,9 +54,9 @@ export class ContactsService {
     }
 
     const ability = await this.caslAbilityFactory.createForUser(user);
-    // Sử dụng helper subject() để map type của model database
-    if (ability.cannot('read', subject('Contact', contact as any))) {
-      throw new NotFoundException('Liên hệ không tồn tại'); // Trả về 404 để chống rà quét ID
+    // Use subject() helper to map database model type
+    if (ability.cannot('read', subject('Contact', contact as unknown as Record<string, unknown>))) {
+      throw new NotFoundException('Liên hệ không tồn tại'); // Return 404 to prevent ID scanning
     }
 
     return contact;
@@ -60,7 +66,7 @@ export class ContactsService {
     const result = await this.contactRepository.create(ownerId, body)
     await this.redisService.invalidateTenantCache(tenantId)
 
-    const changes: any = {};
+    const changes: Record<string, { old: unknown; new: unknown }> = {};
     for (const [key, val] of Object.entries(result)) {
       if (['createdAt', 'updatedAt', 'deletedAt', 'id', 'tenantId'].includes(key)) continue;
       changes[key] = { old: null, new: val };
@@ -85,8 +91,8 @@ export class ContactsService {
     }
 
     const ability = await this.caslAbilityFactory.createForUser(user);
-    if (ability.cannot('update', subject('Contact', oldContact as any))) {
-      throw new NotFoundException('Liên hệ không tồn tại'); // Bảo mật 404
+    if (ability.cannot('update', subject('Contact', oldContact as unknown as Record<string, unknown>))) {
+      throw new NotFoundException('Liên hệ không tồn tại'); // Security 404
     }
 
     const result = await this.contactRepository.update(contactId, body);
@@ -114,14 +120,14 @@ export class ContactsService {
     }
 
     const ability = await this.caslAbilityFactory.createForUser(user);
-    if (ability.cannot('delete', subject('Contact', oldContact as any))) {
+    if (ability.cannot('delete', subject('Contact', oldContact as unknown as Record<string, unknown>))) {
       throw new NotFoundException('Liên hệ không tồn tại');
     }
 
     const result = await this.contactRepository.delete(contactId)
     await this.redisService.invalidateTenantCache(tenantId)
 
-    const changes: any = {};
+    const changes: Record<string, { old: unknown; new: unknown }> = {};
     for (const [key, val] of Object.entries(oldContact)) {
       if (['createdAt', 'updatedAt', 'deletedAt', 'id', 'tenantId'].includes(key)) continue;
       changes[key] = { old: val, new: null };
@@ -145,7 +151,7 @@ export class ContactsService {
     }
 
     const ability = await this.caslAbilityFactory.createForUser(user);
-    if (ability.cannot('update', subject('Contact', exits as any))) {
+    if (ability.cannot('update', subject('Contact', exits as unknown as Record<string, unknown>))) {
       throw new NotFoundException('Liên hệ không tồn tại');
     }
 
@@ -155,17 +161,17 @@ export class ContactsService {
   }
 
   // Logic bulk import Contacts & Deals
-  async bulkImport(tenantId: string, currentUserId: string, body: { contacts: any[] }) {
+  async bulkImport(tenantId: string, currentUserId: string, body: BulkImportContactsBodyDto) {
     const results = [];
     
-    // Đọc trước tất cả users của Tenant để tìm kiếm Owner theo email một cách nhanh nhất
-    const allTenantUsers = await (this.contactRepository as any).prismaService.user.findMany({
+    // Pre-read all Tenant users to find Owner by email as fast as possible
+    const allTenantUsers = await (this.contactRepository as unknown as { prismaService: PrismaService }).prismaService.user.findMany({
       where: { tenantId }
     });
-    const userMap = new Map<string, string>(allTenantUsers.map((u: any) => [u.email.toLowerCase(), u.id]));
+    const userMap = new Map<string, string>(allTenantUsers.map((u) => [u.email.toLowerCase(), u.id]));
 
     for (const item of body.contacts) {
-      // 1. Phân quyền chủ sở hữu (Owner)
+      // 1. Owner authorization
       let ownerId = currentUserId;
       if (item.ownerEmail) {
         const matchedUserId = userMap.get(item.ownerEmail.toLowerCase());
@@ -174,27 +180,32 @@ export class ContactsService {
         }
       }
 
-      // 2. Tìm kiếm Contact trùng lặp (Merge/Overwrite)
+      // 2. Search for duplicate Contacts (Merge/Overwrite)
       let contact = await this.contactRepository.findByEmailOrPhone(item.email, item.phone);
 
       if (contact) {
-        // Cập nhật thông tin mới
-        const updateData: any = {};
+        // Update with new information
+        const updateData: Partial<CreateContactBodyType> & { tags?: ContactTagType[] } = {};
         if (item.name) updateData.name = item.name;
         if (item.company) updateData.company = item.company;
         if (item.position) updateData.position = item.position;
         
-        // Gộp tag cũ và tag mới từ Excel
+        // Merge old tags and new tags from Excel
         if (item.tags && item.tags.length > 0) {
           const existingTags = contact.tags || [];
-          updateData.tags = Array.from(new Set([...existingTags, ...item.tags]));
+          // Tags from BulkImportContactItemSchema are plain strings; cast to ContactTagType[] after Zod validation
+          const validNewTags = item.tags as ContactTagType[];
+          updateData.tags = Array.from(new Set([...existingTags, ...validNewTags])) as ContactTagType[];
         }
         
         const oldContact = { ...contact };
         contact = await this.contactRepository.update(contact.id, updateData);
         
-        // Ghi Audit Log cho hành động UPDATE
-        const changes = getChangesDiff(oldContact, updateData);
+        // Write Audit Log for UPDATE action
+        const changes = getChangesDiff(
+          oldContact as unknown as Record<string, unknown>,
+          updateData as unknown as Record<string, unknown>
+        );
         if (Object.keys(changes).length > 0) {
           await this.auditLogsService.logAction({
             tenantId,
@@ -207,18 +218,19 @@ export class ContactsService {
           });
         }
       } else {
-        // Tạo mới Contact
+        // Create new Contact
         contact = await this.contactRepository.create(ownerId, {
           name: item.name,
           email: item.email || null,
           phone: item.phone || null,
           company: item.company || null,
           position: item.position || null,
-          tags: item.tags || []
+          // Tags from BulkImportContactItemSchema are plain strings; cast to ContactTagType[] after validation
+          tags: (item.tags || []) as ContactTagType[]
         });
 
-        // Ghi Audit Log cho hành động CREATE Contact
-        const changes: any = {};
+        // Write Audit Log for CREATE Contact action
+        const changes: Record<string, { old: unknown; new: unknown }> = {};
         for (const [key, val] of Object.entries(contact)) {
           if (['createdAt', 'updatedAt', 'deletedAt', 'id', 'tenantId'].includes(key)) continue;
           changes[key] = { old: null, new: val };
@@ -234,10 +246,10 @@ export class ContactsService {
         });
       }
 
-      // 3. Tạo Deal đi kèm nếu có khai báo Deal Title
+      // 3. Create accompanying Deal if Deal Title is declared
       if (item.dealTitle) {
-        // Chuẩn hóa ngôn ngữ Trạng thái Deal
-        let stage: any = 'PROSPECT';
+        // Normalize Deal Stage language
+        let stage: DealStageType = 'PROSPECT';
         const rawStage = (item.dealStage || '').toLowerCase().trim();
         
         if (rawStage.includes('mới') || rawStage.includes('prospect')) {
@@ -261,8 +273,8 @@ export class ContactsService {
           note: item.dealNote || null,
         });
 
-        // Ghi Audit Log cho hành động CREATE Deal
-        const dealChanges: any = {};
+        // Write Audit Log for CREATE Deal action
+        const dealChanges: Record<string, { old: unknown; new: unknown }> = {};
         for (const [key, val] of Object.entries(deal)) {
           if (['createdAt', 'updatedAt', 'deletedAt', 'id', 'tenantId'].includes(key)) continue;
           dealChanges[key] = { old: null, new: val };
@@ -281,7 +293,7 @@ export class ContactsService {
       results.push(contact);
     }
 
-    // Xóa cache Redis của tenant đó để cập nhật UI ngay lập tức
+    // Invalidate tenant Redis cache to update UI immediately
     await this.redisService.invalidateTenantCache(tenantId);
     return { success: true, count: results.length };
   }
@@ -322,7 +334,7 @@ export class ContactsService {
       const mappings = JSON.parse(cleanJson);
       return { mappings };
     } catch (err) {
-      // Fallback mapping trong trường hợp lỗi API AI
+      // Fallback mapping in case of AI API error
       const mappings: Record<string, string | null> = {};
       const fields = [
         'name', 'email', 'phone', 'company', 'position', 'tags',

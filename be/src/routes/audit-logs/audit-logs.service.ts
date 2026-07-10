@@ -13,7 +13,7 @@ export class AuditLogsService {
     targetType: string,
     targetId: string,
     targetName?: string | null,
-    changes: any;
+    changes: Record<string, unknown>;
   }){
     return this.auditLogsRepository.create(params);
   }

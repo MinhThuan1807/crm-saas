@@ -86,7 +86,7 @@ export class DealRepository {
     })
   }
 
-  // Tạo Deal mới đi kèm stage tùy chọn (dành cho Import Excel)
+  // Create new Deal with optional stage (for Excel Import)
   createWithStage(data: {
     ownerId: string
     title: string

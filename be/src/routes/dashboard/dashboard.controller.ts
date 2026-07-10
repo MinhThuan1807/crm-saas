@@ -22,9 +22,6 @@ export class DashboardController {
     @Query() query: GetDashboardQueryDto,
     @CurrentUser() user: AccessTokenPayload,
   ) {
-    return this.dashboardService.getDashboardData(user.tenantId, query.period, {
-      userId: user.userId,
-      role: user.role,
-    })
+    return this.dashboardService.getDashboardData(user.tenantId, query.period, user)
   }
 }
