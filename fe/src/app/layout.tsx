@@ -4,7 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "./providers/queryProvider";
 import { ThemeProvider } from "next-themes";
-
+import { Analytics } from '@vercel/analytics/next';
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -35,6 +35,7 @@ export default function RootLayout({
               {children}
           </QueryProvider>
           <Toaster position="top-right" richColors />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
