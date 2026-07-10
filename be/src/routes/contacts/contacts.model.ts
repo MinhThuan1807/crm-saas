@@ -16,10 +16,10 @@ const ContactBaseSchema = z.object({
   id:        z.string(),
   tenantId:  z.string(),
   name:      z.string().min(2).max(100),
-  email:     z.string().optional(),
-  phone:     z.string().optional(),
-  company:   z.string().optional(),
-  position:  z.string().optional(),
+  email:     z.string().optional().nullable(),
+  phone:     z.string().optional().nullable(),
+  company:   z.string().optional().nullable(),
+  position:  z.string().optional().nullable(),
   tags:      z.array(z.enum([
     ContactTagConst.Enterprise,
     ContactTagConst.Vip,
@@ -124,3 +124,32 @@ export const GetContactsWithDealsActivitiesResSchema = z.object({
 
 export type GetContactsQueryType = z.infer<typeof GetContactsQuerySchema>
 export type GetContactsResType   = z.infer<typeof GetContactsWithDealsActivitiesResSchema>
+
+// Schema validate cho từng dòng contact được import từ Excel
+export const BulkImportContactItemSchema = z.object({
+  name: z.string().min(2, "Tên phải có ít nhất 2 ký tự"),
+  email: z.string().email("Email không đúng định dạng").optional().nullable().or(z.literal('')),
+  phone: z.string().optional().nullable().or(z.literal('')),
+  company: z.string().optional().nullable().or(z.literal('')),
+  position: z.string().optional().nullable().or(z.literal('')),
+  tags: z.array(z.string()).optional(),
+  ownerEmail: z.string().email("Email người sở hữu không đúng định dạng").optional().nullable().or(z.literal('')),
+  dealTitle: z.string().optional().nullable().or(z.literal('')),
+  dealValue: z.preprocess(
+    (val) => {
+      if (val === '' || val === null || val === undefined) return null;
+      const parsed = Number(val);
+      return isNaN(parsed) ? null : parsed;
+    },
+    z.number().min(0, "Giá trị deal không được âm").nullable()
+  ).optional(),
+  dealStage: z.string().optional().nullable().or(z.literal('')),
+  dealNote: z.string().optional().nullable().or(z.literal('')),
+});
+
+// Schema validate cho body request gửi lên API
+export const BulkImportContactsBodySchema = z.object({
+  contacts: z.array(BulkImportContactItemSchema),
+});
+
+export type BulkImportContactsBodyType = z.infer<typeof BulkImportContactsBodySchema>;

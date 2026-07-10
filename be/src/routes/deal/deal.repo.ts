@@ -85,4 +85,28 @@ export class DealRepository {
       data: { deletedAt: new Date() },
     })
   }
+
+  // Tạo Deal mới đi kèm stage tùy chọn (dành cho Import Excel)
+  createWithStage(data: {
+    ownerId: string
+    title: string
+    value: number
+    stage: DealStageType
+    contactId: string
+    closeDate?: Date | null
+    note?: string | null
+  }) {
+    return this.prismaService.deal.create({
+      data: {
+        ownerId: data.ownerId,
+        title: data.title,
+        value: data.value,
+        stage: data.stage,
+        contactId: data.contactId,
+        closeDate: data.closeDate ?? null,
+        note: data.note ?? null,
+      } as any,
+    })
+  }
 }
+

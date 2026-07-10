@@ -135,3 +135,16 @@ export const useDeleteContact = () => {
     },
   })
 }
+
+// ─────────────────────────────────────────
+// BULK IMPORT
+// ─────────────────────────────────────────
+export const useBulkImportContacts = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (contacts: any[]) => contactsService.bulkImport(contacts),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: contactKeys.lists() });
+    },
+  });
+};

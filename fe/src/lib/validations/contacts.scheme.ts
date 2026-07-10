@@ -17,10 +17,11 @@ const ContactBaseSchema = z.object({
   email: z
     .string()
     .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Email không hợp lệ.")
-    .optional(),
-  phone: z.string().optional(),
-  company: z.string().optional(),
-  position: z.string().optional(),
+    .optional()
+    .nullable(),
+  phone: z.string().optional().nullable(),
+  company: z.string().optional().nullable(),
+  position: z.string().optional().nullable(),
   tags: z.array(z.enum([
     ContactTagConst.Enterprise,
     ContactTagConst.Vip,
