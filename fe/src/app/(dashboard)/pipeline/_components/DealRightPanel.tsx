@@ -1,6 +1,6 @@
 import { DealAiAnalyzer } from "./DealAiAnalyzer";
 import ActivityTimeline from "@/components/activities/ActivityTimeline";
-import { ActivityItem } from "@/lib/validations/activities.scheme";
+import { ActivityItem, CreateActivityForContactBodyType } from "@/lib/validations/activities.scheme";
 import { useCreateDealActivity } from "@/hooks/useActivities";
 
 interface DealRightPanelProps {
@@ -11,7 +11,7 @@ interface DealRightPanelProps {
 export function DealRightPanel({ dealId, activities }: DealRightPanelProps) {
   const createActivity = useCreateDealActivity(dealId);
 
-  const handleSubmitActivity = (data: any, reset: () => void) => {
+  const handleSubmitActivity = (data: CreateActivityForContactBodyType, reset: () => void) => {
     createActivity.mutate(data, {
       onSuccess: () => {
         reset();

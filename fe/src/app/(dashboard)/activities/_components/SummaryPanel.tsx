@@ -14,7 +14,7 @@ import type { ActivityItem, ActivityType } from "./types";
 // ─────────────────────────────────────────
 
 interface SummaryPanelProps {
-  /** Toàn bộ unfiltered activities — không thay đổi khi type filter thay đổi */
+  /** All unfiltered activities — does not change when type filter changes */
   activities: ActivityItem[];
   isLoading: boolean;
 }
@@ -60,7 +60,7 @@ const TYPE_ROWS: {
   },
 ];
 
-// Màu avatar deterministic theo userId
+// Deterministic avatar color by userId
 const AVATAR_COLORS = [
   "#D4E8F5",
   "#E8D4F5",
@@ -123,7 +123,7 @@ function UserSkeletonRows() {
 // ─────────────────────────────────────────
 
 export function SummaryPanel({ activities, isLoading }: SummaryPanelProps) {
-  // ── Count theo type — useMemo để tránh tính lại mỗi render (req 10.1) ──
+  // ── Count by type — useMemo to avoid recalculation on each render (req 10.1) ──
   const counts = useMemo(() => {
     return activities.reduce<Record<string, number>>((acc, a) => {
       acc[a.type] = (acc[a.type] ?? 0) + 1;
@@ -151,7 +151,7 @@ export function SummaryPanel({ activities, isLoading }: SummaryPanelProps) {
   // ── Render ──────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col gap-3">
-      {/* ── Tổng quan theo type ── */}
+      {/* ── Overview by type ── */}
       <div className="bg-white dark:bg-card rounded-xl border border-border/70 dark:border-border p-4 shadow-sm">
         <p
           className="text-foreground mb-3"
@@ -200,7 +200,7 @@ export function SummaryPanel({ activities, isLoading }: SummaryPanelProps) {
         )}
       </div>
 
-      {/* ── Top nhân viên ── */}
+      {/* ── Top staff ── */}
       <div className="bg-white dark:bg-card rounded-xl border border-border/70 dark:border-border p-4 shadow-sm">
         <p
           className="text-foreground mb-3"
@@ -213,7 +213,7 @@ export function SummaryPanel({ activities, isLoading }: SummaryPanelProps) {
           {isLoading ? (
             <UserSkeletonRows />
           ) : topUsers.length === 0 ? (
-            // Placeholder khi không có data
+            // Placeholder when there is no data
             [1, 2, 3].map((rank) => (
               <div key={rank} className="flex items-center gap-2.5">
                 <span

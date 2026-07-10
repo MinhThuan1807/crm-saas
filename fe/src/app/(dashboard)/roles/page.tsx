@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { ShieldCheck, UserCheck, Users, Edit2, Loader2, Pencil, Trash2, Plus, Lock } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { usersService } from "@/services/users.service";
+import { usersService, RoleDto, RolePermission } from "@/services/users.service";
 import { useMe } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
@@ -42,13 +42,15 @@ const formatSubject = (subject: string) => {
     Task: "Nhiệm vụ",
     Activity: "Hoạt động",
     User: "Thành viên",
+    Report: "Báo cáo",
+    KpiTarget: "Mục tiêu doanh số",
     all: "Hệ thống",
   };
   return map[subject] || subject;
 };
 
-// Hàm tóm tắt gộp quyền theo subject để tối ưu không gian hiển thị trên card
-const getGroupedPermissionsText = (rolePermissions: any[]) => {
+// Summarize and group permissions by subject to optimize card display space
+const getGroupedPermissionsText = (rolePermissions: RolePermission[]) => {
   const hasManageAll = rolePermissions.some((p) => p.action === "manage" && p.subject === "all");
   if (hasManageAll) {
     return ["Toàn quyền hệ thống (manage:all)"];
@@ -64,7 +66,9 @@ const getGroupedPermissionsText = (rolePermissions: any[]) => {
       delete: "Xóa",
       manage: "Toàn quyền",
     };
-    groups[p.subject].push(actionMap[p.action] || p.action);
+    const isABAC = !!(p.conditions && Object.keys(p.conditions).length > 0);
+    const actionLabel = (actionMap[p.action] || p.action) + (isABAC ? " 🔒" : "");
+    groups[p.subject].push(actionLabel);
   });
 
   return Object.entries(groups).map(([subject, actions]) => {
@@ -90,8 +94,8 @@ export default function RolesPage() {
     queryFn: usersService.getPermissions,
   });
 
-  // State quản trị quyền
-  const [selectedRole, setSelectedRole] = useState<any>(null);
+  // Permissions management state
+  const [selectedRole, setSelectedRole] = useState<RoleDto | null>(null);
   const [selectedPermIds, setSelectedPermIds] = useState<string[]>([]);
   const [isPermDialogOpen, setIsPermDialogOpen] = useState(false);
 
@@ -101,15 +105,15 @@ export default function RolesPage() {
   const [newRoleDesc, setNewRoleDesc] = useState("");
 
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState<any>(null);
+  const [editingRole, setEditingRole] = useState<RoleDto | null>(null);
   const [editingRoleName, setEditingRoleName] = useState("");
   const [editingRoleDesc, setEditingRoleDesc] = useState("");
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [deletingRole, setDeletingRole] = useState<any>(null);
+  const [deletingRole, setDeletingRole] = useState<RoleDto | null>(null);
 
   // Matrix Configuration
-  const subjects = ['Contact', 'Deal', 'Task', 'Activity', 'User', 'all'];
+  const subjects = ['Contact', 'Deal', 'Task', 'Activity', 'User', 'Report', 'KpiTarget', 'all'];
   const actions = ['read', 'create', 'update', 'delete', 'manage'];
 
   // Mutations
@@ -122,8 +126,9 @@ export default function RolesPage() {
       refetchRoles();
       queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
     },
-    onError: (err: any) => {
-      const msg = err.response?.data?.message || "Cập nhật thất bại, vui lòng thử lại.";
+    onError: (err: unknown) => {
+      const error = err as { response?: { data?: { message?: string } } };
+      const msg = error.response?.data?.message || "Cập nhật thất bại, vui lòng thử lại.";
       toast.error(msg);
     },
   });
@@ -138,8 +143,9 @@ export default function RolesPage() {
       setNewRoleDesc("");
       refetchRoles();
     },
-    onError: (err: any) => {
-      const msg = err.response?.data?.message || "Không thể tạo vai trò.";
+    onError: (err: unknown) => {
+      const error = err as { response?: { data?: { message?: string } } };
+      const msg = error.response?.data?.message || "Không thể tạo vai trò.";
       toast.error(msg);
     },
   });
@@ -154,8 +160,9 @@ export default function RolesPage() {
       refetchRoles();
       queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
     },
-    onError: (err: any) => {
-      const msg = err.response?.data?.message || "Không thể cập nhật vai trò.";
+    onError: (err: unknown) => {
+      const error = err as { response?: { data?: { message?: string } } };
+      const msg = error.response?.data?.message || "Không thể cập nhật vai trò.";
       toast.error(msg);
     },
   });
@@ -168,16 +175,17 @@ export default function RolesPage() {
       setDeletingRole(null);
       refetchRoles();
     },
-    onError: (err: any) => {
-      const msg = err.response?.data?.message || "Không thể xóa vai trò này.";
+    onError: (err: unknown) => {
+      const error = err as { response?: { data?: { message?: string } } };
+      const msg = error.response?.data?.message || "Không thể xóa vai trò này.";
       toast.error(msg);
     },
   });
 
   // Handlers
-  const handleEditPermsClick = (role: any) => {
+  const handleEditPermsClick = (role: RoleDto) => {
     setSelectedRole(role);
-    setSelectedPermIds(role.permissions.map((p: any) => p.id));
+    setSelectedPermIds(role.permissions.map((p) => p.id));
     setIsPermDialogOpen(true);
   };
 
@@ -206,7 +214,7 @@ export default function RolesPage() {
     });
   };
 
-  const handleEditRoleClick = (role: any) => {
+  const handleEditRoleClick = (role: RoleDto) => {
     setEditingRole(role);
     setEditingRoleName(role.name);
     setEditingRoleDesc(role.description || "");
@@ -228,7 +236,7 @@ export default function RolesPage() {
     });
   };
 
-  const handleDeleteRoleClick = (role: any) => {
+  const handleDeleteRoleClick = (role: RoleDto) => {
     setDeletingRole(role);
     setIsDeleteOpen(true);
   };
@@ -266,7 +274,7 @@ export default function RolesPage() {
 
       <main className="flex-1 overflow-y-auto bg-[#F8F8F7] dark:bg-background p-5">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
-          {roles.map((item: any) => {
+          {roles.map((item: RoleDto) => {
             const { icon: Icon, color, bgColor } = getRoleIcon(item.name);
             const isSystemRole = ["ADMIN", "MANAGER", "SALES_REP"].includes(item.name);
             const summarizedPermissions = getGroupedPermissionsText(item.permissions);
@@ -369,7 +377,7 @@ export default function RolesPage() {
         </div>
       </main>
 
-      {/* Dialog: Chỉnh sửa các quyền hạn (Giao diện Ma trận Bảng tối giản) */}
+      {/* Dialog: Edit permissions (Minimal Table Matrix Interface) */}
       <Dialog open={isPermDialogOpen} onOpenChange={setIsPermDialogOpen}>
         <DialogContent className="md:max-w-3xl lg:max-w-4xl max-h-[85vh] flex flex-col p-0 rounded-[10px] overflow-hidden bg-background">
           <DialogHeader className="p-6 border-b shrink-0 bg-background">
@@ -379,7 +387,7 @@ export default function RolesPage() {
             </DialogDescription>
           </DialogHeader>
 
-          {/* Body bọc scroll area ma trận quyền hạn */}
+          {/* Body wrapping permissions matrix scroll area */}
           <div className="flex-1 overflow-y-auto p-6 max-h-[50vh]">
             <div className="border border-slate-200 dark:border-border rounded-lg overflow-hidden bg-background">
               <table className="w-full text-left border-collapse">
@@ -405,9 +413,13 @@ export default function RolesPage() {
                           return <td key={act} className="p-4 text-center text-slate-300 dark:text-muted/40 text-xs font-semibold border-b border-slate-100 dark:border-border">—</td>;
                         }
                         const isChecked = selectedPermIds.includes(perm.id);
-                        const isABAC = selectedRole?.name === 'SALES_REP' && 
-                          (subj === 'Contact' || subj === 'Deal' || subj === 'Activity' || subj === 'Task') && 
-                          (act === 'read' || act === 'update' || act === 'delete');
+                        const rolePerm = selectedRole?.permissions.find(
+                          (p) => p.subject === subj && p.action === act
+                        );
+                        const isABAC = !!(rolePerm?.conditions && Object.keys(rolePerm.conditions).length > 0) || 
+                          (selectedRole?.name === 'SALES_REP' && 
+                           ['Contact', 'Deal', 'Activity', 'KpiTarget', 'Report'].includes(subj) && 
+                           ['read', 'update', 'delete'].includes(act));
 
                         return (
                           <td
@@ -447,7 +459,7 @@ export default function RolesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog: Tạo vai trò mới */}
+      {/* Dialog: Create new role */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="sm:max-w-[460px] p-0 rounded-[10px] overflow-hidden" aria-describedby={undefined}>
           <DialogHeader className="px-6 pt-6 pb-4 border-b border-[#E8E7E2] dark:border-border">
@@ -496,7 +508,7 @@ export default function RolesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog: Sửa thông tin vai trò (Tên/Mô tả) */}
+      {/* Dialog: Edit role info (Name/Description) */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent className="sm:max-w-[460px] p-0 rounded-[10px] overflow-hidden" aria-describedby={undefined}>
           <DialogHeader className="px-6 pt-6 pb-4 border-b border-[#E8E7E2] dark:border-border">
@@ -543,7 +555,7 @@ export default function RolesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog: Xác nhận Xóa vai trò */}
+      {/* Dialog: Confirm role deletion */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <DialogContent className="sm:max-w-[400px] rounded-[10px] bg-background" aria-describedby={undefined}>
           <DialogHeader>

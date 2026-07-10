@@ -11,12 +11,14 @@ import { ChartCard } from "./ChartCard";
 import { EmptyState } from "./EmptyState";
 import { reportsService } from "@/services/reports.service";
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+import { CustomTooltipProps } from "@/lib/types/chart";
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white dark:bg-card border border-[#E8E7E2] dark:border-border rounded-lg shadow-md px-3 py-2.5 text-xs text-left">
       <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontWeight: 600 }}>{label}</p>
-      {payload.map((p: any) => (
+      {payload.map((p) => (
         <div key={p.name} className="flex justify-between items-center gap-6 mb-1 last:mb-0">
           <div className="flex items-center gap-1.5">
             <span className="size-2 rounded-full shrink-0" style={{ background: p.fill }} />

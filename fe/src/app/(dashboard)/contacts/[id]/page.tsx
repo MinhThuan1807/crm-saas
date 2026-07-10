@@ -9,6 +9,8 @@ import { useGetContact } from "@/hooks/useContacts";
 import { useParams } from "next/navigation";
 import { useContactActivities, useCreateContactActivity } from "@/hooks/useActivities";
 
+import { CreateActivityForContactBodyType } from "@/lib/validations/activities.scheme";
+
 export default function ContactDetailPage() {
   // Get contact ID from URL params
   const params = useParams();
@@ -25,7 +27,7 @@ export default function ContactDetailPage() {
   const contact = getContactDetail.data;
   const activities = activites?.data || [];
 
-  const handleSubmitActivity = (data: any, reset: () => void) => {
+  const handleSubmitActivity = (data: CreateActivityForContactBodyType, reset: () => void) => {
     createActivity.mutate(data, {
       onSuccess: () => {
         reset();

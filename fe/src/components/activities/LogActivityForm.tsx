@@ -68,7 +68,7 @@ function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogAct
     });
   };
 
-  const handleSubmit = (data: any) => {
+  const handleSubmit = (data: CreateActivityForContactBodyType) => {
     const reset = () =>
       form.reset({ title: "", note: "", date: new Date(), type: activeTab });
     

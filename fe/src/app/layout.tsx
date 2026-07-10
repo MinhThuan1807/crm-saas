@@ -16,8 +16,8 @@ const geistInter = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "salesFlow - Hệ thống CRM Multi-tenant SaaS",
-  description: "salesFlow - Hệ thống quản lý khách hàng thông minh dành cho doanh nghiệp SME: Tự động hóa pipeline bán hàng, chăm sóc khách hàng và hỗ trợ phân tích bởi trí tuệ nhân tạo (AI).",
+  title: "SalesFlow - Hệ thống CRM Multi-tenant SaaS",
+  description: "SalesFlow - Hệ thống quản lý khách hàng thông minh dành cho doanh nghiệp SME: Tự động hóa pipeline bán hàng, chăm sóc khách hàng và hỗ trợ phân tích bởi trí tuệ nhân tạo (AI).",
 };
 
 export default function RootLayout({

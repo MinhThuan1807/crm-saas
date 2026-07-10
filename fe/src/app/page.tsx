@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import logoImg from "@/app/icon.png";
-import { useMe } from "@/hooks/useAuth";
+import { useMe, useLogin } from "@/hooks/useAuth";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { gsap } from "gsap";
 import {
@@ -36,22 +36,191 @@ import {
   Lock,
   ArrowDown,
   ShieldAlert,
-  FolderSync
+  FolderSync,
+  History,
+  Eye
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import TargetCursor from "@/components/TargetCursor";
+
+const featuresData = [
+  {
+    icon: <Layers className="size-5" />,
+    title: "Cô lập Tenant tuyệt đối",
+    shortDesc: "Thiết kế kiến trúc Multi-tenant chuẩn chỉnh, cách ly hoàn toàn dữ liệu ở tầng database và cache, ngăn chặn rò rỉ thông tin tối đa.",
+    color: "text-primary bg-primary/10",
+    detailsTitle: "Kiến trúc Đa thuê bao Bảo mật cao",
+    detailsDesc: "Mỗi doanh nghiệp đăng ký tài khoản được cấp một Workspace riêng biệt với mã định danh TenantID độc nhất. Dữ liệu của khách thuê được mã hóa và lọc an toàn ngay tại tầng Prisma ORM trước khi thực thi SQL, đảm bảo không bao giờ xảy ra rò rỉ dữ liệu chéo giữa các tổ chức.",
+    demoContent: (
+      <div className="border border-border rounded-xl p-4 bg-muted/30 font-mono text-[10px] space-y-2">
+        <p className="text-green-600 font-bold">// SQL Query executed by Prisma extension:</p>
+        <p className="text-foreground">SELECT * FROM "Contact" WHERE "tenantId" = 'tenant_company_abc';</p>
+        <div className="h-px bg-border my-2" />
+        <p className="text-red-500 font-bold">// Request from tenant XYZ trying to access ABC:</p>
+        <p className="text-muted-foreground font-semibold">Error: ForbiddenException (Access denied - Dynamic isolation check failed)</p>
+      </div>
+    )
+  },
+  {
+    icon: <GitBranch className="size-5" />,
+    title: "Kanban Deal mượt mà",
+    shortDesc: "Kéo thả linh hoạt các cơ hội bán hàng giữa các cột giai đoạn bán hàng, phản hồi tức thời nhờ tích hợp công nghệ DnD-kit cao cấp.",
+    color: "text-green-500 bg-green-500/10",
+    detailsTitle: "Bảng điều khiển Kanban Bán Hàng Trực Quan",
+    detailsDesc: "Theo dõi và cập nhật trạng thái cơ hội bán hàng trong chớp mắt. Hệ thống được tối ưu hóa khả năng phản hồi kéo thả mượt mà với dnd-kit và đồng bộ cache tức thì với React Query, mang lại trải nghiệm không độ trễ.",
+    demoContent: (
+      <div className="grid grid-cols-3 gap-2 border border-border rounded-xl p-3 bg-muted/30 text-[10px]">
+        <div className="bg-background border border-border p-2 rounded-lg text-center space-y-1">
+          <span className="font-bold text-muted-foreground block border-b pb-1">Tiềm năng</span>
+          <span className="bg-primary/10 text-primary px-1 rounded">5.0tr</span>
+        </div>
+        <div className="bg-background border-2 border-primary border-dashed p-2 rounded-lg text-center flex items-center justify-center text-primary font-bold">
+          Drop here
+        </div>
+        <div className="bg-background border border-border p-2 rounded-lg text-center space-y-1">
+          <span className="font-bold text-muted-foreground block border-b pb-1">Chốt thành công</span>
+          <span className="bg-green-100 text-green-800 px-1 rounded">15.0tr</span>
+        </div>
+      </div>
+    )
+  },
+  {
+    icon: <Bot className="size-5" />,
+    title: "AI Phân tích & Gợi ý",
+    shortDesc: "Tích hợp sâu OpenAI GPT-4o-mini & Groq Llama3 để phân tích thô biên bản cuộc họp, đề xuất tác vụ và tạo bản nháp email follow-up.",
+    color: "text-blue-500 bg-blue-500/10",
+    detailsTitle: "Trợ lý Trí tuệ Nhân tạo Sales Helper",
+    detailsDesc: "Bóc tách biên bản họp hoặc bản ghi âm thô chỉ trong vài giây. AI tự động lập danh sách các công việc cụ thể cần thực hiện kèm thời hạn hoàn thành và soạn thảo sẵn một email theo sát thương vụ mẫu bằng tiếng Việt.",
+    demoContent: (
+      <div className="border border-border rounded-xl p-3 bg-muted/30 text-[10px] space-y-2">
+        <div className="bg-background p-2 rounded border border-border">
+          <strong className="text-primary block">AI Extracted Action Items:</strong>
+          <p className="mt-1">1. Gửi báo giá Enterprise trước thứ 5 (Due: 12/07)</p>
+          <p>2. Gọi điện xác nhận số lượng user lúc 9h sáng</p>
+        </div>
+        <div className="bg-background p-2 rounded border border-border">
+          <strong className="text-primary block">AI Drafted Email:</strong>
+          <p className="mt-1 text-muted-foreground truncate">Chào anh Minh, em gửi dự thảo hợp đồng 12 users gói Enterprise...</p>
+        </div>
+      </div>
+    )
+  },
+  {
+    icon: <FileSpreadsheet className="size-5" />,
+    title: "AI Excel Import",
+    shortDesc: "Tải lên tệp Excel nạp dữ liệu khách hàng hàng loạt. AI tự động nhận diện và ánh xạ các tiêu đề cột thông minh, chính xác.",
+    color: "text-purple-500 bg-purple-500/10",
+    detailsTitle: "Nạp Dữ Liệu Tự Động Với AI Match",
+    detailsDesc: "Giải phóng thời gian nhập liệu thủ công bằng cách tải lên file Excel thô. Công nghệ AI tự động nhận biết, ánh xạ và khớp các cột tùy chỉnh (ví dụ: 'Số phone', 'Hòm thư') vào các trường dữ liệu chuẩn tương ứng trong hệ thống CRM.",
+    demoContent: (
+      <div className="border border-border rounded-xl p-3 bg-muted/30 text-[10px] space-y-2">
+        <div className="flex justify-between items-center bg-background p-1.5 border border-border rounded">
+          <span>Cột trong file: "Email KH"</span>
+          <span className="text-primary font-bold">→ email</span>
+        </div>
+        <div className="flex justify-between items-center bg-background p-1.5 border border-border rounded">
+          <span>Cột trong file: "Tên công ty"</span>
+          <span className="text-primary font-bold">→ companyName</span>
+        </div>
+      </div>
+    )
+  },
+  {
+    icon: <ShieldCheck className="size-5" />,
+    title: "Dynamic RBAC & ABAC",
+    shortDesc: "Phân quyền động theo vai trò (RBAC) kết hợp kiểm soát truy cập theo thuộc tính sở hữu dữ liệu (ABAC) bảo mật tối đa.",
+    color: "text-teal-500 bg-teal-500/10",
+    detailsTitle: "Kiến trúc Phân quyền Dynamic RBAC & ABAC",
+    detailsDesc: "Kết hợp hoàn hảo giữa phân quyền vai trò (RBAC) linh hoạt thông qua Ma trận quyền hạn trực quan và kiểm soát truy cập chi tiết theo thuộc tính sở hữu tài nguyên (ABAC). Toàn bộ luật được cache trên Redis giúp tăng tốc độ phản hồi API tức thì.",
+    demoContent: (
+      <div className="border border-border rounded-xl p-3 bg-muted/30 text-[10px] space-y-1.5">
+        <div className="flex justify-between items-center bg-background p-1.5 border border-border rounded">
+          <span className="font-bold text-foreground">RBAC (Admin/Manager/Sales)</span>
+          <span className="text-green-600 font-bold">Ma trận vai trò động</span>
+        </div>
+        <div className="flex justify-between items-center bg-background p-1.5 border border-border rounded">
+          <span className="font-bold text-foreground">ABAC (ownerId = user.id)</span>
+          <span className="text-primary font-bold">Chỉ thao tác dữ liệu tự sở hữu</span>
+        </div>
+      </div>
+    )
+  },
+  {
+    icon: <History className="size-5" />,
+    title: "Nhật ký Hoạt động (Audit Logs)",
+    shortDesc: "Tự động lưu lại mọi thao tác thêm, sửa, xóa dữ liệu Deal và Khách hàng kèm chi tiết giá trị trước/sau. Tăng tính minh bạch.",
+    color: "text-orange-500 bg-orange-500/10",
+    detailsTitle: "Nhật Ký Hệ Thống Giám Sát Chống Gian Lận",
+    detailsDesc: "Bảo vệ thông tin tổ chức bằng cách tự động ghi chép toàn bộ hoạt động cập nhật hay xóa bỏ dữ liệu Deal, Khách hàng. Admin/Manager có thể đối chiếu giá trị cũ/mới để khôi phục nhanh thông tin bị nhầm lẫn.",
+    demoContent: (
+      <div className="border border-border rounded-xl p-3 bg-muted/30 text-[9px] space-y-1.5 font-mono">
+        <div className="flex justify-between border-b pb-1 font-bold">
+          <span>Trường</span>
+          <span>Giá trị cũ</span>
+          <span>Giá trị mới</span>
+        </div>
+        <div className="flex justify-between text-red-500">
+          <span>stage</span>
+          <span>PROSPECT</span>
+          <span className="text-green-600 font-bold">PROPOSAL</span>
+        </div>
+        <div className="flex justify-between text-red-500">
+          <span>value</span>
+          <span>10,000,000đ</span>
+          <span className="text-green-600 font-bold">12,500,000đ</span>
+        </div>
+      </div>
+    )
+  }
+];
+
+// Magnetic wrapper component for premium tactile feel
+function Magnetic({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const { clientX, clientY } = e;
+    const { left, top, width, height } = ref.current.getBoundingClientRect();
+    const centerX = left + width / 2;
+    const centerY = top + height / 2;
+    const distanceX = clientX - centerX;
+    const distanceY = clientY - centerY;
+    setPosition({ x: distanceX * 0.35, y: distanceY * 0.35 });
+  };
+
+  const handleMouseLeave = () => {
+    setPosition({ x: 0, y: 0 });
+  };
+
+  const { x, y } = position;
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      animate={{ x, y }}
+      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+      className="inline-block"
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 export default function LandingPage() {
   const router = useRouter();
   const { data: me } = useMe();
+  const { mutate: login, isPending: isLoggingIn } = useLogin();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [demoDropdownOpen, setDemoDropdownOpen] = useState(false);
 
   // AI Simulation Tab State
   const [activeDemoTab, setActiveDemoTab] = useState<"notes" | "excel">("notes");
-
-  // Architecture Mode Switch (Business vs Tech)
-  const [archMode, setArchMode] = useState<"business" | "tech">("business");
 
   // 1. AI Meeting Notes State
   const [aiNotesStep, setAiNotesStep] = useState(0); // 0: Idle, 1: Typing Raw, 2: Analyzing, 3: Completed
@@ -66,8 +235,53 @@ export default function LandingPage() {
   // 3. Dynamic Roles Matrix State
   const [selectedMatrixRole, setSelectedMatrixRole] = useState<"ADMIN" | "MANAGER" | "SALES_REP">("SALES_REP");
 
+  // 4. Audit Logs Mock State
+  const [selectedMockLog, setSelectedMockLog] = useState<number>(0);
+  const mockAuditLogs = [
+    {
+      id: "log-1",
+      time: "10:14:02 - Hôm nay",
+      user: "Nguyễn Văn A",
+      role: "Sales Rep",
+      action: "UPDATE",
+      targetType: "DEAL",
+      targetName: "Hợp đồng VinaTech",
+      changes: {
+        stage: { old: "PROPOSAL", new: "CLOSED_WON" },
+        value: { old: "12,500,000đ", new: "15,000,000đ" },
+        updatedAt: { old: "2026-07-09T17:00:00Z", new: "2026-07-10T03:14:02Z" }
+      }
+    },
+    {
+      id: "log-2",
+      time: "09:45:18 - Hôm nay",
+      user: "Trần Thị B",
+      role: "Manager",
+      action: "DELETE",
+      targetType: "CONTACT",
+      targetName: "Lê Minh C (VinaTech)",
+      changes: {
+        deleted: { old: "false", new: "true" },
+        deletedBy: { old: "null", new: "Trần Thị B" }
+      }
+    },
+    {
+      id: "log-3",
+      time: "17:30:00 - Hôm qua",
+      user: "Phạm Văn D",
+      role: "Sales Rep",
+      action: "CREATE",
+      targetType: "DEAL",
+      targetName: "Dự án ABC Group",
+      changes: {
+        title: { old: "N/A", new: "Dự án ABC Group" },
+        value: { old: "0đ", new: "8,500,000đ" },
+        stage: { old: "N/A", new: "PROSPECT" }
+      }
+    }
+  ];
+
   // SVG lines ref for GSAP animation
-  const svgRef = useRef<SVGSVGElement | null>(null);
   const excelLinesSvgRef = useRef<SVGSVGElement | null>(null);
 
   // Perspective tilt effect for Hero Mockup
@@ -78,43 +292,120 @@ export default function LandingPage() {
   const rotateX = useTransform(y, [-300, 300], [15, -15]);
   const rotateY = useTransform(x, [-300, 300], [-15, 15]);
 
+  // 5. Hero Section Mockup Animation State
+  const [heroAnimStep, setHeroAnimStep] = useState<"negotiation" | "sliding" | "won">("negotiation");
+  const [heroKpiValue, setHeroKpiValue] = useState<number>(12.5);
+  const [particles, setParticles] = useState<{ id: number; x: number; y: number; color: string }[]>([]);
+
+  // 6. Active Feature Card Index for Expandable Cards
+  const [activeFeatureIndex, setActiveFeatureIndex] = useState<number | null>(null);
+
+  // 7. Custom cursor coordinates and proximity snap state
+  const [mousePos, setMousePos] = useState({ x: -100, y: -100 });
+  const [nearestCardIndex, setNearestCardIndex] = useState<number | null>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+
+      let nearestIndex: number | null = null;
+      let minDistance = 220; // snap distance threshold
+
+      cardRefs.current.forEach((ref, idx) => {
+        if (!ref) return;
+        const rect = ref.getBoundingClientRect();
+        const cardX = rect.left + rect.width / 2;
+        const cardY = rect.top + rect.height / 2;
+        const distance = Math.hypot(e.clientX - cardX, e.clientY - cardY);
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestIndex = idx;
+        }
+      });
+
+      setNearestCardIndex(nearestIndex);
+    };
+
+    window.addEventListener("mousemove", handleGlobalMouseMove);
+    return () => window.removeEventListener("mousemove", handleGlobalMouseMove);
+  }, [mounted]);
+
+  const triggerParticles = () => {
+    const colors = ["#8B5CF6", "#F59E0B", "#10B981", "#3B82F6", "#EC4899"];
+    const newParticles = Array.from({ length: 25 }).map((_, i) => ({
+      id: Date.now() + i,
+      x: (Math.random() - 0.5) * 120, // wider spread
+      y: (Math.random() - 0.5) * 120,
+      color: colors[Math.floor(Math.random() * colors.length)]
+    }));
+    setParticles(newParticles);
+    setTimeout(() => setParticles([]), 1500);
+  };
+
+  const handleDemoLogin = (role: "ADMIN" | "MANAGER" | "SALES") => {
+    if (role === "ADMIN") {
+      login({ email: "admin@abc.com", password: "Password123!" });
+    } else if (role === "MANAGER") {
+      login({ email: "manager@abc.com", password: "Password123!" });
+    } else {
+      login({ email: "sales@abc.com", password: "Password123!" });
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // GSAP Animation for Tech Architecture SVG
   useEffect(() => {
     if (!mounted) return;
+    
+    const interval = setInterval(() => {
+      // 1. Start sliding from Negotiation to Won
+      setHeroAnimStep("sliding");
+      
+      // 2. Lands in Won column after 1.2 seconds
+      setTimeout(() => {
+        setHeroAnimStep("won");
+        
+        // Trigger counter
+        let start = 12.5;
+        const end = 27.5;
+        const duration = 1000; // ms
+        const steps = 20;
+        const stepTime = duration / steps;
+        const increment = (end - start) / steps;
+        
+        let currentStep = 0;
+        const counterInterval = setInterval(() => {
+          currentStep++;
+          start += increment;
+          setHeroKpiValue(Number(start.toFixed(1)));
+          if (currentStep >= steps) {
+            clearInterval(counterInterval);
+            setHeroKpiValue(end);
+          }
+        }, stepTime);
 
-    // Pulse effects for connection paths
-    const paths = svgRef.current?.querySelectorAll(".flow-path");
-    if (paths && paths.length > 0) {
-      paths.forEach((path) => {
-        // Create dynamic flowing dash offset
-        gsap.to(path, {
-          strokeDashoffset: -40,
-          repeat: -1,
-          ease: "none",
-          duration: 2,
-        });
-      });
-    }
+        // Spawn particles
+        triggerParticles();
+      }, 1200);
 
-    // Bounce effect for elements
-    gsap.fromTo(
-      ".arch-node",
-      { scale: 0.96, opacity: 0.8 },
-      {
-        scale: 1,
-        opacity: 1,
-        duration: 1.5,
-        repeat: -1,
-        yoyo: true,
-        stagger: 0.15,
-        ease: "power1.inOut"
-      }
-    );
+      // 3. Reset back to Negotiation column after 4.5 seconds
+      setTimeout(() => {
+        setHeroAnimStep("negotiation");
+        setHeroKpiValue(12.5);
+      }, 4500);
+
+    }, 6000);
+
+    return () => clearInterval(interval);
   }, [mounted]);
+
+
 
   // Mouse move handler for Hero Tilt
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -209,6 +500,14 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/30 font-sans transition-colors duration-300">
       
+      <TargetCursor 
+        targetSelector=".cursor-target" 
+        excludeSelector=".no-custom-cursor"
+        cursorColor="var(--primary)" 
+        cursorColorOnTarget="var(--primary)"
+        parallaxOn={true}
+      />
+      
       {/* ── BACKGROUND ORNAMENT ────────────────────────────────────────── */}
       <div className="absolute top-0 left-0 right-0 h-[600px] bg-gradient-to-b from-primary/10 via-transparent to-transparent pointer-events-none z-0" />
       <div className="absolute top-[8%] left-[4%] w-[380px] h-[380px] bg-primary/20 rounded-full blur-[140px] pointer-events-none z-0 dark:bg-primary/12" />
@@ -233,10 +532,10 @@ export default function LandingPage() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Tính năng</a>
-            <a href="#ai-demo" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Trải nghiệm AI</a>
-            <a href="#roles-matrix" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Phân quyền</a>
-            <a href="#architecture" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Kiến trúc</a>
+            <a href="#features" className="cursor-target text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Tính năng</a>
+            <a href="#ai-demo" className="cursor-target text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Trải nghiệm AI</a>
+            <a href="#roles-matrix" className="cursor-target text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Phân quyền</a>
+            <a href="#audit-logs" className="cursor-target text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Nhật ký hoạt động</a>
           </div>
 
           <div className="hidden md:flex items-center gap-3">
@@ -244,7 +543,7 @@ export default function LandingPage() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-xl hover:bg-muted"
+              className="rounded-xl hover:bg-muted cursor-target"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
               {theme === "dark" ? <Sun className="size-4.5 text-yellow-500" /> : <Moon className="size-4.5 text-slate-700" />}
@@ -253,7 +552,7 @@ export default function LandingPage() {
             {me ? (
               <Button
                 onClick={() => router.push("/dashboard")}
-                className="bg-primary hover:bg-primary/95 text-white font-medium rounded-xl px-5 shadow-lg shadow-primary/15 flex items-center gap-2 group cursor-pointer"
+                className="bg-primary hover:bg-primary/95 text-white font-medium rounded-xl px-5 shadow-lg shadow-primary/15 flex items-center gap-2 group cursor-pointer cursor-target"
               >
                 Vào Dashboard
                 <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
@@ -263,13 +562,13 @@ export default function LandingPage() {
                 <Button
                   variant="ghost"
                   onClick={() => router.push("/login")}
-                  className="text-foreground hover:bg-muted rounded-xl font-medium px-4 cursor-pointer"
+                  className="text-foreground hover:bg-muted rounded-xl font-medium px-4 cursor-pointer cursor-target"
                 >
                   Đăng nhập
                 </Button>
                 <Button
                   onClick={() => router.push("/register")}
-                  className="bg-primary hover:bg-primary/95 text-white font-medium rounded-xl px-5 shadow-lg shadow-primary/15 cursor-pointer"
+                  className="bg-primary hover:bg-primary/95 text-white font-medium rounded-xl px-5 shadow-lg shadow-primary/15 cursor-pointer cursor-target"
                 >
                   Dùng thử miễn phí
                 </Button>
@@ -282,7 +581,7 @@ export default function LandingPage() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-xl"
+              className="rounded-xl cursor-target"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
               {theme === "dark" ? <Sun className="size-4.5 text-yellow-500" /> : <Moon className="size-4.5 text-slate-700" />}
@@ -290,7 +589,7 @@ export default function LandingPage() {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-xl"
+              className="rounded-xl cursor-target"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -311,7 +610,7 @@ export default function LandingPage() {
               <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground border-b border-border/40">Tính năng</a>
               <a href="#ai-demo" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground border-b border-border/40">Trải nghiệm AI</a>
               <a href="#roles-matrix" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground border-b border-border/40">Phân quyền</a>
-              <a href="#architecture" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground border-b border-border/40">Kiến trúc</a>
+              <a href="#audit-logs" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium py-1.5 text-muted-foreground hover:text-foreground border-b border-border/40">Nhật ký hoạt động</a>
               <div className="flex flex-col gap-2 pt-2">
                 {me ? (
                   <Button
@@ -319,7 +618,7 @@ export default function LandingPage() {
                       setMobileMenuOpen(false);
                       router.push("/dashboard");
                     }}
-                    className="w-full bg-primary hover:bg-primary/95 text-white font-medium rounded-xl"
+                    className="w-full bg-primary hover:bg-primary/95 text-white font-medium rounded-xl cursor-target"
                   >
                     Vào Dashboard
                   </Button>
@@ -331,7 +630,7 @@ export default function LandingPage() {
                         setMobileMenuOpen(false);
                         router.push("/login");
                       }}
-                      className="w-full border-border rounded-xl font-medium"
+                      className="w-full border-border rounded-xl font-medium cursor-target"
                     >
                       Đăng nhập
                     </Button>
@@ -340,7 +639,7 @@ export default function LandingPage() {
                         setMobileMenuOpen(false);
                         router.push("/register");
                       }}
-                      className="w-full bg-primary hover:bg-primary/95 text-white font-medium rounded-xl"
+                      className="w-full bg-primary hover:bg-primary/95 text-white font-medium rounded-xl cursor-target"
                     >
                       Dùng thử miễn phí
                     </Button>
@@ -353,7 +652,7 @@ export default function LandingPage() {
       </nav>
 
       {/* ── HERO SECTION ───────────────────────────────────────────────── */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-20 md:pt-20 md:pb-28 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section id="hero-section" className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-20 md:pt-20 md:pb-28 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
         
         {/* Left column info */}
         <div className="lg:col-span-6 space-y-6 text-center lg:text-left">
@@ -371,7 +670,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] text-foreground"
+            className="cursor-target text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] text-foreground"
           >
             Giải pháp Quản lý Khách hàng <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-600 dark:from-primary dark:to-indigo-400">Thông minh</span> thế hệ mới
           </motion.h1>
@@ -380,9 +679,9 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed"
+            className="cursor-target text-base sm:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed"
           >
-            Tăng tốc doanh số bán hàng cho các doanh nghiệp vừa và nhỏ (SME) với giao diện Kanban trực quan, bảo mật cô lập đa khách thuê và trợ lý AI phân tích ghi chú thông minh.
+            Tăng tốc doanh số bán hàng cho các doanh nghiệp vừa và nhỏ (SME) với giao diện Kanban trực quan, bảo mật cô lập đa khách thuê và trợ lý AI phân tích ghi chú thông minh. Tích hợp nạp dữ liệu tự động bằng AI Mapping Import và Nhật ký hoạt động (Audit Logs) giúp bảo vệ tài sản doanh nghiệp.
           </motion.p>
 
           <motion.div
@@ -395,7 +694,7 @@ export default function LandingPage() {
               <Button
                 onClick={() => router.push("/dashboard")}
                 size="lg"
-                className="bg-primary hover:bg-primary/95 text-white text-base font-semibold rounded-2xl px-8 py-6 shadow-xl shadow-primary/20 flex items-center gap-2 group cursor-pointer"
+                className="bg-primary hover:bg-primary/95 text-white text-base font-semibold rounded-2xl px-8 py-6 shadow-xl shadow-primary/20 flex items-center gap-2 group cursor-pointer cursor-target"
               >
                 Truy cập hệ thống quản trị
                 <ArrowRight className="size-5 group-hover:translate-x-1 transition-transform duration-300" />
@@ -405,20 +704,92 @@ export default function LandingPage() {
                 <Button
                   onClick={() => router.push("/register")}
                   size="lg"
-                  className="bg-primary hover:bg-primary/95 text-white text-base font-semibold rounded-2xl px-8 py-6 shadow-xl shadow-primary/20 cursor-pointer"
+                  className="bg-primary hover:bg-primary/95 text-white text-base font-semibold rounded-2xl px-8 py-6 shadow-xl shadow-primary/20 cursor-pointer cursor-target"
                 >
                   Bắt đầu dùng thử
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => router.push("/login")}
-                  size="lg"
-                  className="border-border text-foreground hover:bg-muted text-base font-semibold rounded-2xl px-8 py-6 cursor-pointer"
+                <div
+                  className="relative"
+                  onMouseEnter={() => setDemoDropdownOpen(true)}
+                  onMouseLeave={() => setDemoDropdownOpen(false)}
                 >
-                  Xem Demo tài khoản
-                </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleDemoLogin("ADMIN")}
+                    disabled={isLoggingIn}
+                    size="lg"
+                    className="border-border text-foreground hover:bg-muted text-base font-semibold rounded-2xl px-8 py-6 cursor-pointer flex items-center gap-2 cursor-target"
+                  >
+                    {isLoggingIn ? "Đang kết nối..." : "Xem Demo tài khoản"}
+                  </Button>
+
+                  <AnimatePresence>
+                    {demoDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute left-0 mt-2 w-72 bg-card border border-border rounded-2xl p-2.5 shadow-2xl z-50 flex flex-col gap-1 text-left"
+                      >
+                        <div className="px-2.5 py-1.5 border-b border-border/60 mb-1">
+                          <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Chọn tài khoản thử nghiệm</p>
+                        </div>
+                        
+                        <button
+                          onClick={() => handleDemoLogin("ADMIN")}
+                          className="w-full text-left p-2 hover:bg-muted/60 rounded-xl transition-colors flex items-start gap-2.5 group/item cursor-pointer cursor-target"
+                        >
+                          <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0 group-hover/item:bg-primary group-hover/item:text-white transition-colors">
+                            <ShieldCheck className="size-4.5" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-bold text-foreground">Admin Account</span>
+                              <span className="text-[9px] font-mono px-1 py-0.2 bg-primary/10 text-primary border border-primary/20 rounded">Full</span>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">Toàn quyền quản trị, xem logs, cấu hình phân quyền.</p>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => handleDemoLogin("MANAGER")}
+                          className="w-full text-left p-2 hover:bg-muted/60 rounded-xl transition-colors flex items-start gap-2.5 group/item cursor-pointer cursor-target"
+                        >
+                          <div className="size-8 rounded-lg bg-green-500/10 flex items-center justify-center text-green-500 shrink-0 group-hover/item:bg-green-500 group-hover/item:text-white transition-colors">
+                            <Users className="size-4.5" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-bold text-foreground">Manager Account</span>
+                              <span className="text-[9px] font-mono px-1 py-0.2 bg-green-500/10 text-green-600 border border-green-200 rounded">Lead</span>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">Quản lý cơ hội bán hàng, giao dịch của đội ngũ.</p>
+                          </div>
+                        </button>
+
+                        <button
+                          onClick={() => handleDemoLogin("SALES")}
+                          className="w-full text-left p-2 hover:bg-muted/60 rounded-xl transition-colors flex items-start gap-2.5 group/item cursor-pointer cursor-target"
+                        >
+                          <div className="size-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0 group-hover/item:bg-blue-500 group-hover/item:text-white transition-colors">
+                            <GitBranch className="size-4.5" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-bold text-foreground">Sales Rep Account</span>
+                              <span className="text-[9px] font-mono px-1 py-0.2 bg-blue-500/10 text-blue-600 border border-blue-200 rounded">ABAC</span>
+                            </div>
+                            <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">Chỉ xem/sửa dữ liệu tự sở hữu. Chặn xem logs.</p>
+                          </div>
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </>
-            )}
+            )
+            }
           </motion.div>
 
           {/* Key Quick Stats */}
@@ -477,11 +848,14 @@ export default function LandingPage() {
                   <div className="text-[10px] text-muted-foreground font-mono bg-background border border-border rounded-md px-4 py-0.5">
                     salesflow.io/pipeline
                   </div>
-                  <div className="size-3 bg-muted rounded-full" />
+                  <div className="text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 rounded-md px-2.5 py-0.5 flex items-center gap-1 font-mono">
+                    <span>MRR:</span>
+                    <span className="tabular-nums">{heroKpiValue}tr</span>
+                  </div>
                 </div>
 
                 {/* Body mock contents (Kanban board layout) */}
-                <div className="flex-1 p-3 grid grid-cols-3 gap-2 bg-[#F8F8F7] dark:bg-background/40">
+                <div className="flex-1 p-3 grid grid-cols-3 gap-2 bg-[#F8F8F7] dark:bg-background/40 relative overflow-hidden">
                   {/* Column 1 */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-center px-1">
@@ -506,14 +880,22 @@ export default function LandingPage() {
                   {/* Column 2 */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-center px-1">
-                      <span className="text-[10px] font-semibold text-primary uppercase">Đàm phán (1)</span>
-                      <span className="size-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[9px] font-semibold">1</span>
+                      <span className="text-[10px] font-semibold text-primary uppercase">Đàm phán ({heroAnimStep === "won" ? 0 : 1})</span>
+                      <span className="size-4 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[9px] font-semibold">{heroAnimStep === "won" ? 0 : 1}</span>
                     </div>
                     {/* Simulated dragging card */}
                     <motion.div
-                      animate={{ y: [0, 4, 0] }}
-                      transition={{ repeat: -1, duration: 3, ease: "easeInOut" }}
-                      className="bg-card border-2 border-primary/50 rounded-lg p-2 space-y-1.5 shadow-md scale-[1.02]"
+                      animate={
+                        heroAnimStep === "negotiation"
+                          ? { x: 0, y: 0, scale: 1.02 }
+                          : { x: 145, y: 70, scale: 0.95 }
+                      }
+                      transition={{
+                        type: "spring",
+                        stiffness: 70,
+                        damping: 15,
+                      }}
+                      className="bg-card border-2 border-primary/50 rounded-lg p-2 space-y-1.5 shadow-md relative z-20"
                     >
                       <p className="text-[11px] font-semibold truncate text-foreground flex items-center gap-1">
                         <Sparkles className="size-3 text-primary shrink-0 animate-pulse" />
@@ -527,16 +909,33 @@ export default function LandingPage() {
                   </div>
 
                   {/* Column 3 */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 relative">
                     <div className="flex justify-between items-center px-1">
-                      <span className="text-[10px] font-semibold text-muted-foreground uppercase">Thành công (4)</span>
-                      <span className="size-4 rounded-full bg-muted flex items-center justify-center text-[9px] font-semibold">4</span>
+                      <span className="text-[10px] font-semibold text-muted-foreground uppercase">Thành công ({heroAnimStep === "won" ? 5 : 4})</span>
+                      <span className="size-4 rounded-full bg-muted flex items-center justify-center text-[9px] font-semibold">{heroAnimStep === "won" ? 5 : 4}</span>
                     </div>
                     <div className="bg-card border border-border rounded-lg p-2 opacity-60 space-y-1 shadow-xs">
                       <p className="text-[11px] font-semibold truncate text-foreground">Triển khai VinaTech</p>
                       <span className="text-[9px] text-green-600 font-medium">Done</span>
                     </div>
                   </div>
+
+                  {/* Particles animation layer */}
+                  {particles.map((p) => (
+                    <motion.div
+                      key={p.id}
+                      initial={{ x: 330, y: 120, scale: 0, opacity: 1 }}
+                      animate={{
+                        x: 330 + p.x,
+                        y: 120 + p.y,
+                        scale: Math.random() * 1.5 + 0.5,
+                        opacity: 0,
+                      }}
+                      transition={{ duration: 1.2, ease: "easeOut" }}
+                      className="absolute w-1.5 h-1.5 rounded-full pointer-events-none z-30"
+                      style={{ backgroundColor: p.color }}
+                    />
+                  ))}
                 </div>
               </div>
 
@@ -571,94 +970,51 @@ export default function LandingPage() {
           
           <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
             <span className="text-xs font-bold text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full">Tính năng cốt lõi</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+            <h2 className="cursor-target text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mt-2">
               Giải quyết mọi nỗi đau của các SME bán hàng
             </h2>
-            <p className="text-muted-foreground text-sm sm:text-base">
+            <p className="cursor-target text-muted-foreground text-sm sm:text-base">
               Chúng tôi tối ưu hóa quy trình nghiệp vụ và áp dụng công nghệ tự động hóa AI nâng cao nhằm giúp doanh nghiệp của bạn vượt trội.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Feature 1 */}
-            <motion.div
-              whileHover={{ y: -6 }}
-              className="bg-card border border-border p-6 rounded-2xl shadow-sm transition-all flex flex-col justify-between"
-            >
-              <div className="space-y-4">
-                <div className="size-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
-                  <Layers className="size-5" />
-                </div>
-                <h3 className="text-lg font-bold text-foreground">Cô lập Tenant tuyệt đối</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  Thiết kế kiến trúc Multi-tenant chuẩn chỉnh, cách ly hoàn toàn dữ liệu ở tầng database và cache, ngăn chặn rò rỉ thông tin tối đa.
-                </p>
-              </div>
-              <div className="pt-4 flex items-center gap-1 text-xs text-primary font-semibold">
-                Độ trễ thấp
-                <ChevronRight className="size-3" />
-              </div>
-            </motion.div>
-
-            {/* Feature 2 */}
-            <motion.div
-              whileHover={{ y: -6 }}
-              className="bg-card border border-border p-6 rounded-2xl shadow-sm transition-all flex flex-col justify-between"
-            >
-              <div className="space-y-4">
-                <div className="size-10 bg-green-500/10 rounded-xl flex items-center justify-center text-green-500">
-                  <GitBranch className="size-5" />
-                </div>
-                <h3 className="text-lg font-bold text-foreground">Kanban Deal mượt mà</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  Kéo thả linh hoạt các cơ hội bán hàng giữa các cột giai đoạn bán hàng, phản hồi tức thời nhờ tích hợp công nghệ DnD-kit cao cấp.
-                </p>
-              </div>
-              <div className="pt-4 flex items-center gap-1 text-xs text-green-600 font-semibold">
-                Hiển thị trực quan
-                <ChevronRight className="size-3" />
-              </div>
-            </motion.div>
-
-            {/* Feature 3 */}
-            <motion.div
-              whileHover={{ y: -6 }}
-              className="bg-card border border-border p-6 rounded-2xl shadow-sm transition-all flex flex-col justify-between"
-            >
-              <div className="space-y-4">
-                <div className="size-10 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500">
-                  <Bot className="size-5" />
-                </div>
-                <h3 className="text-lg font-bold text-foreground">AI Phân tích & Gợi ý</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  Tích hợp sâu OpenAI GPT-4o-mini & Groq Llama3 để phân tích thô biên bản cuộc họp, đề xuất tác vụ và tạo bản nháp email follow-up.
-                </p>
-              </div>
-              <div className="pt-4 flex items-center gap-1 text-xs text-blue-500 font-semibold">
-                Xử lý không đồng bộ
-                <ChevronRight className="size-3" />
-              </div>
-            </motion.div>
-
-            {/* Feature 4 */}
-            <motion.div
-              whileHover={{ y: -6 }}
-              className="bg-card border border-border p-6 rounded-2xl shadow-sm transition-all flex flex-col justify-between"
-            >
-              <div className="space-y-4">
-                <div className="size-10 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-500">
-                  <TrendingUp className="size-5" />
-                </div>
-                <h3 className="text-lg font-bold text-foreground">AI Import & Phân quyền</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  Tải lên Excel nạp dữ liệu hàng loạt khớp cột tự động bằng AI. Quản lý phân quyền động trực quan với ma trận phân quyền tối tân.
-                </p>
-              </div>
-              <div className="pt-4 flex items-center gap-1 text-xs text-purple-600 font-semibold">
-                Nhập liệu nhanh chóng
-                <ChevronRight className="size-3" />
-              </div>
-            </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuresData.map((feat, index) => {
+              const isNearest = nearestCardIndex === index;
+              return (
+                <motion.div
+                  key={feat.title}
+                  ref={(el) => { cardRefs.current[index] = el; }}
+                  layoutId={`feature-card-${index}`}
+                  onClick={() => setActiveFeatureIndex(index)}
+                  animate={{
+                    scale: isNearest ? 1.05 : 1,
+                    y: isNearest ? -8 : 0,
+                    boxShadow: isNearest 
+                      ? "0 20px 25px -5px rgb(0 0 0 / 0.15), 0 8px 10px -6px rgb(0 0 0 / 0.15)" 
+                      : "0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05)"
+                  }}
+                  transition={{ type: "spring", stiffness: 150, damping: 18 }}
+                  className="bg-card border border-border p-6 rounded-2xl flex flex-col justify-between cursor-pointer group origin-center transition-colors duration-300 cursor-target"
+                >
+                  <div className="space-y-4">
+                    <div className={`size-10 rounded-xl flex items-center justify-center ${feat.color}`}>
+                      {feat.icon}
+                    </div>
+                    <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                      {feat.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                      {feat.shortDesc}
+                    </p>
+                  </div>
+                  <div className="pt-4 flex items-center gap-1 text-xs text-primary font-semibold">
+                    Xem chi tiết
+                    <ChevronRight className="size-3 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </motion.section>
@@ -681,10 +1037,10 @@ export default function LandingPage() {
                 <Bot className="size-3.5" />
                 Trợ lý AI SalesFlow
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+              <h2 className="cursor-target text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
                 Động cơ Tự động hóa tích hợp Trí tuệ Nhân tạo
               </h2>
-              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+              <p className="cursor-target text-muted-foreground text-sm sm:text-base leading-relaxed">
                 Chúng tôi cung cấp các công cụ AI đột phá để loại bỏ các thao tác thủ công phức tạp nhất trong quy trình quản trị khách hàng. Hãy chọn và trải nghiệm các tính năng AI dưới đây:
               </p>
 
@@ -696,7 +1052,7 @@ export default function LandingPage() {
                     resetAiNotesSimulation();
                     resetAiExcelSimulation();
                   }}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-target cursor-pointer ${
                     activeDemoTab === "notes"
                       ? "bg-background text-primary shadow-xs"
                       : "text-muted-foreground hover:text-foreground"
@@ -710,7 +1066,7 @@ export default function LandingPage() {
                     resetAiNotesSimulation();
                     resetAiExcelSimulation();
                   }}
-                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-target cursor-pointer ${
                     activeDemoTab === "excel"
                       ? "bg-background text-primary shadow-xs"
                       : "text-muted-foreground hover:text-foreground"
@@ -727,7 +1083,7 @@ export default function LandingPage() {
                     {(aiNotesStep === 0 || aiNotesStep === 3) && (
                       <Button
                         onClick={startAiNotesSimulation}
-                        className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl px-5 py-5 flex items-center gap-2 cursor-pointer shadow-lg shadow-primary/10"
+                        className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl px-5 py-5 flex items-center gap-2 cursor-pointer shadow-lg shadow-primary/10 cursor-target"
                       >
                         <Play className="size-4 fill-white" />
                         Chạy thử phân tích cuộc gọi
@@ -737,7 +1093,7 @@ export default function LandingPage() {
                       <Button
                         variant="outline"
                         onClick={resetAiNotesSimulation}
-                        className="border-border rounded-xl font-semibold px-4 cursor-pointer"
+                        className="border-border rounded-xl font-semibold px-4 cursor-pointer cursor-target"
                       >
                         <RotateCcw className="size-4 mr-1.5" />
                         Đặt lại
@@ -749,7 +1105,7 @@ export default function LandingPage() {
                     {(aiExcelStep === 0 || aiExcelStep === 3) && (
                       <Button
                         onClick={startAiExcelSimulation}
-                        className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl px-5 py-5 flex items-center gap-2 cursor-pointer shadow-lg shadow-primary/10"
+                        className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl px-5 py-5 flex items-center gap-2 cursor-pointer shadow-lg shadow-primary/10 cursor-target"
                       >
                         <Play className="size-4 fill-white" />
                         Chạy thử AI Match cột Excel
@@ -759,7 +1115,7 @@ export default function LandingPage() {
                       <Button
                         variant="outline"
                         onClick={resetAiExcelSimulation}
-                        className="border-border rounded-xl font-semibold px-4 cursor-pointer"
+                        className="border-border rounded-xl font-semibold px-4 cursor-pointer cursor-target"
                       >
                         <RotateCcw className="size-4 mr-1.5" />
                         Đặt lại
@@ -1020,19 +1376,19 @@ export default function LandingPage() {
                   <div className="flex bg-muted p-0.5 rounded-lg border border-border text-[10px] font-bold">
                     <button
                       onClick={() => setSelectedMatrixRole("ADMIN")}
-                      className={`px-2 py-1 rounded ${selectedMatrixRole === "ADMIN" ? "bg-background text-primary" : "text-muted-foreground"}`}
+                      className={`px-2 py-1 rounded cursor-target cursor-pointer ${selectedMatrixRole === "ADMIN" ? "bg-background text-primary" : "text-muted-foreground"}`}
                     >
                       ADMIN
                     </button>
                     <button
                       onClick={() => setSelectedMatrixRole("MANAGER")}
-                      className={`px-2 py-1 rounded ${selectedMatrixRole === "MANAGER" ? "bg-background text-primary" : "text-muted-foreground"}`}
+                      className={`px-2 py-1 rounded cursor-target cursor-pointer ${selectedMatrixRole === "MANAGER" ? "bg-background text-primary" : "text-muted-foreground"}`}
                     >
                       MANAGER
                     </button>
                     <button
                       onClick={() => setSelectedMatrixRole("SALES_REP")}
-                      className={`px-2 py-1 rounded ${selectedMatrixRole === "SALES_REP" ? "bg-background text-primary" : "text-muted-foreground"}`}
+                      className={`px-2 py-1 rounded cursor-target cursor-pointer ${selectedMatrixRole === "SALES_REP" ? "bg-background text-primary" : "text-muted-foreground"}`}
                     >
                       SALES_REP
                     </button>
@@ -1104,27 +1460,27 @@ export default function LandingPage() {
                 <ShieldCheck className="size-3.5" />
                 Kiểm Soát Quyền Chuyên Sâu
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+              <h2 className="cursor-target text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
                 Quản trị vai trò động & Bảo mật cấp dòng
               </h2>
-              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+              <p className="cursor-target text-muted-foreground text-sm sm:text-base leading-relaxed">
                 Đảm bảo an toàn thông tin tối đa cho tổ chức của bạn. Hệ thống nâng cấp toàn diện từ phân quyền vai trò tĩnh truyền thống sang phân quyền động linh hoạt thông qua Giao diện Bảng Ma trận trực quan.
               </p>
               
               <ul className="space-y-3 pt-2">
-                <li className="flex items-start gap-2.5 text-xs sm:text-sm">
+                <li className="flex items-start gap-2.5 text-xs sm:text-sm cursor-target">
                   <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
                   <div>
-                    <strong className="text-foreground font-semibold">Tạo vai trò tùy biến:</strong> Dễ dàng bổ sung vai trò mới (ví dụ: Cộng tác viên, Hỗ trợ kỹ thuật) và phân quyền chi tiết.
+                    <strong className=" text-foreground font-semibold">Tạo vai trò tùy biến:</strong> Dễ dàng bổ sung vai trò mới (ví dụ: Cộng tác viên, Hỗ trợ kỹ thuật) và phân quyền chi tiết.
                   </div>
                 </li>
-                <li className="flex items-start gap-2.5 text-xs sm:text-sm">
+                <li className="flex items-start gap-2.5 text-xs sm:text-sm cursor-target">
                   <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-foreground font-semibold">Lọc dữ liệu thông minh (ABAC):</strong> Nhân viên Sales chỉ nhìn thấy và chăm sóc khách hàng của chính họ, ngăn rò rỉ cơ hội bán hàng chéo.
                   </div>
                 </li>
-                <li className="flex items-start gap-2.5 text-xs sm:text-sm">
+                <li className="flex items-start gap-2.5 text-xs sm:text-sm cursor-target">
                   <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-foreground font-semibold">Tốc độ tức thì với Redis:</strong> Quyền hạn của User được cache trên bộ nhớ đệm giúp các lượt gọi API kiểm tra quyền không bị chậm trễ.
@@ -1136,9 +1492,9 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* ── TECH STACK & ARCHITECTURE SECTION ──────────────────────────── */}
+      {/* ── AUDIT LOGS & SECURITY SECTION ──────────────────────────── */}
       <motion.section
-        id="architecture"
+        id="audit-logs"
         variants={revealVariants}
         initial="hidden"
         whileInView="visible"
@@ -1147,224 +1503,150 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto px-6">
           
-          <div className="text-center max-w-2xl mx-auto space-y-3 mb-8">
+          <div className="text-center max-w-2xl mx-auto space-y-3 mb-12">
             <span className="text-xs font-bold text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
-              <Cpu className="size-3.5" />
-              Công nghệ & Sự Vận Hành
+              <History className="size-3.5" />
+              An toàn & Bảo mật thông tin
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-              {archMode === "business" ? "Nền tảng công nghệ tối tân bảo vệ bạn" : "Kiến trúc hệ thống chuẩn doanh nghiệp"}
+            <h2 className="cursor-target text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+              Giám sát Hoạt động & Nhật ký Thay đổi (Audit Logs)
             </h2>
-            <p className="text-muted-foreground text-sm sm:text-base">
-              {archMode === "business" 
-                ? "Chúng tôi chuyển hóa những công nghệ kỹ thuật phức tạp thành lợi ích thực tế cho doanh nghiệp: An toàn, nhanh chóng và không bao giờ đơ máy."
-                : "Chúng tôi sử dụng mô hình client-server hiện đại kết hợp với kiến trúc xử lý tác vụ nền hàng đợi (Message Queue) hiệu năng cao."}
+            <p className="cursor-target text-muted-foreground text-sm sm:text-base">
+              Mọi thay đổi dữ liệu nhạy cảm (Deal, Khách hàng) đều được lưu vết tự động. Giúp bạn chủ động kiểm soát quy trình và chống thất thoát tài nguyên doanh nghiệp.
             </p>
           </div>
 
-          {/* Dual mode selector */}
-          <div className="flex bg-muted p-1 rounded-xl border border-border/60 max-w-xs mx-auto mb-12">
-            <button
-              onClick={() => setArchMode("business")}
-              className={`flex-1 py-1.5 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                archMode === "business"
-                  ? "bg-background text-primary shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              💼 Cho Doanh Nghiệp
-            </button>
-            <button
-              onClick={() => setArchMode("tech")}
-              className={`flex-1 py-1.5 px-3 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                archMode === "tech"
-                  ? "bg-background text-primary shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              💻 Cho Kỹ Thuật
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
             
-            {/* SVG Interactive Diagram (GSAP elements) */}
-            <div className="lg:col-span-7 flex justify-center bg-card border border-border rounded-2xl p-6 shadow-sm overflow-hidden min-h-[380px] items-center relative">
-              
-              <svg
-                ref={svgRef}
-                width="100%"
-                height="320"
-                viewBox="0 0 540 320"
-                fill="none"
-                className="z-10"
-              >
-                {/* Gradient definitions */}
-                <defs>
-                  <linearGradient id="primary-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#534AB7" />
-                    <stop offset="100%" stopColor="#818CF8" />
-                  </linearGradient>
-                </defs>
+            {/* Left column: Mock Audit Log Viewer */}
+            <div className="lg:col-span-7 bg-card border border-border rounded-2xl p-5 shadow-lg flex flex-col justify-between min-h-[420px]">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="size-2.5 rounded-full bg-primary animate-pulse" />
+                    <span className="text-xs font-bold text-foreground font-mono">WORKSPACE_AUDIT_LOGS</span>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground font-semibold">Chế độ giả lập tương tác</span>
+                </div>
 
-                {/* Connection Lines (Paths) */}
-                {/* 1. Client -> Gateway */}
-                <path
-                  d="M100 160 L180 160"
-                  stroke="#534AB7"
-                  strokeWidth="2.5"
-                  strokeDasharray="5,5"
-                  className="flow-path"
-                  strokeLinecap="round"
-                />
-                {/* 2. Gateway -> Queue */}
-                <path
-                  d="M260 140 Q330 80 400 80"
-                  stroke="#818CF8"
-                  strokeWidth="2"
-                  strokeDasharray="5,5"
-                  className="flow-path"
-                  strokeLinecap="round"
-                />
-                {/* 3. Gateway -> Database */}
-                <path
-                  d="M260 180 Q330 240 400 240"
-                  stroke="#10B981"
-                  strokeWidth="2"
-                  strokeDasharray="5,5"
-                  className="flow-path"
-                  strokeLinecap="round"
-                />
-                {/* 4. Queue -> AI Workers */}
-                <path
-                  d="M440 110 L440 210"
-                  stroke="#EC4899"
-                  strokeWidth="2"
-                  strokeDasharray="5,5"
-                  className="flow-path"
-                  strokeLinecap="round"
-                />
+                {/* Log Row Items */}
+                <div className="space-y-2">
+                  {mockAuditLogs.map((log, index) => (
+                    <div
+                      key={log.id}
+                      onClick={() => setSelectedMockLog(index)}
+                      className={`p-3 rounded-xl border transition-all cursor-pointer text-left ${
+                        selectedMockLog === index
+                          ? "bg-primary/5 border-primary/40 shadow-xs"
+                          : "bg-background border-border/40 hover:bg-muted/40"
+                      }`}
+                    >
+                      <div className="flex justify-between items-start gap-2">
+                        <div>
+                          <p className="text-xs font-bold text-foreground">{log.user}</p>
+                          <p className="text-[10px] text-muted-foreground font-medium mt-0.5">{log.time} · {log.role}</p>
+                        </div>
+                        <div className="flex gap-1.5 items-center">
+                          <span className={`text-[9px] font-bold px-2 py-0.5 border rounded-full ${
+                            log.action === "CREATE"
+                              ? "bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800"
+                              : log.action === "UPDATE"
+                              ? "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800"
+                              : "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800"
+                          }`}>
+                            {log.action}
+                          </span>
+                          <span className="text-[9px] font-semibold text-[#534AB7] dark:text-primary font-mono">{log.targetType}</span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2 truncate">
+                        Tác động lên: <strong className="text-foreground font-semibold">{log.targetName}</strong>
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-                {/* Nodes (Boxes) */}
-                
-                {/* NODE: Next.js Client */}
-                <g className="arch-node cursor-pointer">
-                  <rect x="15" y="125" width="85" height="70" rx="14" fill="var(--background)" stroke="#534AB7" strokeWidth="2" />
-                  <text x="57" y="155" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">
-                    {archMode === "tech" ? "Next.js 16" : "Giao diện mượt"}
-                  </text>
-                  <text x="57" y="172" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">
-                    {archMode === "tech" ? "Frontend" : "Trải nghiệm KH"}
-                  </text>
-                  <circle cx="57" cy="115" r="4" fill="#534AB7" />
-                </g>
-
-                {/* NODE: NestJS Gateway */}
-                <g className="arch-node cursor-pointer">
-                  <rect x="180" y="125" width="85" height="70" rx="14" fill="var(--background)" stroke="url(#primary-grad)" strokeWidth="2" />
-                  <text x="222" y="155" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">
-                    {archMode === "tech" ? "NestJS API" : "Bộ não xử lý"}
-                  </text>
-                  <text x="222" y="172" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">
-                    {archMode === "tech" ? "Gateway" : "Hệ thống lõi"}
-                  </text>
-                </g>
-
-                {/* NODE: Redis Queue */}
-                <g className="arch-node cursor-pointer">
-                  <rect x="400" y="45" width="85" height="65" rx="14" fill="var(--background)" stroke="#EF4444" strokeWidth="2" />
-                  <text x="442" y="75" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">
-                    {archMode === "tech" ? "Upstash Redis" : "Hàng chờ ngầm"}
-                  </text>
-                  <text x="442" y="90" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">
-                    {archMode === "tech" ? "BullMQ Queue" : "Tránh đơ lag"}
-                  </text>
-                </g>
-
-                {/* NODE: AI Worker */}
-                <g className="arch-node cursor-pointer">
-                  <rect x="400" y="210" width="85" height="65" rx="14" fill="var(--background)" stroke="#EC4899" strokeWidth="2" />
-                  <text x="442" y="238" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">
-                    {archMode === "tech" ? "AI Worker" : "Trợ lý AI"}
-                  </text>
-                  <text x="442" y="253" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">
-                    {archMode === "tech" ? "OpenAI / Groq" : "Siêu máy tính"}
-                  </text>
-                </g>
-
-                {/* NODE: PostgreSQL Database */}
-                <g className="arch-node cursor-pointer">
-                  <rect x="290" y="225" width="85" height="65" rx="14" fill="var(--background)" stroke="#10B981" strokeWidth="2" />
-                  <text x="332" y="255" fill="var(--foreground)" fontSize="11" fontWeight="bold" textAnchor="middle">
-                    {archMode === "tech" ? "RDS Postgres" : "Kho dữ liệu"}
-                  </text>
-                  <text x="332" y="270" fill="var(--muted-foreground)" fontSize="9" textAnchor="middle">
-                    {archMode === "tech" ? "Tenant Isolation" : "Khóa cô lập 🔒"}
-                  </text>
-                </g>
-              </svg>
-
-              <div className="absolute bottom-4 right-4 bg-background/90 text-[10px] text-muted-foreground border border-border px-2.5 py-1 rounded-md">
-                {archMode === "business" ? "⚡ Mô phỏng quy trình xử lý an toàn" : "⚡ Sơ đồ dữ liệu không đồng bộ"}
+              {/* Dynamic diff viewer for selected log */}
+              <div className="mt-4 bg-muted/40 border border-border/60 rounded-xl p-3.5 text-xs">
+                <p className="font-bold text-foreground mb-2 flex items-center gap-1.5">
+                  <Eye className="size-3.5 text-primary" />
+                  Chi tiết thay đổi của {mockAuditLogs[selectedMockLog].user}
+                </p>
+                <div className="border border-border/60 rounded-lg overflow-hidden bg-background">
+                  <table className="w-full text-left border-collapse text-[11px]">
+                    <thead>
+                      <tr className="border-b border-border bg-muted/50 font-semibold text-muted-foreground">
+                        <th className="p-2">Trường dữ liệu</th>
+                        <th className="p-2">Trước thay đổi (Old)</th>
+                        <th className="p-2">Sau thay đổi (New)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/40 font-medium">
+                      {Object.entries(mockAuditLogs[selectedMockLog].changes).map(([field, val]) => (
+                        <tr key={field} className="hover:bg-muted/10 transition-colors">
+                          <td className="p-2 text-primary font-mono font-semibold">{field}</td>
+                          <td className="p-2 text-red-500 line-through bg-red-50/20 dark:bg-red-950/10 font-mono">{val.old}</td>
+                          <td className="p-2 text-green-600 font-bold bg-green-50/20 dark:bg-green-950/10 font-mono">{val.new}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
-            {/* Right Tech Info */}
-            <div className="lg:col-span-5 space-y-6">
-              <h3 className="text-xl font-bold text-foreground">
-                {archMode === "business" ? "Vì sao SalesFlow ổn định vượt trội?" : "Hạ tầng mạng lưới tin cậy"}
-              </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                {archMode === "business" 
-                  ? "Mọi thiết kế kỹ thuật của chúng tôi đều hướng tới mục tiêu mang lại sự yên tâm tuyệt đối cho khách hàng doanh nghiệp về tốc độ và độ bảo mật."
-                  : "Chúng tôi thiết kế ứng dụng chạy trên nền tảng VPS cô lập hoặc cụm dịch vụ AWS (ECS + RDS). Sử dụng hàng đợi Redis kết hợp BullMQ giúp giảm tải tối đa cho API chính."}
-              </p>
+            {/* Right column: Benefits list */}
+            <div className="lg:col-span-5 flex flex-col justify-center space-y-6">
+              <div className="space-y-2">
+                <span className="text-xs font-bold text-primary uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full">
+                  Tính năng nâng cao
+                </span>
+                <h3 className="cursor-target text-2xl font-bold text-foreground">
+                  Vì sao doanh nghiệp cần Nhật ký hành động?
+                </h3>
+                <p className="cursor-target text-muted-foreground text-sm leading-relaxed">
+                  Trong một đội ngũ bán hàng năng động, dữ liệu khách hàng và các deals thay đổi liên tục. Audit Logs giúp người quản lý nắm bắt rõ tiến trình và bảo vệ tài sản số của công ty.
+                </p>
+              </div>
 
-              <ul className="space-y-3 pt-2">
-                {archMode === "business" ? (
-                  <>
-                    <li className="flex items-start gap-2.5 text-xs sm:text-sm">
-                      <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-foreground font-semibold">Bảo mật tuyệt đối (PostgreSQL Isolation):</strong> Dữ liệu của bạn được cô lập hoàn toàn như sở hữu căn hộ riêng biệt, không lo rò rỉ dữ liệu sang công ty khác.
-                      </div>
-                    </li>
-                    <li className="flex items-start gap-2.5 text-xs sm:text-sm">
-                      <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-foreground font-semibold">Không bao giờ đơ máy (Task Queue):</strong> Khi AI chạy phân tích hoặc bạn tải lên file Excel lớn, tác vụ sẽ được xử lý ngầm, giúp bạn tiếp tục làm việc bình thường.
-                      </div>
-                    </li>
-                    <li className="flex items-start gap-2.5 text-xs sm:text-sm">
-                      <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-foreground font-semibold">Tải trang tức thì (Edge Delivery):</strong> Hệ thống sử dụng mạng lưới phân phối biên toàn cầu giúp thời gian chờ gần như bằng không.
-                      </div>
-                    </li>
-                  </>
-                ) : (
-                  <>
-                    <li className="flex items-start gap-2.5 text-xs sm:text-sm">
-                      <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-foreground font-semibold">Bảo mật thông tin:</strong> Tự động phân tách dữ liệu theo tenantId thông qua Prisma query middleware mở rộng.
-                      </div>
-                    </li>
-                    <li className="flex items-start gap-2.5 text-xs sm:text-sm">
-                      <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-foreground font-semibold">Tối ưu hóa chi phí:</strong> Sử dụng Upstash Serverless Redis bên ngoài VPC giúp linh hoạt thanh toán theo lượng sử dụng thực tế.
-                      </div>
-                    </li>
-                    <li className="flex items-start gap-2.5 text-xs sm:text-sm">
-                      <CheckCircle2 className="size-4.5 text-primary shrink-0 mt-0.5" />
-                      <div>
-                        <strong className="text-foreground font-semibold">Tốc độ cao:</strong> Next.js deploy CDN Edge tối ưu hóa thời gian tải trang đầu tiên trên toàn cầu.
-                      </div>
-                    </li>
-                  </>
-                )}
-              </ul>
+              <div className="space-y-4">
+                <div className="flex gap-3 cursor-target">
+                  <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0 mt-0.5">
+                    <CheckCircle2 className="size-4.5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-foreground">Lưu vết lịch sử tự động</h4>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Mọi hành động tạo mới, cập nhật giá trị deal hoặc xóa khách hàng đều được hệ thống backend ghi nhận tức thì, không thể can thiệp hay xóa bỏ.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 cursor-target">
+                  <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0 mt-0.5">
+                    <CheckCircle2 className="size-4.5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-foreground">Chi tiết so sánh Old/New</h4>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Không chỉ ghi nhận hành động, hệ thống còn lưu trữ sự khác biệt của từng trường thông tin giúp dễ dàng khôi phục khi phát sinh nhầm lẫn.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 cursor-target">
+                  <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0 mt-0.5">
+                    <CheckCircle2 className="size-4.5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-foreground">Kiểm soát truy cập (RBAC)</h4>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Chỉ có các vai trò quản trị viên như ADMIN và MANAGER mới có thể xem Audit Logs toàn bộ workspace để đảm bảo tính riêng tư của nhân viên.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -1374,10 +1656,10 @@ export default function LandingPage() {
       {/* ── CALL TO ACTION & FOOTER ────────────────────────────────────── */}
       <section className="relative z-10 py-20 bg-gradient-to-b from-transparent to-primary/5">
         <div className="max-w-4xl mx-auto px-6 text-center space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+          <h2 className="cursor-target text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
             Bắt đầu số hóa quy trình kinh doanh của bạn ngay hôm nay
           </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
+          <p className="cursor-target text-muted-foreground max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
             Tham gia cùng hàng trăm nhóm bán hàng SME đang sử dụng SalesFlow để tối ưu hóa quy trình, chăm sóc khách hàng và gia tăng tỷ lệ chốt deal vượt bậc.
           </p>
           <div className="pt-2 flex justify-center gap-4">
@@ -1385,7 +1667,7 @@ export default function LandingPage() {
               <Button
                 onClick={() => router.push("/dashboard")}
                 size="lg"
-                className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-2xl px-8 py-6 shadow-xl shadow-primary/10 cursor-pointer"
+                className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-2xl px-8 py-6 shadow-xl shadow-primary/10 cursor-target"
               >
                 Vào Dashboard Quản trị
               </Button>
@@ -1394,7 +1676,7 @@ export default function LandingPage() {
                 <Button
                   onClick={() => router.push("/register")}
                   size="lg"
-                  className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-2xl px-8 py-6 shadow-xl shadow-primary/10 cursor-pointer"
+                  className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-2xl px-8 py-6 shadow-xl shadow-primary/10 cursor-pointer cursor-target"
                 >
                   Đăng ký miễn phí
                 </Button>
@@ -1402,7 +1684,7 @@ export default function LandingPage() {
                   variant="outline"
                   onClick={() => router.push("/login")}
                   size="lg"
-                  className="border-border text-foreground hover:bg-muted font-semibold rounded-2xl px-8 py-6 cursor-pointer"
+                  className="border-border text-foreground hover:bg-muted font-semibold rounded-2xl px-8 py-6 cursor-target"
                 >
                   Đăng nhập
                 </Button>
@@ -1429,6 +1711,65 @@ export default function LandingPage() {
           </p>
         </div>
       </section>
+
+      {/* ── EXPANDABLE DETAIL MODAL ────────────────────────────────────── */}
+      <AnimatePresence>
+        {activeFeatureIndex !== null && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.6 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setActiveFeatureIndex(null)}
+              className="absolute inset-0 bg-zinc-950 backdrop-blur-xs cursor-pointer"
+            />
+            
+            {/* Modal Card */}
+            <motion.div
+              layoutId={`feature-card-${activeFeatureIndex}`}
+              className="bg-card border border-border rounded-3xl p-6 md:p-8 w-full max-w-xl shadow-2xl relative z-10 overflow-hidden flex flex-col justify-between"
+              style={{ maxHeight: "90vh" }}
+            >
+              <button
+                onClick={() => setActiveFeatureIndex(null)}
+                className="absolute right-4 top-4 text-muted-foreground hover:text-foreground hover:bg-muted p-1.5 rounded-full transition-colors cursor-pointer cursor-target"
+              >
+                <X className="size-5" />
+              </button>
+
+              <div className="space-y-6 flex-1 overflow-y-auto pr-1">
+                <div className="flex items-center gap-3">
+                  <div className={`size-11 rounded-xl flex items-center justify-center ${featuresData[activeFeatureIndex].color}`}>
+                    {featuresData[activeFeatureIndex].icon}
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-extrabold text-foreground">
+                    {featuresData[activeFeatureIndex].detailsTitle}
+                  </h3>
+                </div>
+
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed font-normal">
+                  {featuresData[activeFeatureIndex].detailsDesc}
+                </p>
+
+                <div className="space-y-2">
+                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">Mô phỏng tính năng thực tế</span>
+                  {featuresData[activeFeatureIndex].demoContent}
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-border mt-6 flex justify-end">
+                <Button
+                  onClick={() => setActiveFeatureIndex(null)}
+                  className="bg-primary hover:bg-primary/95 text-white font-bold rounded-xl px-6 cursor-pointer cursor-target"
+                >
+                  Đóng
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

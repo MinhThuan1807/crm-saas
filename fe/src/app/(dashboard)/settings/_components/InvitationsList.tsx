@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Invitation } from "@/services/invitations.service";
 import { useQuery } from "@tanstack/react-query";
-import { usersService } from "@/services/users.service";
+import { usersService, RoleDto } from "@/services/users.service";
 
 const formatRoleDisplayName = (name: string) => {
   if (name === "ADMIN") return "Admin";
@@ -372,7 +372,7 @@ function EditInvitationDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-[10px] border-[#E8E7E2] dark:border-border bg-background">
-                {roles.map((r: any) => (
+                {roles.map((r: RoleDto) => (
                   <SelectItem key={r.id} value={r.name} style={{ fontSize: 13 }}>
                     {formatRoleDisplayName(r.name)}
                   </SelectItem>
@@ -382,7 +382,7 @@ function EditInvitationDialog({
           </div>
 
           <p className="text-[#6B6B67] dark:text-muted-foreground leading-relaxed" style={{ fontSize: 11 }}>
-            * Lưu ý: Khi chỉnh sửa, hệ thống sẽ tự động tạo link token mới và vô hiệu hóa link cũ. Một email kích hoạt mới sẽ được tự động gửi đến địa chỉ email này.
+            * Note: When editing, the system will automatically create a new token link and invalidate the old one. A new activation email will be automatically sent to this email address.
           </p>
         </div>
 

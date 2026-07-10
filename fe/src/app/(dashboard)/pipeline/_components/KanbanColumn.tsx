@@ -27,13 +27,13 @@ function formatTotal(total: number): string {
 export function KanbanColumn({ stage, deals, onEdit, onDelete }: Props) {
   const config = STAGE_CONFIG[stage];
 
-  // Column là droppable target — id = stage string
+  // Column is droppable target — id = stage string
   const { setNodeRef, isOver } = useDroppable({ id: stage });
 
   const totalValue = deals.reduce((sum, d) => sum + Number(d.value), 0);
   const isEmpty = deals.length === 0;
 
-  // SortableContext cần danh sách id theo thứ tự hiện tại
+  // SortableContext needs id list in current order
   const dealIds = deals.map((d) => d.id);
 
   return (

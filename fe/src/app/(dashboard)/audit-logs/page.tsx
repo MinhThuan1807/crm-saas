@@ -187,21 +187,22 @@ export default function AuditLogsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {Object.entries(selectedLog.changes || {}).map(([field, val]: [string, any]) => {
-                      const renderVal = (v: any) => {
+                    {Object.entries(selectedLog.changes || {}).map(([field, val]) => {
+                      const renderVal = (v: unknown) => {
                         if (v === null || v === undefined) return "NULL";
                         if (typeof v === "object") return JSON.stringify(v);
                         return String(v);
                       };
+                      const change = val as { old?: unknown; new?: unknown };
 
                       return (
                         <TableRow key={field}>
                           <TableCell className="font-medium text-[#534AB7] dark:text-primary">{field}</TableCell>
                           <TableCell className="text-red-600 dark:text-red-400 line-through bg-red-50/50 dark:bg-red-950/20 max-w-[150px] truncate">
-                            {renderVal(val.old)}
+                            {renderVal(change.old)}
                           </TableCell>
                           <TableCell className="text-green-700 dark:text-green-400 font-semibold bg-green-50/50 dark:bg-green-950/20 max-w-[150px] truncate">
-                            {renderVal(val.new)}
+                            {renderVal(change.new)}
                           </TableCell>
                         </TableRow>
                       );

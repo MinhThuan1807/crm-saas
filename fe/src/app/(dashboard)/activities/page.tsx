@@ -40,7 +40,7 @@ import {
 // Helpers
 // ─────────────────────────────────────────
 
-/** Format ngày thành label tiếng Việt: "Hôm nay", "Hôm qua", hoặc ngày đầy đủ */
+/** Format date into Vietnamese labels: "Hôm nay" (Today), "Hôm qua" (Yesterday), or full date */
 function formatDateLabel(date: Date): string {
   if (isToday(date)) {
     return `Hôm nay — ${format(date, "d 'tháng' M, yyyy")}`;
@@ -51,7 +51,7 @@ function formatDateLabel(date: Date): string {
   return format(date, "d 'tháng' M, yyyy");
 }
 
-/** Group flat ActoivityItem[] the calendar day, sort ngày giảm dần */
+/** Group flat ActivityItem[] by calendar day, sort dates descending */
 function groupActivitiesByDate(activities: ActivityItem[]): ActivityGroup[] {
   const groups: Record<string, ActivityGroup> = {};
 
@@ -69,7 +69,7 @@ function groupActivitiesByDate(activities: ActivityItem[]): ActivityGroup[] {
     groups[dayKey].items.push(activity);
   }
 
-  // Sort groups theo ngày giảm dần (API đã trả về items sorted rồi)
+  // Sort groups by date descending (API has already returned sorted items)
   return Object.values(groups).sort((a, b) => b.date.localeCompare(a.date));
 }
 
@@ -141,7 +141,7 @@ export default function Activities() {
     [data],
   );
 
-  // ── Group theo ngày cho timeline ────────────────────────────────
+  // ── Group by day for timeline ────────────────────────────────
   const groups = useMemo(
     () => (showEmpty ? [] : groupActivitiesByDate(allActivities)),
     [allActivities, showEmpty],

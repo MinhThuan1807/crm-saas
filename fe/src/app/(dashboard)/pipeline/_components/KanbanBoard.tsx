@@ -149,7 +149,7 @@ export function KanbanBoard() {
   const updateDealStage = useUpdateDealStage();
 
   const [activeDeal, setActiveDeal] = useState<Deal | null>(null);
-  // Track stage gốc lúc bắt đầu kéo — active.data.current không tự update
+  // Track original stage at start of drag — active.data.current doesn't update on its own
   const dragOriginStage = useRef<Stage | null>(null);
   const lastOverStage = useRef<Stage | null>(null);
 
@@ -208,13 +208,13 @@ export function KanbanBoard() {
 
   const allEmpty = STAGES.every((s) => pipeline[s].length === 0);
 
-  // ── tìm stage chứa dealId ───────────────────────────────────────
+  // ── find stage containing dealId ───────────────────────────────────────
   function findStage(dealId: string): Stage | undefined {
     const currentPipeline = useDealPipelineStore.getState().pipeline;
     return STAGES.find((s) => currentPipeline[s].some((d) => d.id === dealId));
   }
 
-  // ── onDragStart: lưu deal đang kéo + stage gốc ─────────────────────────
+  // ── onDragStart: save dragged deal + original stage ─────────────────────────
   function handleDragStart(event: DragStartEvent) {
     const dealId = event.active.id as string;
     const deal = STAGES.flatMap((s) => pipeline[s]).find(
@@ -225,7 +225,7 @@ export function KanbanBoard() {
     lastOverStage.current = dragOriginStage.current;
   }
 
-  // ── onDragOver: live preview khi kéo sang column khác ───────────────────
+  // ── onDragOver: live preview when dragging to another column ───────────────────
   function handleDragOver(event: DragOverEvent) {
     const { active, over } = event;
     if (!over) return;
@@ -243,16 +243,16 @@ export function KanbanBoard() {
 
     if (!toStage || fromStage === toStage) return;
 
-    // Preview cross-column move trong store (chưa gọi API)
+    // Preview cross-column move in store (API not called yet)
     moveDeal(dealId, fromStage, toStage);
     lastOverStage.current = toStage;
   }
 
-  // ── onDragEnd: commit thay đổi ───────────────────────────────────────────
+  // ── onDragEnd: commit changes ───────────────────────────────────────────
   function handleDragEnd(event: DragEndEvent) {
     setActiveDeal(null);
     const { active, over } = event;
-    // Lấy stage gốc từ ref (không bị ảnh hưởng bởi handleDragOver)
+    // Get original stage from ref (unaffected by handleDragOver)
     const originStage = dragOriginStage.current;
     dragOriginStage.current = null;
 
@@ -261,13 +261,13 @@ export function KanbanBoard() {
     const dealId = active.id as string;
     const overId = over.id as string;
 
-    // Stage hiện tại trong store (sau khi handleDragOver đã preview)
+    // Current stage in store (after handleDragOver has previewed)
     const currentStage = findStage(dealId);
     if (!currentStage) return;
     const isOverStage = (STAGES as readonly string[]).includes(overId);
 
     if (isOverStage) {
-      // Thả vào column header/empty area
+      // Drop into column header/empty area
       const toStage = overId as Stage;
       if (originStage !== toStage) {
         updateDealStage.mutate({
@@ -280,7 +280,7 @@ export function KanbanBoard() {
       return;
     }
 
-    // Thả vào vị trí của card khác
+    // Drop into position of another card
     const overStage = findStage(overId);
     if (!overStage) return;
 
@@ -292,10 +292,10 @@ export function KanbanBoard() {
       if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
         const reordered = arrayMove(items, oldIndex, newIndex);
         setPipeline({ ...pipeline, [currentStage]: reordered });
-        // Backend không lưu thứ tự → không gọi API
+        // Backend doesn't store order -> API not called
       }
     } else {
-      // ── Cross-column: handleDragOver đã move, chỉ gọi API ───────────
+      // ── Cross-column: handleDragOver already moved, only call API ───────────
       updateDealStage.mutate({
         id: dealId,
         from: originStage,
@@ -353,7 +353,7 @@ export function KanbanBoard() {
         )}
       </div>
 
-      {/* DragOverlay: render clone của card đang kéo */}
+      {/* DragOverlay: render clone of the dragged card */}
       <DragOverlay>
         {activeDeal ? (
           <DealCard

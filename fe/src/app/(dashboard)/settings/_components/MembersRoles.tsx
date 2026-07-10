@@ -23,7 +23,7 @@ import {
 import { useGetUsers, useUpdateUser, useDeleteUser } from "@/hooks/useUsers";
 import { useGetInvitations, useCreateInvitation } from "@/hooks/useInvitations";
 import { useQuery } from "@tanstack/react-query";
-import { usersService } from "@/services/users.service";
+import { usersService, RoleDto } from "@/services/users.service";
 
 import { cn } from "@/lib/utils";
 
@@ -88,8 +88,8 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) 
   });
 
   useEffect(() => {
-    if (roles.length > 0 && !roles.some((r: any) => r.name === role)) {
-      const defaultRole = roles.find((r: any) => r.name === "SALES_REP") || roles[0];
+    if (roles.length > 0 && !roles.some((r: RoleDto) => r.name === role)) {
+      const defaultRole = roles.find((r: RoleDto) => r.name === "SALES_REP") || roles[0];
       setRole(defaultRole.name);
     }
   }, [roles, role]);
@@ -140,7 +140,7 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) 
               onValueChange={(v) => setRole(v)}
               className="gap-2"
             >
-              {roles.map((r: any) => {
+              {roles.map((r: RoleDto) => {
                 const isSelected = role === r.name;
                 const Icon = r.name === "ADMIN" ? Crown : r.name === "MANAGER" ? ChartIcon : Info;
                 return (
@@ -595,7 +595,7 @@ function EditMemberDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="rounded-[10px] border-[#E8E7E2] dark:border-border bg-background">
-                {roles.map((r: any) => (
+                {roles.map((r: RoleDto) => (
                   <SelectItem key={r.id} value={r.name} style={{ fontSize: 13 }}>
                     {formatRoleDisplayName(r.name)}
                   </SelectItem>

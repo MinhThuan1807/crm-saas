@@ -13,6 +13,7 @@ import { EmptyState } from "./EmptyState";
 import { formatVndShort, getInitials, getAvatarColors } from "@/lib/helper";
 import { reportsService } from "@/services/reports.service";
 import { useMe } from "@/hooks/useAuth";
+import { CustomTooltipProps } from "@/lib/types/chart";
 import {
   Dialog,
   DialogContent,
@@ -24,16 +25,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white dark:bg-card border border-[#E8E7E2] dark:border-border rounded-lg shadow-md px-3 py-2.5 text-xs">
       <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontWeight: 600 }}>{label}</p>
-      {payload.map((p: any) => (
+      {payload.map((p) => (
         <div key={p.dataKey} className="flex items-center gap-2 mb-0.5">
           <span className="size-2 rounded-full shrink-0" style={{ background: p.color ?? p.fill }} />
           <span className="text-[#6B6B67] dark:text-muted-foreground">{p.name}:</span>
-          <span className="text-[#1A1A18] dark:text-foreground" style={{ fontWeight: 500 }}>{formatVndShort(p.value)}</span>
+          <span className="text-[#1A1A18] dark:text-foreground" style={{ fontWeight: 500 }}>{formatVndShort(Number(p.value))}</span>
         </div>
       ))}
     </div>
@@ -78,8 +79,9 @@ export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabPro
       toast.success("Cập nhật target KPI thành công!");
       setIsModalOpen(false);
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || "Cập nhật target KPI thất bại.");
+    onError: (err: unknown) => {
+      const error = err as { response?: { data?: { message?: string } } };
+      toast.error(error.response?.data?.message || "Cập nhật target KPI thất bại.");
     },
   });
 

@@ -7,12 +7,14 @@ import { ChartCard } from "./ChartCard";
 import { EmptyState } from "./EmptyState";
 import { winLossData } from "./reportsData";
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+import { CustomTooltipProps } from "@/lib/types/chart";
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white dark:bg-card border border-[#E8E7E2] dark:border-border rounded-lg shadow-md px-3 py-2 text-xs">
       <p className="text-[#1A1A18] dark:text-foreground mb-1" style={{ fontWeight: 600 }}>{label}</p>
-      {payload.map((p: any) => (
+      {payload.map((p) => (
         <div key={p.dataKey} className="flex items-center gap-2 mb-0.5">
           <span className="size-2 rounded-full shrink-0" style={{ background: p.fill }} />
           <span className="text-[#6B6B67] dark:text-muted-foreground">{p.name}:</span>

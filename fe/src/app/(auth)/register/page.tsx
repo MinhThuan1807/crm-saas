@@ -24,7 +24,8 @@ type StrengthLevel = 0 | 1 | 2 | 3;
 interface StrengthResult {
   level: StrengthLevel;
   label: string;
-  color: string;
+  colorClass: string;
+  bgClass: string;
   criteria: { label: string; met: boolean }[];
 }
 
@@ -35,14 +36,15 @@ function getPasswordStrength(pw: string): StrengthResult {
     { label: "Chứa chữ hoa",    met: /[A-Z]/.test(pw) },
   ];
   const metCount = criteria.filter((c) => c.met).length as 0 | 1 | 2 | 3;
-  const levels: { label: string; color: string }[] = [
-    { label: "",          color: "#E8E7E2" },
-    { label: "Yếu",       color: "#E05D5D" },
-    { label: "Trung bình", color: "#F0A429" },
-    { label: "Mạnh",      color: "#3B8A3B" },
+  const levels: { label: string; colorClass: string; bgClass: string }[] = [
+    { label: "",          colorClass: "text-muted-foreground", bgClass: "bg-muted" },
+    { label: "Yếu",       colorClass: "text-red-500 dark:text-red-400", bgClass: "bg-red-500 dark:bg-red-400" },
+    { label: "Trung bình", colorClass: "text-amber-500 dark:text-amber-400", bgClass: "bg-amber-500 dark:bg-amber-400" },
+    { label: "Mạnh",      colorClass: "text-green-600 dark:text-green-400", bgClass: "bg-green-600 dark:bg-green-400" },
   ];
   return { level: metCount, ...levels[metCount], criteria };
 }
+
 
 
 // ─── Password Input ───────────────────────────────────────────────────────────
@@ -77,7 +79,7 @@ PasswordInput.displayName = "PasswordInput";
 
 function PasswordStrengthMeter({ password }: { password: string }) {
   if (!password) return null;
-  const { level, label, color, criteria } = getPasswordStrength(password);
+  const { level, label, colorClass, bgClass, criteria } = getPasswordStrength(password);
   return (
     <div className="space-y-2 pt-0.5">
       {/* Bar */}
@@ -85,8 +87,10 @@ function PasswordStrengthMeter({ password }: { password: string }) {
         {([1, 2, 3] as const).map((i) => (
           <div
             key={i}
-            className="h-1 flex-1 rounded-full transition-all duration-300"
-            style={{ background: i <= level ? color : "#F1EFE8" }}
+            className={cn(
+              "h-1 flex-1 rounded-full transition-all duration-300",
+              i <= level ? bgClass : "bg-muted"
+            )}
           />
         ))}
       </div>
@@ -97,8 +101,10 @@ function PasswordStrengthMeter({ password }: { password: string }) {
             {criteria.map((c) => (
               <span
                 key={c.label}
-                className="flex items-center gap-1"
-                style={{ fontSize: 11, color: c.met ? "#3B8A3B" : "#9B9B96" }}
+                className={cn(
+                  "flex items-center gap-1 text-[11px]",
+                  c.met ? "text-green-600 dark:text-green-400" : "text-muted-foreground"
+                )}
               >
                 <Check
                   className={cn("size-3 transition-opacity", c.met ? "opacity-100" : "opacity-30")}
@@ -108,12 +114,13 @@ function PasswordStrengthMeter({ password }: { password: string }) {
               </span>
             ))}
           </div>
-          <span style={{ fontSize: 11, fontWeight: 500, color }}>{label}</span>
+          <span className={cn("text-[11px] font-medium", colorClass)}>{label}</span>
         </div>
       )}
     </div>
   );
 }
+
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -137,7 +144,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-svh flex flex-col items-center justify-center px-4 py-16 bg-[#F8F8F7]">
+    <div className="min-h-svh flex flex-col items-center justify-center px-4 py-16 bg-[#F8F8F7] dark:bg-background">
       <div className="w-full max-w-[420px]">
         {/* Brand header */}
         <div className="flex flex-col items-center gap-5 mb-8 text-center">
@@ -156,7 +163,7 @@ export default function RegisterPage() {
         </div>
 
         {/* Form card */}
-        <div className="bg-background border border-border rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="bg-card border border-border rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <form onSubmit={handleSubmit(onSubmit)} noValidate className="p-6 space-y-4">
             {/* Company name */}
             <div className="space-y-1.5">
@@ -282,7 +289,7 @@ export default function RegisterPage() {
           <div className="relative px-6 pb-1">
             <Separator />
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="bg-background px-3 text-muted-foreground" style={{ fontSize: 12 }}>
+              <span className="bg-card px-3 text-muted-foreground" style={{ fontSize: 12 }}>
                 hoặc
               </span>
             </div>
@@ -316,7 +323,7 @@ export default function RegisterPage() {
       </div>
 
       <p className="mt-12 text-muted-foreground" style={{ fontSize: 12 }}>
-        © 2025 SalesFlow · All rights reserved.
+        © 2026 SalesFlow · All rights reserved.
       </p>
     </div>
   );

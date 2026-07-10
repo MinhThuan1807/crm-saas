@@ -140,10 +140,10 @@ export function DealAiAnalyzer({ dealId }: DealAiAnalyzerProps) {
     setTasksAccepted(false);
 
     try {
-      // 1. Gửi yêu cầu phân tích lên backend
+      // 1. Send analysis request to backend
       await dealsService.analyze(dealId, note);
 
-      // 2. Thiết lập kết nối EventSource để stream kết quả
+      // 2. Establish EventSource connection to stream results
       const eventSource = new EventSource(`/api/deals/${dealId}/ai-stream`, {
         withCredentials: true,
       });
@@ -157,7 +157,7 @@ export function DealAiAnalyzer({ dealId }: DealAiAnalyzerProps) {
       eventSource.addEventListener("ai-complete", (e) => {
         try {
           const data = JSON.parse(e.data);
-          const mapped = (data.tasks || []).map((t: any, idx: number) => ({
+          const mapped = (data.tasks || []).map((t: { title: string; dueDate?: string | null }, idx: number) => ({
             id: `ai-${idx}-${Date.now()}`,
             title: t.title,
             due: t.dueDate ? new Date(t.dueDate).toLocaleDateString("vi-VN") : "Không có hạn",
@@ -168,7 +168,7 @@ export function DealAiAnalyzer({ dealId }: DealAiAnalyzerProps) {
           rawTasksRef.current = data.tasks || [];
           realEmailRef.current = data.emailDraft || "Không có nội dung email được tạo.";
 
-          // Chuyển sang phase streaming
+          // Switch to streaming phase
           setPhase("streaming_tasks");
         } catch (err) {
           console.error("Error parsing ai-complete payload:", err);
@@ -196,10 +196,11 @@ export function DealAiAnalyzer({ dealId }: DealAiAnalyzerProps) {
         eventSource.close();
       };
 
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
       console.error("Error triggering analyze:", err);
       setErrorMsg(
-        err.response?.data?.message || "Không thể khởi động phân tích AI. Vui lòng thử lại sau."
+        error.response?.data?.message || "Không thể khởi động phân tích AI. Vui lòng thử lại sau."
       );
       setPhase("idle");
     }

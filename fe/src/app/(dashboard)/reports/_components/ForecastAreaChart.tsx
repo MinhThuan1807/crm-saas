@@ -5,16 +5,18 @@ import {
 import { ChartCard } from "./ChartCard";
 import { formatVndShort } from "@/lib/helper";
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+import { CustomTooltipProps } from "@/lib/types/chart";
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white dark:bg-card border border-[#E8E7E2] dark:border-border rounded-lg shadow-md px-3 py-2.5 text-xs">
       <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontWeight: 600 }}>{label}</p>
-      {payload.map((p: any) => (
+      {payload.map((p) => (
         <div key={p.dataKey} className="flex items-center gap-2 mb-0.5">
           <span className="size-2 rounded-full shrink-0" style={{ background: p.color ?? p.stroke }} />
           <span className="text-[#6B6B67] dark:text-muted-foreground">{p.name}:</span>
-          <span className="text-[#1A1A18] dark:text-foreground" style={{ fontWeight: 500 }}>{formatVndShort(p.value)}</span>
+          <span className="text-[#1A1A18] dark:text-foreground" style={{ fontWeight: 500 }}>{formatVndShort(Number(p.value))}</span>
         </div>
       ))}
     </div>

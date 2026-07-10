@@ -1,20 +1,20 @@
-// Import API types — source of truth từ validation schema
+// Import API types — source of truth from validation schema
 import type { ActivityItem as ApiActivityItem } from "@/lib/validations/activities.scheme";
 
-// Re-export ActivityItem từ API schema để dùng trong toàn bộ activities components
+// Re-export ActivityItem from API schema to use in all activities components
 export type { ActivityItem } from "@/lib/validations/activities.scheme";
 
 // ActivityType uppercase theo API (CALL | EMAIL | MEETING | NOTE)
 export type ActivityType = "CALL" | "EMAIL" | "MEETING" | "NOTE";
 
-// ActivityGroup — nhóm activities theo calendar day
+// ActivityGroup — group activities by calendar day
 export interface ActivityGroup {
-  date: string; // "yyyy-MM-dd" — dùng để sort và làm key
-  dateLabel: string; // "Hôm nay — 8 tháng 6, 2026" — hiển thị
+  date: string; // "yyyy-MM-dd" — used for sorting and as key
+  dateLabel: string; // "Today — June 8, 2026" — display
   items: ApiActivityItem[];
 }
 
-// TYPE_META — metadata cho badge và icon theo uppercase API enum
+// TYPE_META — metadata for badge and icon according to uppercase API enum
 export const TYPE_META: Record<
   ActivityType,
   {
@@ -55,5 +55,5 @@ export const TYPE_META: Record<
   },
 };
 
-// TOP_STAFF đã được xóa — tính toán dynamic trong SummaryPanel
-// từ toàn bộ unfiltered activities data 
+// TOP_STAFF was deleted — calculated dynamically in SummaryPanel
+// from all unfiltered activities data

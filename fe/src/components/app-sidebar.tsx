@@ -120,7 +120,7 @@ export function AppSidebar() {
                 SalesFlow
               </span>
             </Link>
-            <div className="flex items-center gap-1.5 pl-8">
+            <div className="flex items-center gap-1.5">
               <span className="text-muted-foreground" style={{ fontSize: 12 }}>
                 Công ty ABC
               </span>

@@ -20,9 +20,11 @@ function getFunnelColor(stageName: string): string {
   return STAGE_COLORS.PROSPECT.funnel;
 }
 
-const FunnelTooltip = ({ active, payload }: any) => {
+import { CustomTooltipProps } from "@/lib/types/chart";
+
+const FunnelTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null;
-  const data = payload[0].payload;
+  const data = payload[0].payload as { stage: string; count: number; value: number; percentage: number };
   return (
     <div className="bg-white dark:bg-card border border-[#E8E7E2] dark:border-border rounded-lg shadow-md px-3 py-2.5 text-xs text-left">
       <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontWeight: 600 }}>{data.stage}</p>
@@ -44,18 +46,19 @@ const FunnelTooltip = ({ active, payload }: any) => {
   );
 };
 
-const ForecastTooltip = ({ active, payload, label }: any) => {
-  if (!active || !payload?.length) return null;
+const ForecastTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+  if (!active || !payload?.length || label === undefined) return null;
+  const labelStr = String(label);
   return (
     <div className="bg-white dark:bg-card border border-[#E8E7E2] dark:border-border rounded-lg shadow-md px-3 py-2.5 text-xs text-left">
-      <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontWeight: 600 }}>Tháng {label.replace("T", "")}</p>
-      {payload.map((p: any) => (
+      <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontWeight: 600 }}>Tháng {labelStr.replace("T", "")}</p>
+      {payload.map((p) => (
         <div key={p.dataKey} className="flex justify-between items-center gap-6 mb-1 last:mb-0">
           <div className="flex items-center gap-1.5">
             <span className="size-2 rounded-full shrink-0" style={{ background: p.color ?? p.fill }} />
             <span className="text-[#6B6B67] dark:text-muted-foreground">{p.name}:</span>
           </div>
-          <span className="text-[#1A1A18] dark:text-foreground font-semibold">{formatVndShort(p.value)}</span>
+          <span className="text-[#1A1A18] dark:text-foreground font-semibold">{formatVndShort(Number(p.value))}</span>
         </div>
       ))}
     </div>
