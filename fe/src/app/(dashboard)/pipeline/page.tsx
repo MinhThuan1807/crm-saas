@@ -81,7 +81,7 @@ export default function Pipeline() {
       </header>
 
       {/* Kanban area */}
-      <main className="flex-1 overflow-x-auto overflow-y-hidden p-5 bg-[#F8F8F7]">
+      <main className="flex-1 overflow-x-auto overflow-y-hidden p-5 bg-[#F8F8F7] dark:bg-background">
         <div className="min-w-230 h-full">
           <KanbanBoard />
         </div>

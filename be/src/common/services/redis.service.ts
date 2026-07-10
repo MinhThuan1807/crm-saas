@@ -32,8 +32,8 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     return this.redis;
   }
 
-  // Các method tiện ích
-  async set(key: string, value: any, expiresIn?: number) {
+  // Utility methods
+  async set(key: string, value: unknown, expiresIn?: number) {
     if (expiresIn) {
       await this.redis.setex(key, expiresIn, JSON.stringify(value));
     } else {
@@ -53,13 +53,13 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async clear() {
     await this.redis.flushdb();
   }
-  // Tăng thêm bản cache của tenant lên 1 (hủy toàn bộ cache cũ)
+  // Increment tenant cache version by 1 (invalidate all old cache)
   async invalidateTenantCache(tenantId: string): Promise<number> {
     const key = `cache:tenant_version:${tenantId}`
     return await this.redis.incr(key);
   }
 
-  //Lấy phiên bản cache hiện tại của tenant
+  // Get current cache version of tenant
   async getTenantCacheVersion(tenantId: string): Promise<string> {
     const key = `cache:tenant_version:${tenantId}`;
     let version = await this.redis.get(key);

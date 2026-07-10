@@ -69,11 +69,10 @@ export class ActivitiesRepository {
   // Get all activities for tenant with pagination and filters
   async findAll(
     query: GetActivitiesQueryType,
-    userContext?: { userId: string; role: string },
+    filters?: { userId?: string },
   ): Promise<{ data: ActivityWithRelations[]; total: number }> {
-    const isSalesRep = userContext?.role === ROLE.SALES_REP
     const where = {
-      ...(isSalesRep && { userId: userContext.userId }),
+      ...(filters?.userId && { userId: filters.userId }),
       ...(query.type && { type: query.type }),
       ...(query.contactId && { contactId: query.contactId }),
       ...(query.dealId && { dealId: query.dealId }),
@@ -84,7 +83,6 @@ export class ActivitiesRepository {
         ],
       }),
     }
-
     const [data, total] = await this.prisma.$transaction([
       this.prisma.activity.findMany({
         where,
@@ -99,7 +97,6 @@ export class ActivitiesRepository {
       }),
       this.prisma.activity.count({ where }),
     ])
-
     return { data, total }
   }
 

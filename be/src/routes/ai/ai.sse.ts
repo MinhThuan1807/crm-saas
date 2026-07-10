@@ -11,7 +11,7 @@ function keyFor(tenantId: string, dealId: string) {
   return `${tenantId}:${dealId}`
 }
 
-function sendEvent(res: Response, event: string, data: any) {
+function sendEvent(res: Response, event: string, data: unknown) {
   try {
     res.write(`event: ${event}\n`)
     res.write(`data: ${JSON.stringify(data)}\n\n`)
@@ -57,7 +57,7 @@ export function subscribeToAiStream(tenantId: string, dealId: string, res: Respo
   return cleanup
 }
 
-export function publishAiEvent(tenantId: string, dealId: string, event: string, payload: any) {
+export function publishAiEvent(tenantId: string, dealId: string, event: string, payload: unknown) {
   const k = keyFor(tenantId, dealId)
   const set = subscribers.get(k)
   if (!set || set.size === 0) return false

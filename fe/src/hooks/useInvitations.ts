@@ -27,8 +27,9 @@ export const useCreateInvitation = () => {
       toast.success("Đã gửi lời mời thành công!");
       queryClient.invalidateQueries({ queryKey: invitationKeys.lists() });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || "Không thể gửi lời mời. Vui lòng thử lại.";
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { message?: string } } };
+      const msg = err.response?.data?.message || "Không thể gửi lời mời. Vui lòng thử lại.";
       toast.error(msg);
     },
   });
@@ -43,8 +44,9 @@ export const useRevokeInvitation = () => {
       toast.success("Đã hủy lời mời thành công!");
       queryClient.invalidateQueries({ queryKey: invitationKeys.lists() });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || "Không thể hủy lời mời.";
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { message?: string } } };
+      const msg = err.response?.data?.message || "Không thể hủy lời mời.";
       toast.error(msg);
     },
   });
@@ -60,8 +62,9 @@ export const useUpdateInvitation = () => {
       toast.success("Đã cập nhật lời mời và gửi lại email thành công!");
       queryClient.invalidateQueries({ queryKey: invitationKeys.lists() });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || "Không thể cập nhật lời mời.";
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { message?: string } } };
+      const msg = err.response?.data?.message || "Không thể cập nhật lời mời.";
       toast.error(msg);
     },
   });

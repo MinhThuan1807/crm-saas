@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common'
-import { PrismaService } from 'src/common/services/prisma.service'
-import { ROLE } from 'src/common/constants/role.constanst'
-import { DealStage, ActivityType } from '../../../generated/prisma-client/enums'
+import { Injectable, ForbiddenException } from '@nestjs/common'
+import { DealStage } from '../../../generated/prisma-client/enums'
 import { DashboardPeriodType, DashboardResType } from './dashboard.model'
 import { RedisService } from 'src/common/services/redis.service'
+import { DashboardRepository } from './dashboard.repo'
+import { CaslAbilityFactory } from 'src/common/casl/casl-ability.factory'
+import { AccessTokenPayload } from 'src/common/types/jwt.type'
+import { subject } from '@casl/ability'
 
 // Target revenue configurable via env, default to 500M VND
 const TARGET_REVENUE_VND = process.env.MONTHLY_REVENUE_TARGET
@@ -11,7 +13,7 @@ const TARGET_REVENUE_VND = process.env.MONTHLY_REVENUE_TARGET
   : 500000000
 
 /**
- * Tính khoảng thời gian hiện tại và trước đó dựa trên chu kỳ
+ * Calculate current and previous ranges based on period
  * @param period - 'week' | 'month' | 'quarter'
  * @returns {{current: {start: Date, end: Date}, previous: {start: Date, end: Date}}}
  */
@@ -60,51 +62,48 @@ function getPeriodRanges(period: DashboardPeriodType) {
 @Injectable()
 export class DashboardService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly dashboardRepo: DashboardRepository,
     private readonly redisService: RedisService,
+    private readonly caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
   async getDashboardData(
     tenantId: string,
     period: DashboardPeriodType,
-    userContext: { userId: string; role: string },
+    user: AccessTokenPayload,
   ): Promise<DashboardResType> {
-    // Get the current cache version of the Tenant
-    const version = await this.redisService.getTenantCacheVersion(tenantId);
-
-    // Generate a unique cache key based on Tenant, version, period, and user authorization
-    const cacheKey = `cache:dashboard:${tenantId}:${version}:${period}:${userContext.userId}:${userContext.role}`;
-
-    // Attempt to fetch data from Redis
-    const cachedData = await this.redisService.get(cacheKey);
-    if (cachedData) {
-      return cachedData;
+    const ability = await this.caslAbilityFactory.createForUser(user)
+    if (ability.cannot('read', 'Deal')) {
+      throw new ForbiddenException('Bạn không có quyền truy cập dữ liệu dashboard')
     }
 
+    // Get the current cache version of the Tenant
+    const version = await this.redisService.getTenantCacheVersion(tenantId)
 
-    const isSalesRep = userContext.role === ROLE.SALES_REP
-    const userFilter = isSalesRep ? { ownerId: userContext.userId } : {}
+    // Generate a unique cache key based on Tenant, version, period, and user authorization
+    const cacheKey = `cache:dashboard:${tenantId}:${version}:${period}:${user.userId}:${user.role}`
+
+    // Attempt to fetch data from Redis
+    const cachedData = await this.redisService.get(cacheKey)
+    if (cachedData) {
+      return cachedData
+    }
+
+    // Build filters dynamically using CASL dynamic permissions
+    const userFilter = ability.cannot('read', subject('Deal', { ownerId: 'other' } as any))
+      ? { ownerId: user.userId }
+      : {}
+
+    const activityFilter = ability.cannot('read', subject('Activity', { userId: 'other' } as any))
+      ? { userId: user.userId }
+      : {}
 
     const ranges = getPeriodRanges(period)
 
     // ─── 1. QUERY DEALS FOR METRICS ───
     const [currentDeals, previousDeals] = await Promise.all([
-      this.prisma.deal.findMany({
-        where: {
-          tenantId,
-          deletedAt: null,
-          createdAt: { gte: ranges.current.start, lte: ranges.current.end },
-          ...userFilter,
-        },
-      }),
-      this.prisma.deal.findMany({
-        where: {
-          tenantId,
-          deletedAt: null,
-          createdAt: { gte: ranges.previous.start, lte: ranges.previous.end },
-          ...userFilter,
-        },
-      }),
+      this.dashboardRepo.findDealsInPeriod(tenantId, ranges.current.start, ranges.current.end, userFilter),
+      this.dashboardRepo.findDealsInPeriod(tenantId, ranges.previous.start, ranges.previous.end, userFilter),
     ])
 
     // Metric 1: Total Deal Value
@@ -122,7 +121,6 @@ export class DashboardService {
     const currentOpenDeals = currentDeals.filter((d) => openStages.includes(d.stage))
     const prevOpenDeals = previousDeals.filter((d) => openStages.includes(d.stage))
     const openDealsDiff = currentOpenDeals.length - prevOpenDeals.length
-    const periodLabel = period === 'week' ? 'tuần này' : period === 'quarter' ? 'quý này' : 'tháng này'
 
     // Metric 3: Win Rate
     const getWinRate = (dealsList: typeof currentDeals) => {
@@ -136,13 +134,11 @@ export class DashboardService {
     const winRateDiff = currentWinRate - prevWinRate
 
     // Metric 4: Revenue against Target (always monthly target)
-    // Filter CLOSED_WON deals closed in the current month/period
     const closedWonDealsInPeriod = currentDeals.filter((d) => d.stage === DealStage.CLOSED_WON)
     const actualRevenue = closedWonDealsInPeriod.reduce((sum, d) => sum + Number(d.value), 0)
     const targetRevenue = TARGET_REVENUE_VND
 
     // ─── 2. PIPELINE FUNNEL ───
-    // Group active deals in the current period by stage
     const funnelStages = [
       { name: 'Prospect', key: DealStage.PROSPECT },
       { name: 'Qualified', key: DealStage.QUALIFIED },
@@ -164,34 +160,33 @@ export class DashboardService {
     const pipelineTotalCount = currentDeals.length
     const pipelineTotalValue = currentTotalValue
 
-    // ─── 3. LEADERBOARD ───
-    // Query users of the tenant to calculate their sales performance
-    const tenantUsers = await this.prisma.user.findMany({
-      where: { tenantId },
-      select: { id: true, name: true },
-    })
-
-    const repsPerformance = await Promise.all(
-      tenantUsers.map(async (u) => {
-        const userClosedWonDeals = await this.prisma.deal.findMany({
-          where: {
-            tenantId,
-            ownerId: u.id,
-            stage: DealStage.CLOSED_WON,
-            deletedAt: null,
-            createdAt: { gte: ranges.current.start, lte: ranges.current.end },
-          },
-        })
-        const revenue = userClosedWonDeals.reduce((sum, d) => sum + Number(d.value), 0)
-        const dealsCount = userClosedWonDeals.length
-        return {
-          id: u.id,
-          name: u.name,
-          deals: dealsCount,
-          revenue: Math.round(revenue),
-        }
-      }),
+    // ─── 3. LEADERBOARD (OPTIMIZED) ───
+    // Query CLOSED_WON deals of the tenant in current period and aggregate in-memory to avoid N+1 queries
+    const closedWonDealsCurrent = await this.dashboardRepo.findClosedWonDealsInPeriod(
+      tenantId,
+      ranges.current.start,
+      ranges.current.end,
+      userFilter,
     )
+
+    const performanceMap = new Map<string, { count: number; revenue: number }>()
+    for (const d of closedWonDealsCurrent) {
+      const perf = performanceMap.get(d.ownerId) || { count: 0, revenue: 0 }
+      perf.count += 1
+      perf.revenue += Number(d.value)
+      performanceMap.set(d.ownerId, perf)
+    }
+
+    const tenantUsers = await this.dashboardRepo.findUsers(tenantId)
+    const repsPerformance = tenantUsers.map((u) => {
+      const perf = performanceMap.get(u.id) || { count: 0, revenue: 0 }
+      return {
+        id: u.id,
+        name: u.name,
+        deals: perf.count,
+        revenue: Math.round(perf.revenue),
+      }
+    })
 
     // Sort reps by revenue descending, rank top 5
     const leaderboard = repsPerformance
@@ -209,20 +204,7 @@ export class DashboardService {
       })
 
     // ─── 4. RECENT DEALS ───
-    const recentDealsRaw = await this.prisma.deal.findMany({
-      where: {
-        tenantId,
-        deletedAt: null,
-        ...userFilter,
-      },
-      include: {
-        contact: { select: { company: true } },
-        owner: { select: { id: true, name: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-    })
-
+    const recentDealsRaw = await this.dashboardRepo.findRecentDeals(tenantId, userFilter, 5)
     const now = new Date()
     const recentDeals = recentDealsRaw.map((d) => {
       const diffTime = Math.abs(now.getTime() - d.createdAt.getTime())
@@ -246,18 +228,12 @@ export class DashboardService {
     const startOfToday = new Date()
     startOfToday.setHours(0, 0, 0, 0)
 
-    const upcomingActivitiesRaw = await this.prisma.activity.findMany({
-      where: {
-        tenantId,
-        date: { gte: startOfToday },
-        ...(isSalesRep ? { userId: userContext.userId } : {}),
-      },
-      include: {
-        contact: { select: { name: true, company: true } },
-      },
-      orderBy: { date: 'asc' },
-      take: 5,
-    })
+    const upcomingActivitiesRaw = await this.dashboardRepo.findUpcomingActivities(
+      tenantId,
+      startOfToday,
+      activityFilter,
+      5,
+    )
 
     const upcomingActivities = upcomingActivitiesRaw.map((act) => {
       return {
@@ -320,8 +296,8 @@ export class DashboardService {
     }
 
     // Save the computed result to Redis with a 5-minute TTL before returning
-    await this.redisService.set(cacheKey, result, 300);
+    await this.redisService.set(cacheKey, result, 300)
 
-    return result;
+    return result
   }
 }

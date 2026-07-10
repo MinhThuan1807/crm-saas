@@ -2,13 +2,16 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { ChartCard } from "./ChartCard";
 import { industryData } from "./reportsData";
 
-const CustomTooltip = ({ active, payload }: any) => {
+import { CustomTooltipProps } from "@/lib/types/chart";
+
+const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null;
   const d = payload[0];
+  const payloadData = d.payload as { color?: string } | undefined;
   return (
     <div className="bg-white border border-[#E8E7E2] rounded-lg shadow-md px-3 py-2 text-xs">
       <div className="flex items-center gap-2">
-        <span className="size-2 rounded-full" style={{ background: d.payload.color }} />
+        <span className="size-2 rounded-full" style={{ background: payloadData?.color }} />
         <span className="text-[#1A1A18]" style={{ fontWeight: 600 }}>{d.name}</span>
         <span className="text-[#6B6B67]">{d.value}%</span>
       </div>

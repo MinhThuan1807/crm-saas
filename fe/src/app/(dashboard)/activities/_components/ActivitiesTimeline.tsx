@@ -19,10 +19,7 @@ export function ActivitiesTimeline({
   onDelete?: (activity: ActivityItem) => void;
 }) {
   return showEmpty || groups.length === 0 ? (
-    <div
-      className="bg-white rounded-xl border"
-      style={{ borderColor: "#E8E7E2", borderWidth: "0.5px" }}
-    >
+    <div className="bg-white dark:bg-card rounded-xl border border-border/70 dark:border-border">
       <EmptyState />
     </div>
   ) : (

@@ -4,7 +4,7 @@ import {
   GetContactsQueryType,
   UpdateContactBodyType,
 } from "@/lib/validations/contacts.scheme";
-import { contactsService } from "@/services/contacts.service";
+import { contactsService, BulkImportContactItem } from "@/services/contacts.service";
 import { ApiError } from "@/types/error.type";
 import {
   useInfiniteQuery,
@@ -46,11 +46,11 @@ export const contactKeys = {
 // }
 
 // ─────────────────────────────────────────
-// GET ALL — dùng ở trang danh sách
+// GET ALL — used on list page
 // ─────────────────────────────────────────
 export const useGetContacts = (params: GetContactsQueryType) => {
   return useInfiniteQuery({
-    queryKey: contactKeys.list(params), // search thay đổi → refetch tự động
+    queryKey: contactKeys.list(params), // search changes -> automatic refetch
     queryFn: ({ pageParam }) =>
       contactsService.getAll({
         ...params,
@@ -66,13 +66,13 @@ export const useGetContacts = (params: GetContactsQueryType) => {
 }
 
 // ─────────────────────────────────────────
-// GET ONE — dùng ở trang detail
+// GET ONE — used on detail page
 // ─────────────────────────────────────────
 export const useGetContact = (id: string) => {
   return useQuery({
     queryKey: contactKeys.detail(id),
     queryFn:  () => contactsService.getById(id),
-    enabled:  !!id, // chỉ fetch khi có id
+    enabled:  !!id, // only fetch if id exists
   })
 }
 
@@ -105,7 +105,7 @@ export const useUpdateContact = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateContactBodyType }) => contactsService.update(id, data),
     onSuccess: (_, { id }) => {
-      // invalidate cả list lẫn detail
+      // invalidate both list and detail
       queryClient.invalidateQueries({ queryKey: contactKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: contactKeys.lists() })
       toast.success("Cập nhật thành công")
@@ -135,3 +135,16 @@ export const useDeleteContact = () => {
     },
   })
 }
+
+// ─────────────────────────────────────────
+// BULK IMPORT
+// ─────────────────────────────────────────
+export const useBulkImportContacts = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (contacts: BulkImportContactItem[]) => contactsService.bulkImport(contacts),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: contactKeys.lists() });
+    },
+  });
+};

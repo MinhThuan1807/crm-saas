@@ -3,270 +3,198 @@ import {
   ConflictException,
   NotFoundException,
   BadRequestException,
-} from '@nestjs/common';
-import { PrismaService } from 'src/common/services/prisma.service';
-import { HashingService } from 'src/common/services/hashing.service';
-import { TokenService } from 'src/common/services/token.service';
-import { MailService } from 'src/common/services/mail.service';
-import { CreateInvitationType, AcceptInvitationType, UpdateInvitationType } from './invitations.model';
-import { v4 as uuidv4 } from 'uuid';
-import envConfig from 'src/common/config';
+} from '@nestjs/common'
+import { HashingService } from 'src/common/services/hashing.service'
+import { TokenService } from 'src/common/services/token.service'
+import { MailService } from 'src/common/services/mail.service'
+import { RedisService } from 'src/common/services/redis.service'
+import { SharedUserRepository } from 'src/common/repositories/shared-user.repo'
+import { InvitationRepository } from './invitation.repo'
+import { CreateInvitationType, AcceptInvitationType, UpdateInvitationType } from './invitations.model'
+import { v4 as uuidv4 } from 'uuid'
+import envConfig from 'src/common/config'
+import { PrismaService } from 'src/common/services/prisma.service'
 
 @Injectable()
 export class InvitationsService {
   constructor(
-    private readonly prisma: PrismaService,
     private readonly hashingService: HashingService,
     private readonly tokenService: TokenService,
     private readonly mailService: MailService,
+    private readonly redisService: RedisService,
+    private readonly sharedUserRepo: SharedUserRepository,
+    private readonly invitationRepo: InvitationRepository,
+    private readonly prismaService: PrismaService
   ) {}
 
-  async createInvitation(
-    body: CreateInvitationType,
-    tenantId: string,
-  ) {
-    // 1. Check if email is already registered in the system (since email is globally unique)
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: body.email },
-    });
+  // ─── CREATE INVITATION ────────────────────────────────────────────────────
+
+async createInvitation(body: CreateInvitationType, tenantId: string) {
+    const existingUser = await this.sharedUserRepo.findUniqueEmail(body.email)
     if (existingUser) {
-      throw new ConflictException('Email này đã đăng ký tài khoản ở một workspace khác');
+      throw new ConflictException('Email này đã đăng ký tài khoản ở một workspace khác')
     }
-
-    // 2. Fetch tenant name for email context
-    const tenant = await this.prisma.tenant.findUnique({
-      where: { id: tenantId },
-      select: { name: true },
-    });
+    const tenant = await this.sharedUserRepo.findTenantUnique(tenantId)
     if (!tenant) {
-      throw new NotFoundException('Không tìm thấy workspace');
+      throw new NotFoundException('Không tìm thấy workspace')
     }
-
-    // 3. Delete any previous pending invitation for this email in this tenant to prevent unique violations
-    await this.prisma.invitation.deleteMany({
-      where: { tenantId, email: body.email },
-    });
-
-    // 4. Generate token and expiry (7 days)
-    const token = uuidv4();
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
-
-    // 5. Create invitation in DB
-    const invitation = await this.prisma.invitation.create({
-      data: {
-        tenantId,
-        email: body.email,
-        role: body.role,
-        token,
-        expiresAt,
-        status: 'PENDING',
-      },
-    });
-
-    // 6. Send the invitation email asynchronously
-    const inviteLink = `${envConfig.FRONTEND_URL}/invite?token=${token}`;
+    // Find Role in tenant based on submitted name
+    const dbRole = await this.prismaService.role.findFirst({
+      where: { tenantId, name: body.role }
+    })
+    if (!dbRole) {
+      throw new BadRequestException('Vai trò không hợp lệ')
+    }
+    await this.invitationRepo.deleteManyByEmail(body.email)
+    const token = uuidv4()
+    const expiresAt = new Date()
+    expiresAt.setDate(expiresAt.getDate() + 7)
+    const invitation = await this.invitationRepo.create({
+      email: body.email,
+      roleId: dbRole.id,
+      token,
+      expiresAt,
+      tenantId,
+    })
+    const inviteLink = `${envConfig.FRONTEND_URL}/invite?token=${token}`
     await this.mailService.sendInvitationEmail({
       to: body.email,
       companyName: tenant.name,
       role: body.role,
       inviteLink,
-    });
-
-    return invitation;
+    })
+    return {
+      ...invitation,
+      role: body.role,
+    }
   }
+
+
+  // ─── GET INVITATIONS ──────────────────────────────────────────────────────
 
   async getInvitationsByTenant(tenantId: string) {
-    return this.prisma.invitation.findMany({
-      where: { tenantId },
-      orderBy: { createdAt: 'desc' },
-    });
+    return this.invitationRepo.findManyByTenant(tenantId)
   }
+
+  // ─── REVOKE INVITATION ────────────────────────────────────────────────────
 
   async revokeInvitation(id: string, tenantId: string) {
-    const invitation = await this.prisma.invitation.findFirst({
-      where: { id, tenantId },
-    });
+    const invitation = await this.invitationRepo.findByIdAndTenant(id, tenantId)
     if (!invitation) {
-      throw new NotFoundException('Không tìm thấy lời mời hoặc lời mời không thuộc workspace này');
+      throw new NotFoundException('Không tìm thấy lời mời hoặc lời mời không thuộc workspace này')
     }
 
-    return this.prisma.invitation.delete({
-      where: { id },
-    });
+    return this.invitationRepo.deleteById(id)
   }
 
-  async verifyInvitationToken(token: string) {
-    const invitation = await this.prisma.invitation.findUnique({
-      where: { token },
-      include: { tenant: { select: { name: true } } },
-    });
+  // ─── VERIFY TOKEN ─────────────────────────────────────────────────────────
 
+async verifyInvitationToken(token: string) {
+    const invitation = await this.invitationRepo.findByToken(token)
     if (!invitation) {
-      throw new BadRequestException('Lời mời không hợp lệ hoặc link đã hỏng');
+      throw new BadRequestException('Lời mời không hợp lệ hoặc link đã hỏng')
     }
-
     if (invitation.status !== 'PENDING') {
-      throw new BadRequestException('Lời mời này đã được chấp nhận hoặc đã bị hủy');
+      throw new BadRequestException('Lời mời này đã được chấp nhận hoặc đã bị hủy')
     }
-
     if (invitation.expiresAt < new Date()) {
-      // Update status to EXPIRED to keep DB clean
-      await this.prisma.invitation.update({
-        where: { id: invitation.id },
-        data: { status: 'EXPIRED' },
-      });
-      throw new BadRequestException('Lời mời này đã hết hạn (quá 7 ngày)');
+      await this.invitationRepo.updateStatus(invitation.id, 'EXPIRED')
+      throw new BadRequestException('Lời mời này đã hết hạn (quá 7 ngày)')
     }
-
     return {
       email: invitation.email,
-      role: invitation.role,
+      role: invitation.role.name, // Return role name string
       companyName: invitation.tenant.name,
       token: invitation.token,
-    };
+    }
   }
 
-  async acceptInvitation(body: AcceptInvitationType) {
-    // 1. Verify token validation
-    const invitation = await this.prisma.invitation.findUnique({
-      where: { token: body.token },
-    });
+  // ─── ACCEPT INVITATION ────────────────────────────────────────────────────
 
+ async acceptInvitation(body: AcceptInvitationType) {
+    const invitation = await this.invitationRepo.findByTokenOnly(body.token)
     if (!invitation || invitation.status !== 'PENDING' || invitation.expiresAt < new Date()) {
-      throw new BadRequestException('Lời mời không hợp lệ hoặc đã hết hạn');
+      throw new BadRequestException('Lời mời không hợp lệ hoặc đã hết hạn')
     }
-
-    // Double check email availability
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: invitation.email },
-    });
+    const existingUser = await this.sharedUserRepo.findUniqueEmail(invitation.email)
     if (existingUser) {
-      throw new ConflictException('Email này đã đăng ký tài khoản ở một workspace khác');
+      throw new ConflictException('Email này đã đăng ký tài khoản ở một workspace khác')
     }
-
-    // 2. Hash password & write user + update status in transaction
-    const hashedPassword = await this.hashingService.hash(body.password);
-    const newUser = await this.prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: {
-          email: invitation.email,
-          name: body.name,
-          password: hashedPassword,
-          role: invitation.role,
-          tenantId: invitation.tenantId,
-        },
-      });
-
-      await tx.invitation.update({
-        where: { id: invitation.id },
-        data: { status: 'ACCEPTED' },
-      });
-
-      return user;
-    });
-
-    // 3. Automatically issue login tokens
+    const hashedPassword = await this.hashingService.hash(body.password)
+    const newUser = await this.sharedUserRepo.createUserAndAcceptInvitation({
+      email: invitation.email,
+      name: body.name,
+      hashedPassword,
+      roleId: invitation.roleId, // Pass invitation roleId
+      tenantId: invitation.tenantId,
+      invitationId: invitation.id,
+    })
+    // Sign tokens
     const [accessToken, refreshToken] = await Promise.all([
       this.tokenService.signAccessToken({
         userId: newUser.id,
-        role: newUser.role,
+        role: newUser.role, // This is already the mapped string from sharedUserRepo
         tenantId: newUser.tenantId,
       }),
       this.tokenService.signRefreshToken({ userId: newUser.id }),
-    ]);
-
-    const decodedRefreshToken = await this.tokenService.verifyRefreshToken(refreshToken);
-    await this.prisma.refreshToken.create({
-      data: {
-        token: refreshToken,
-        userId: newUser.id,
-        expiresAt: new Date(decodedRefreshToken.exp * 1000),
-      },
-    });
-
+    ])
+    const decoded = await this.tokenService.verifyRefreshToken(refreshToken)
+    const ttlSeconds = Math.max(0, Math.floor(decoded.exp - Date.now() / 1000))
+    await this.redisService.set(
+      `auth:refresh:${refreshToken}`,
+      { userId: newUser.id, role: newUser.role, tenantId: newUser.tenantId },
+      ttlSeconds,
+    )
     return {
       message: 'Đăng ký tài khoản thành công',
       accessToken,
       refreshToken,
-    };
+    }
   }
 
-  async updateInvitation(
-    id: string,
-    body: UpdateInvitationType,
-    tenantId: string,
-  ) {
-    // 1. Find the invitation
-    const invitation = await this.prisma.invitation.findFirst({
-      where: { id, tenantId },
-    });
+  // ─── UPDATE INVITATION ────────────────────────────────────────────────────
+
+ async updateInvitation(id: string, body: UpdateInvitationType, tenantId: string) {
+    const invitation = await this.invitationRepo.findByIdAndTenant(id, tenantId)
     if (!invitation) {
-      throw new NotFoundException('Không tìm thấy lời mời');
+      throw new NotFoundException('Không tìm thấy lời mời')
     }
-
     if (invitation.status !== 'PENDING') {
-      throw new BadRequestException('Chỉ có thể chỉnh sửa lời mời đang ở trạng thái chờ kích hoạt');
+      throw new BadRequestException('Chỉ có thể chỉnh sửa lời mời đang ở trạng thái chờ kích hoạt')
     }
-
-    const updateData: any = {};
-
-    // 2. If email is being updated
+    const updateData: {
+      token: string;
+      expiresAt: Date;
+      email?: string;
+      roleId?: string;
+    } = {
+      token: uuidv4(),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    }
     if (body.email && body.email !== invitation.email) {
-      const existingUser = await this.prisma.user.findUnique({
-        where: { email: body.email },
-      });
-      if (existingUser) {
-        throw new ConflictException('Email này đã đăng ký tài khoản ở một workspace khác');
-      }
-
-      const existingInv = await this.prisma.invitation.findFirst({
-        where: {
-          tenantId,
-          email: body.email,
-          id: { not: id },
-        },
-      });
-      if (existingInv) {
-        throw new ConflictException('Đã có một lời mời khác cho email này trong hệ thống');
-      }
-
-      updateData.email = body.email;
+      const existingUser = await this.sharedUserRepo.findUniqueEmail(body.email)
+      if (existingUser) throw new ConflictException('Email này đã đăng ký tài khoản')
+      const existingInv = await this.invitationRepo.findDuplicateEmail(body.email, tenantId, id)
+      if (existingInv) throw new ConflictException('Đã có một lời mời khác cho email này')
+      updateData.email = body.email
     }
-
     if (body.role) {
-      updateData.role = body.role;
+      const dbRole = await this.prismaService.role.findFirst({ where: { tenantId, name: body.role } })
+      if (!dbRole) throw new BadRequestException('Vai trò không hợp lệ')
+      updateData.roleId = dbRole.id
     }
-
-    // 3. Regenerate token and reset expiration (7 days) since credentials changed
-    const token = uuidv4();
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
-
-    updateData.token = token;
-    updateData.expiresAt = expiresAt;
-
-    // 4. Update in database
-    const updatedInvitation = await this.prisma.invitation.update({
-      where: { id },
-      data: updateData,
-    });
-
-    // 5. Fetch tenant details
-    const tenant = await this.prisma.tenant.findUnique({
-      where: { id: tenantId },
-      select: { name: true },
-    });
-
-    // 6. Send email
-    const inviteLink = `${envConfig.FRONTEND_URL}/invite?token=${token}`;
+    const updatedInvitation = await this.invitationRepo.update(id, updateData)
+    const tenant = await this.sharedUserRepo.findTenantUnique(tenantId)
+    const inviteLink = `${envConfig.FRONTEND_URL}/invite?token=${updateData.token}`
     await this.mailService.sendInvitationEmail({
       to: updatedInvitation.email,
       companyName: tenant?.name || 'Workspace CRM',
-      role: updatedInvitation.role,
+      role: updatedInvitation.role.name,
       inviteLink,
-    });
-
-    return updatedInvitation;
+    })
+    return {
+      ...updatedInvitation,
+      role: updatedInvitation.role.name,
+    }
   }
 }

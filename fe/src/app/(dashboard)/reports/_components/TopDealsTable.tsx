@@ -54,20 +54,20 @@ export function TopDealsTable({ deals = [] }: TopDealsTableProps) {
   
 
   return (
-    <div className="bg-white rounded-[10px] border border-[#E8E7E2]">
+    <div className="bg-white dark:bg-card rounded-[10px] border border-[#E8E7E2] dark:border-border">
       {/* Card header */}
-      <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#E8E7E2]">
+      <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#E8E7E2] dark:border-border">
         <div>
-          <h3 className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 600 }}>
+          <h3 className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 13, fontWeight: 600 }}>
             Top Deals đã chốt
           </h3>
-          <p className="text-[#6B6B67] mt-0.5" style={{ fontSize: 11 }}>
+          <p className="text-[#6B6B67] dark:text-muted-foreground mt-0.5" style={{ fontSize: 11 }}>
             Deals đóng trong kỳ được chọn
           </p>
         </div>
 
         {/* Filter pills */}
-        <div className="flex items-center gap-1 bg-[#F1EFE8] p-0.5 rounded-lg">
+        <div className="flex items-center gap-1 bg-[#F1EFE8] dark:bg-muted p-0.5 rounded-lg">
           {(["all", "won", "lost"] as Filter[]).map((f) => (
             <button
               key={f}
@@ -76,8 +76,8 @@ export function TopDealsTable({ deals = [] }: TopDealsTableProps) {
               style={{
                 fontSize: 12,
                 fontWeight: filter === f ? 500 : 400,
-                background: filter === f ? "#ffffff" : "transparent",
-                color: filter === f ? "#1A1A18" : "#6B6B67",
+                background: filter === f ? "var(--card)" : "transparent",
+                color: filter === f ? "var(--foreground)" : "var(--muted-foreground)",
                 boxShadow: filter === f ? "0 1px 2px rgba(0,0,0,0.06)" : "none",
               }}
             >
@@ -91,11 +91,11 @@ export function TopDealsTable({ deals = [] }: TopDealsTableProps) {
       <div className="overflow-x-auto">
         <table className="w-full" style={{ borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid #E8E7E2" }}>
+            <tr style={{ borderBottom: "1px solid var(--border)" }}>
               {["Deal", "Công ty", "Owner", "Giá trị", "Ngày chốt", "Giai đoạn"].map((col) => (
                 <th
                   key={col}
-                  className="text-left text-[#6B6B67] px-5 py-3"
+                  className="text-left text-[#6B6B67] dark:text-muted-foreground px-5 py-3"
                   style={{ fontSize: 11, fontWeight: 500 }}
                 >
                   {col}
@@ -106,7 +106,7 @@ export function TopDealsTable({ deals = [] }: TopDealsTableProps) {
           <tbody>
             {paginatedDeals.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-8 text-[#6B6B67]" style={{ fontSize: 12 }}>
+                <td colSpan={6} className="text-center py-8 text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 12 }}>
                   Không có dữ liệu trong kỳ
                 </td>
               </tr>
@@ -114,19 +114,19 @@ export function TopDealsTable({ deals = [] }: TopDealsTableProps) {
               paginatedDeals.map((deal, i) => (
                 <tr
                   key={deal.id}
-                  className="hover:bg-[#F8F8F7] transition-colors"
-                  style={{ borderBottom: i < filtered.length - 1 ? "1px solid #E8E7E2" : "none" }}
+                  className="hover:bg-[#F8F8F7] dark:hover:bg-muted/50 transition-colors"
+                  style={{ borderBottom: i < filtered.length - 1 ? "1px solid var(--border)" : "none" }}
                 >
                   {/* Deal name */}
                   <td className="px-5 py-3">
-                    <span className="text-[#1A1A18]" style={{ fontSize: 12, fontWeight: 500 }}>
+                    <span className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 12, fontWeight: 500 }}>
                       {deal.name}
                     </span>
                   </td>
 
                   {/* Company */}
                   <td className="px-5 py-3">
-                    <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>{deal.company}</span>
+                    <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 12 }}>{deal.company}</span>
                   </td>
 
                   {/* Owner */}
@@ -145,7 +145,7 @@ export function TopDealsTable({ deals = [] }: TopDealsTableProps) {
                           {getInitials(deal.owner.name)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-[#1A1A18] whitespace-nowrap" style={{ fontSize: 12 }}>
+                      <span className="text-[#1A1A18] dark:text-foreground whitespace-nowrap" style={{ fontSize: 12 }}>
                         {deal.owner.name}
                       </span>
                     </div>
@@ -153,14 +153,14 @@ export function TopDealsTable({ deals = [] }: TopDealsTableProps) {
 
                   {/* Value */}
                   <td className="px-5 py-3">
-                    <span className="text-[#1A1A18] tabular-nums" style={{ fontSize: 12, fontWeight: 600 }}>
+                    <span className="text-[#1A1A18] dark:text-foreground tabular-nums" style={{ fontSize: 12, fontWeight: 600 }}>
                       {formatVndShort(deal.value)}
                     </span>
                   </td>
 
                   {/* Close date */}
                   <td className="px-5 py-3">
-                    <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>{formatDate(deal.closedAt)}</span>
+                    <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 12 }}>{formatDate(deal.closedAt)}</span>
                   </td>
 
                   {/* Stage */}
@@ -185,30 +185,30 @@ export function TopDealsTable({ deals = [] }: TopDealsTableProps) {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between px-5 py-3 border-t border-[#E8E7E2]">
-        <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>
+      <div className="flex items-center justify-between px-5 py-3 border-t border-[#E8E7E2] dark:border-border">
+        <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 12 }}>
           Hiển thị {totalItems > 0 ? startIndex + 1 : 0} - {endIndex} trong {totalItems} deals
         </span>
         
         <div className="flex items-center gap-1">
-          <span className="text-[#6B6B67]" style={{ fontSize: 12 }}>
+          <span className="text-[#6B6B67] dark:text-muted-foreground" style={{ fontSize: 12 }}>
             Trang {currentPage} / {totalPages}
           </span>
           <button
-            className="size-7 flex items-center justify-center rounded hover:bg-[#F1EFE8] transition-colors cursor-pointer"
-            style={{ border: "1px solid #E8E7E2", background: "white" }}
+            className="size-7 flex items-center justify-center rounded hover:bg-[#F1EFE8] dark:hover:bg-muted transition-colors cursor-pointer"
+            style={{ border: "1px solid var(--border)", background: "var(--card)" }}
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
             >
-            <ChevronLeft size={14} className="text-[#6B6B67]" />
+            <ChevronLeft size={14} className="text-[#6B6B67] dark:text-muted-foreground" />
           </button>
           <button
-            className="size-7 flex items-center justify-center rounded hover:bg-[#F1EFE8] transition-colors cursor-pointer"
-            style={{ border: "1px solid #E8E7E2", background: "white" }}
+            className="size-7 flex items-center justify-center rounded hover:bg-[#F1EFE8] dark:hover:bg-muted transition-colors cursor-pointer"
+            style={{ border: "1px solid var(--border)", background: "var(--card)" }}
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages || totalPages === 0}
           >
-            <ChevronRight size={14} className="text-[#6B6B67]" />
+            <ChevronRight size={14} className="text-[#6B6B67] dark:text-muted-foreground" />
           </button>
         </div>
       </div>

@@ -13,6 +13,7 @@ import { EmptyState } from "./EmptyState";
 import { formatVndShort, getInitials, getAvatarColors } from "@/lib/helper";
 import { reportsService } from "@/services/reports.service";
 import { useMe } from "@/hooks/useAuth";
+import { CustomTooltipProps } from "@/lib/types/chart";
 import {
   Dialog,
   DialogContent,
@@ -24,16 +25,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-[#E8E7E2] rounded-lg shadow-md px-3 py-2.5 text-xs">
-      <p className="text-[#1A1A18] mb-1.5" style={{ fontWeight: 600 }}>{label}</p>
-      {payload.map((p: any) => (
+    <div className="bg-white dark:bg-card border border-[#E8E7E2] dark:border-border rounded-lg shadow-md px-3 py-2.5 text-xs">
+      <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontWeight: 600 }}>{label}</p>
+      {payload.map((p) => (
         <div key={p.dataKey} className="flex items-center gap-2 mb-0.5">
           <span className="size-2 rounded-full shrink-0" style={{ background: p.color ?? p.fill }} />
-          <span className="text-[#6B6B67]">{p.name}:</span>
-          <span className="text-[#1A1A18]" style={{ fontWeight: 500 }}>{formatVndShort(p.value)}</span>
+          <span className="text-[#6B6B67] dark:text-muted-foreground">{p.name}:</span>
+          <span className="text-[#1A1A18] dark:text-foreground" style={{ fontWeight: 500 }}>{formatVndShort(Number(p.value))}</span>
         </div>
       ))}
     </div>
@@ -78,8 +79,9 @@ export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabPro
       toast.success("Cập nhật target KPI thành công!");
       setIsModalOpen(false);
     },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || "Cập nhật target KPI thất bại.");
+    onError: (err: unknown) => {
+      const error = err as { response?: { data?: { message?: string } } };
+      toast.error(error.response?.data?.message || "Cập nhật target KPI thất bại.");
     },
   });
 
@@ -133,7 +135,7 @@ export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabPro
               {LEGEND.map((l) => (
                 <div key={l.label} className="flex items-center gap-1.5">
                   <div className="w-3 h-3 rounded-sm shrink-0" style={{ background: l.color }} />
-                  <span className="text-[#6B6B67]" style={{ fontSize: 11 }}>{l.label}</span>
+                  <span className="text-muted-foreground" style={{ fontSize: 11 }}>{l.label}</span>
                 </div>
               ))}
             </div>
@@ -150,9 +152,9 @@ export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabPro
         ) : (
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={teamData} margin={{ top: 5, right: 16, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={formatVndShort} width={44} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} tickFormatter={formatVndShort} width={44} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="actual" name="Thực tế" fill="#534AB7" radius={[4, 4, 0, 0]} maxBarSize={30} />
               <Bar dataKey="target" name="Target" fill="#AFA9EC" radius={[4, 4, 0, 0]} maxBarSize={30} />
@@ -162,25 +164,25 @@ export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabPro
       </ChartCard>
 
       {/* Table Row */}
-      <div className="bg-white rounded-[10px] border border-[#E8E7E2] overflow-hidden shadow-sm">
-        <div className="p-4 border-b border-[#E8E7E2] flex items-center justify-between">
+      <div className="bg-white dark:bg-card rounded-[10px] border border-[#E8E7E2] dark:border-border overflow-hidden shadow-sm">
+        <div className="p-4 border-b border-[#E8E7E2] dark:border-border flex items-center justify-between">
           <div>
-            <h3 className="text-[#1A1A18]" style={{ fontSize: 13, fontWeight: 600 }}>Chi tiết chỉ số hiệu suất</h3>
-            <p className="text-[#6B6B67] mt-0.5" style={{ fontSize: 11 }}>Đo lường chi tiết năng lực bán hàng và tần suất hoạt động</p>
+            <h3 className="text-[#1A1A18] dark:text-foreground" style={{ fontSize: 13, fontWeight: 600 }}>Chi tiết chỉ số hiệu suất</h3>
+            <p className="text-[#6B6B67] dark:text-muted-foreground mt-0.5" style={{ fontSize: 11 }}>Đo lường chi tiết năng lực bán hàng và tần suất hoạt động</p>
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#E8E7E2] bg-[#F8F8F7]">
-                <th className="p-3 pl-4 text-[#6B6B67] font-medium" style={{ fontSize: 11 }}>NHÂN VIÊN</th>
-                <th className="p-3 text-[#6B6B67] font-medium text-right" style={{ fontSize: 11 }}>DOANH SỐ ĐẠT</th>
-                <th className="p-3 text-[#6B6B67] font-medium text-right" style={{ fontSize: 11 }}>CHỈ TIÊU (TARGET)</th>
-                <th className="p-3 text-[#6B6B67] font-medium text-right" style={{ fontSize: 11 }}>TỶ LỆ ĐẠT</th>
-                <th className="p-3 text-[#6B6B67] font-medium text-right" style={{ fontSize: 11 }}>TỶ LỆ CHỐT (WIN RATE)</th>
-                <th className="p-3 text-[#6B6B67] font-medium text-right" style={{ fontSize: 11 }}>HOẠT ĐỘNG</th>
-                <th className="p-3 pr-4 text-[#6B6B67] font-medium text-right" style={{ fontSize: 11 }}>SỐ NGÀY CHỐT TB</th>
+              <tr className="border-b border-[#E8E7E2] dark:border-border bg-[#F8F8F7] dark:bg-muted/30">
+                <th className="p-3 pl-4 text-[#6B6B67] dark:text-muted-foreground font-medium" style={{ fontSize: 11 }}>NHÂN VIÊN</th>
+                <th className="p-3 text-[#6B6B67] dark:text-muted-foreground font-medium text-right" style={{ fontSize: 11 }}>DOANH SỐ ĐẠT</th>
+                <th className="p-3 text-[#6B6B67] dark:text-muted-foreground font-medium text-right" style={{ fontSize: 11 }}>CHỈ TIÊU (TARGET)</th>
+                <th className="p-3 text-[#6B6B67] dark:text-muted-foreground font-medium text-right" style={{ fontSize: 11 }}>TỶ LỆ ĐẠT</th>
+                <th className="p-3 text-[#6B6B67] dark:text-muted-foreground font-medium text-right" style={{ fontSize: 11 }}>TỶ LỆ CHỐT (WIN RATE)</th>
+                <th className="p-3 text-[#6B6B67] dark:text-muted-foreground font-medium text-right" style={{ fontSize: 11 }}>HOẠT ĐỘNG</th>
+                <th className="p-3 pr-4 text-[#6B6B67] dark:text-muted-foreground font-medium text-right" style={{ fontSize: 11 }}>SỐ NGÀY CHỐT TB</th>
               </tr>
             </thead>
             <tbody>
@@ -194,7 +196,7 @@ export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabPro
                 teamData.map((row) => {
                   const ratio = row.target > 0 ? ((row.actual / row.target) * 100).toFixed(0) : "0";
                   return (
-                    <tr key={row.userId} className="border-b border-[#E8E7E2] last:border-0 hover:bg-[#F8F8F7] transition-colors">
+                    <tr key={row.userId} className="border-b border-[#E8E7E2] dark:border-border last:border-0 hover:bg-[#F8F8F7] dark:hover:bg-muted/50 transition-colors">
                       {/* User Profile */}
                       <td className="p-3 pl-4">
                         <div className="flex items-center gap-2.5">
@@ -207,23 +209,23 @@ export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabPro
                           >
                             {getInitials(row.name)}
                           </div>
-                          <span className="text-[#1A1A18] font-medium" style={{ fontSize: 12 }}>
+                          <span className="text-[#1A1A18] dark:text-foreground font-medium" style={{ fontSize: 12 }}>
                             {row.name}
                           </span>
                         </div>
                       </td>
                       {/* Actual */}
-                      <td className="p-3 text-[#1A1A18] text-right font-medium tabular-nums" style={{ fontSize: 12 }}>
+                      <td className="p-3 text-[#1A1A18] dark:text-foreground text-right font-medium tabular-nums" style={{ fontSize: 12 }}>
                         {formatVndShort(row.actual)}
                       </td>
                       {/* Target */}
-                      <td className="p-3 text-[#6B6B67] text-right tabular-nums" style={{ fontSize: 12 }}>
+                      <td className="p-3 text-[#6B6B67] dark:text-muted-foreground text-right tabular-nums" style={{ fontSize: 12 }}>
                         <div className="flex items-center justify-end gap-1.5">
                           <span>{formatVndShort(row.target)}</span>
                           {isAdminOrManager && (
                             <button
                               onClick={() => handleOpenEdit(row.userId, row.name, row.target)}
-                              className="p-1 hover:bg-[#EEEDFE] rounded text-[#534AB7] hover:text-[#4840A0] transition-colors cursor-pointer"
+                              className="p-1 hover:bg-[#EEEDFE] dark:hover:bg-muted rounded text-[#534AB7] dark:text-primary hover:text-[#4840A0] transition-colors cursor-pointer"
                               title="Chỉnh sửa KPI Target"
                             >
                               <Edit2 size={11} />
@@ -245,15 +247,15 @@ export function TeamPerformanceTab({ startDate, endDate }: TeamPerformanceTabPro
                         </span>
                       </td>
                       {/* Win Rate */}
-                      <td className="p-3 text-[#1A1A18] text-right font-medium tabular-nums" style={{ fontSize: 12 }}>
+                      <td className="p-3 text-[#1A1A18] dark:text-foreground text-right font-medium tabular-nums" style={{ fontSize: 12 }}>
                         {row.winRate}%
                       </td>
                       {/* Activities */}
-                      <td className="p-3 text-[#6B6B67] text-right tabular-nums" style={{ fontSize: 12 }}>
+                      <td className="p-3 text-[#6B6B67] dark:text-muted-foreground text-right tabular-nums" style={{ fontSize: 12 }}>
                         {row.activities}
                       </td>
                       {/* Average Days to Close */}
-                      <td className="p-3 pr-4 text-[#6B6B67] text-right tabular-nums" style={{ fontSize: 12 }}>
+                      <td className="p-3 pr-4 text-[#6B6B67] dark:text-muted-foreground text-right tabular-nums" style={{ fontSize: 12 }}>
                         {row.avgDaysToClose} ngày
                       </td>
                     </tr>

@@ -34,7 +34,7 @@ const ICONS: Record<ActivityType, ReactNode> = {
   NOTE: <FileText size={14} />,
 };
 
-// Tạo initials từ tên user (lấy 2 chữ cái đầu của 2 từ đầu tiên)
+// Generate initials from user name (take first 2 letters of first 2 words)
 function getInitials(name: string): string {
   return name
     .split(" ")
@@ -43,7 +43,7 @@ function getInitials(name: string): string {
     .join("");
 }
 
-// Màu avatar deterministic theo userId (không random mỗi render)
+// Deterministic avatar color by userId (no random on each render)
 const AVATAR_COLORS = [
   "#D4E8F5",
   "#E8D4F5",
@@ -91,10 +91,7 @@ export function ActivityCard({
   });
 
   return (
-    <div
-      className="bg-white rounded-xl border p-3 hover:shadow-sm transition-shadow"
-      style={{ borderColor: "#E8E7E2", borderWidth: "0.5px" }}
-    >
+    <div className="bg-white dark:bg-card rounded-xl border border-border/70 dark:border-border p-3 hover:shadow-sm transition-shadow">
       <div className="flex gap-3">
         {/* Type icon */}
         <div
@@ -123,7 +120,7 @@ export function ActivityCard({
                 {formattedDate}
               </span>
 
-              {/* Edit/Delete dropdown — chỉ hiển thị khi có callback */}
+              {/* Edit/Delete dropdown — only show when callback is present */}
               {(onEdit || onDelete) && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -158,7 +155,7 @@ export function ActivityCard({
                 </DropdownMenu>
               )}
 
-              {/* Fallback button khi không có callback (view-only) */}
+              {/* Fallback button when there is no callback (view-only) */}
               {!onEdit && !onDelete && (
                 <button className="text-muted-foreground hover:text-foreground transition-colors p-0.5 bg-transparent border-0 cursor-pointer">
                   <MoreHorizontal size={13} />
@@ -200,15 +197,15 @@ export function ActivityCard({
           {activity.deal && (
             <div className="mb-2">
               <span
-                className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 border border-border text-muted-foreground"
-                style={{ fontSize: 11, background: "#F8F8F7" }}
+                className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 border border-border text-muted-foreground bg-[#F8F8F7] dark:bg-muted"
+                style={{ fontSize: 11 }}
               >
                 Deal: {activity.deal.title}
               </span>
             </div>
           )}
 
-          {/* Note với expand/collapse — threshold 120 chars (req 13.1) */}
+          {/* Note with expand/collapse — threshold 120 chars (req 13.1) */}
           <p
             className="text-muted-foreground mb-2"
             style={{ fontSize: 12, lineHeight: 1.55 }}
@@ -225,19 +222,16 @@ export function ActivityCard({
             )}
           </p>
 
-          {/* AI badge — hiển thị khi activity có dealId (req 13.4) */}
+          {/* AI badge — display when activity has dealId (req 13.4) */}
           {activity.dealId && (
-            <div
-              className="rounded-lg px-3 py-2 mb-2 flex items-start justify-between gap-2"
-              style={{ background: "#EEEDFE" }}
-            >
+            <div className="rounded-lg px-3 py-2 mb-2 flex items-start justify-between gap-2 bg-[#EEEDFE] dark:bg-secondary">
               <div className="flex items-start gap-1.5 min-w-0">
                 <Sparkles
                   size={12}
-                  style={{ color: "#534AB7", marginTop: 2 }}
+                  style={{ color: "var(--primary)", marginTop: 2 }}
                   className="shrink-0"
                 />
-                <p style={{ fontSize: 11, color: "#534AB7", lineHeight: 1.5 }}>
+                <p style={{ fontSize: 11, color: "var(--primary)", lineHeight: 1.5 }}>
                   <span style={{ fontWeight: 500 }}>AI Suggestions</span>
                   {" · "}
                   Có gợi ý AI cho deal này

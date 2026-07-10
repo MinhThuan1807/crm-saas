@@ -11,7 +11,7 @@ export const DealStage = {
 
 export type DealStage = (typeof DealStage)[keyof typeof DealStage];
 
-// ─── Base schemas (nội bộ) ────────────────────────────────────────────────────
+// ─── Base schemas (internal) ────────────────────────────────────────────────────
 const DealOwnerSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -22,7 +22,7 @@ const DealContactCardSchema = z.object({
   name: z.string(),
 });
 
-// ─── Deal Card — dùng trong pipeline view ────────────────────────────────────
+// ─── Deal Card — used in pipeline view ────────────────────────────────────
 export const DealCardSchema = z.object({
   id: z.string(),
   tenantId: z.string(),

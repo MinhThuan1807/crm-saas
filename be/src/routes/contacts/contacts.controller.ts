@@ -4,12 +4,14 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ContactsService } from './contacts.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AccessTokenPayload } from 'src/common/types/jwt.type';
-import { CreateContactBodyDto, CreateContactResDto, GetContactResDto, GetContactsQueryDto, GetContactsResDto, UpdateContactBodyDto } from './contacts.dto';
+import { CreateContactBodyDto, CreateContactResDto, GetContactResDto, GetContactsQueryDto, GetContactsResDto, UpdateContactBodyDto, BulkImportContactsBodyDto } from './contacts.dto';
 import { ZodSerializerDto } from 'nestjs-zod';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @ApiTags('Contacts')
 @Controller('contacts')
 @UseGuards(JwtAuthGuard)
+@SkipThrottle()
 export class ContactsController {
   constructor(private readonly contactService: ContactsService) {}
 
@@ -17,14 +19,27 @@ export class ContactsController {
   @ApiOkResponse({ type: GetContactsResDto })
   @ZodSerializerDto(GetContactsResDto)
   getContacts(@CurrentUser() user: AccessTokenPayload, @Query() query: GetContactsQueryDto) {
-    return this.contactService.getAllContacts(user.tenantId, query, { userId: user.userId, role: user.role });
+    return this.contactService.getAllContacts(user.tenantId, query, user);
+  }
+
+  @Post('bulk')
+  bulkImport(
+    @CurrentUser() user: AccessTokenPayload,
+    @Body() body: BulkImportContactsBodyDto,
+  ) {
+    return this.contactService.bulkImport(user.tenantId, user.userId, body);
+  }
+
+  @Post('import/map-columns')
+  mapColumns(@Body() body: { headers: string[] }) {
+    return this.contactService.aiMapColumns(body.headers);
   }
 
   @Get(':id')
   @ApiOkResponse({ type: GetContactResDto })
   @ZodSerializerDto(GetContactResDto)
   getContactById(@CurrentUser() user: AccessTokenPayload, @Param('id') contactId: string) {
-    return this.contactService.getContactById(contactId, user.tenantId, { userId: user.userId, role: user.role });
+    return this.contactService.getContactById(contactId, user.tenantId, user);
   }
 
   @Post()
@@ -43,7 +58,7 @@ export class ContactsController {
     @Param('id') contactId: string,
     @Body() body: UpdateContactBodyDto,
   ) {
-    return this.contactService.update(contactId, user.tenantId, body, { userId: user.userId, role: user.role })
+    return this.contactService.update(contactId, user.tenantId, body, user)
   }
 
   @Delete(':id')
@@ -51,7 +66,7 @@ export class ContactsController {
     @CurrentUser() user: AccessTokenPayload,
     @Param('id') contactId: string,
   ) {
-    return this.contactService.delete(contactId, user.tenantId, { userId: user.userId, role: user.role })
+    return this.contactService.delete(contactId, user.tenantId, user)
   }
 
   @Patch(':id/restore')
@@ -59,7 +74,8 @@ export class ContactsController {
     @CurrentUser() user: AccessTokenPayload,
     @Param('id') contactId: string,
   ) {
-    return this.contactService.restore(contactId, user.tenantId, { userId: user.userId, role: user.role })
+    return this.contactService.restore(contactId, user.tenantId, user)
   }
 }
+
 

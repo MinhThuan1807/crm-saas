@@ -123,7 +123,7 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
                     Tên deal <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Tên deal" {...field} style={{ fontSize: 13 }} className="bg-[#F8F8F7] border-[#E8E7E2]" />
+                    <Input placeholder="Tên deal" {...field} style={{ fontSize: 13 }} className="bg-[#F8F8F7] dark:bg-card border-[#E8E7E2] dark:border-border text-foreground" />
                   </FormControl>
                   <FormMessage style={{ fontSize: 11 }} />
                 </FormItem>
@@ -140,7 +140,7 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
                     <FormLabel style={{ fontSize: 12 }}>Giai đoạn</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
-                        <SelectTrigger size="sm" style={{ fontSize: 13 }} className="bg-[#F8F8F7] border-[#E8E7E2]">
+                        <SelectTrigger size="sm" style={{ fontSize: 13 }} className="bg-[#F8F8F7] dark:bg-card border-[#E8E7E2] dark:border-border text-foreground">
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
@@ -170,7 +170,7 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
                         {...field}
                         onChange={(e) => field.onChange(e.target.valueAsNumber)}
                         style={{ fontSize: 13 }}
-                        className="bg-[#F8F8F7] border-[#E8E7E2]"
+                        className="bg-[#F8F8F7] dark:bg-card border-[#E8E7E2] dark:border-border text-foreground"
                       />
                     </FormControl>
                     <FormMessage style={{ fontSize: 11 }} />
@@ -189,7 +189,7 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
                     <FormLabel style={{ fontSize: 12 }}>Người phụ trách <span className="text-destructive">*</span></FormLabel>
                     <Select value={field.value} onValueChange={field.onChange} disabled={usersLoading}>
                       <FormControl>
-                        <SelectTrigger size="sm" style={{ fontSize: 13 }} className="bg-[#F8F8F7] border-[#E8E7E2]">
+                        <SelectTrigger size="sm" style={{ fontSize: 13 }} className="bg-[#F8F8F7] dark:bg-card border-[#E8E7E2] dark:border-border text-foreground">
                           <SelectValue placeholder={usersLoading ? "Đang tải..." : "Chọn nhân viên"} />
                         </SelectTrigger>
                       </FormControl>
@@ -217,7 +217,7 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
                         <FormControl>
                           <Button
                             variant="outline"
-                            className="w-full h-8 pl-3 text-left font-normal text-xs bg-[#F8F8F7] border border-[#E8E7E2] text-foreground hover:bg-gray-100"
+                            className="w-full h-8 pl-3 text-left font-normal text-xs bg-[#F8F8F7] dark:bg-card border border-[#E8E7E2] dark:border-border text-foreground hover:bg-gray-100 dark:hover:bg-muted"
                           >
                             {field.value ? (
                               format(new Date(field.value), "dd/MM/yyyy")
@@ -228,7 +228,7 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-white" align="start">
+                      <PopoverContent className="w-auto p-0 bg-white dark:bg-card border dark:border-border" align="start">
                         <Calendar
                           mode="single"
                           selected={field.value ? new Date(field.value) : undefined}
@@ -260,7 +260,7 @@ export function EditDealSheet({ deal, open, onOpenChange }: Props) {
                       rows={4}
                       {...field}
                       style={{ fontSize: 13, resize: "none" }}
-                      className="bg-[#F8F8F7] border-[#E8E7E2]"
+                      className="bg-[#F8F8F7] dark:bg-card border-[#E8E7E2] dark:border-border text-foreground"
                     />
                   </FormControl>
                   <FormMessage style={{ fontSize: 11 }} />

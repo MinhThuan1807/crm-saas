@@ -182,6 +182,7 @@ export type TenantWhereInput = {
   slug?: Prisma.StringFilter<"Tenant"> | string
   plan?: Prisma.StringFilter<"Tenant"> | string
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
+  roles?: Prisma.RoleListRelationFilter
   activities?: Prisma.ActivityListRelationFilter
   contacts?: Prisma.ContactListRelationFilter
   deals?: Prisma.DealListRelationFilter
@@ -197,6 +198,7 @@ export type TenantOrderByWithRelationInput = {
   slug?: Prisma.SortOrder
   plan?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  roles?: Prisma.RoleOrderByRelationAggregateInput
   activities?: Prisma.ActivityOrderByRelationAggregateInput
   contacts?: Prisma.ContactOrderByRelationAggregateInput
   deals?: Prisma.DealOrderByRelationAggregateInput
@@ -215,6 +217,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Tenant"> | string
   plan?: Prisma.StringFilter<"Tenant"> | string
   createdAt?: Prisma.DateTimeFilter<"Tenant"> | Date | string
+  roles?: Prisma.RoleListRelationFilter
   activities?: Prisma.ActivityListRelationFilter
   contacts?: Prisma.ContactListRelationFilter
   deals?: Prisma.DealListRelationFilter
@@ -252,6 +255,7 @@ export type TenantCreateInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealCreateNestedManyWithoutTenantInput
@@ -267,6 +271,7 @@ export type TenantUncheckedCreateInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
@@ -282,6 +287,7 @@ export type TenantUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
@@ -297,6 +303,7 @@ export type TenantUncheckedUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
@@ -379,6 +386,20 @@ export type TenantUpdateOneRequiredWithoutUsersNestedInput = {
   upsert?: Prisma.TenantUpsertWithoutUsersInput
   connect?: Prisma.TenantWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutUsersInput, Prisma.TenantUpdateWithoutUsersInput>, Prisma.TenantUncheckedUpdateWithoutUsersInput>
+}
+
+export type TenantCreateNestedOneWithoutRolesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutRolesInput, Prisma.TenantUncheckedCreateWithoutRolesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutRolesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutRolesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutRolesInput, Prisma.TenantUncheckedCreateWithoutRolesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutRolesInput
+  upsert?: Prisma.TenantUpsertWithoutRolesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutRolesInput, Prisma.TenantUpdateWithoutRolesInput>, Prisma.TenantUncheckedUpdateWithoutRolesInput>
 }
 
 export type TenantCreateNestedOneWithoutContactsInput = {
@@ -471,6 +492,7 @@ export type TenantCreateWithoutUsersInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealCreateNestedManyWithoutTenantInput
@@ -485,6 +507,7 @@ export type TenantUncheckedCreateWithoutUsersInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
@@ -515,6 +538,7 @@ export type TenantUpdateWithoutUsersInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
@@ -529,11 +553,88 @@ export type TenantUncheckedUpdateWithoutUsersInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
   kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutRolesInput = {
+  id?: string
+  name: string
+  slug: string
+  plan?: string
+  createdAt?: Date | string
+  activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
+  contacts?: Prisma.ContactCreateNestedManyWithoutTenantInput
+  deals?: Prisma.DealCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetCreateNestedManyWithoutTenantInput
+  users?: Prisma.UserCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutRolesInput = {
+  id?: string
+  name: string
+  slug: string
+  plan?: string
+  createdAt?: Date | string
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
+  contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutTenantInput
+  deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  kpiTargets?: Prisma.KpiTargetUncheckedCreateNestedManyWithoutTenantInput
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutRolesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutRolesInput, Prisma.TenantUncheckedCreateWithoutRolesInput>
+}
+
+export type TenantUpsertWithoutRolesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutRolesInput, Prisma.TenantUncheckedUpdateWithoutRolesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutRolesInput, Prisma.TenantUncheckedCreateWithoutRolesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutRolesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutRolesInput, Prisma.TenantUncheckedUpdateWithoutRolesInput>
+}
+
+export type TenantUpdateWithoutRolesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
+  contacts?: Prisma.ContactUpdateManyWithoutTenantNestedInput
+  deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUpdateManyWithoutTenantNestedInput
+  users?: Prisma.UserUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutRolesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  plan?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
+  contacts?: Prisma.ContactUncheckedUpdateManyWithoutTenantNestedInput
+  deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  kpiTargets?: Prisma.KpiTargetUncheckedUpdateManyWithoutTenantNestedInput
+  users?: Prisma.UserUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
 }
 
@@ -543,6 +644,7 @@ export type TenantCreateWithoutContactsInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
@@ -557,6 +659,7 @@ export type TenantUncheckedCreateWithoutContactsInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
@@ -587,6 +690,7 @@ export type TenantUpdateWithoutContactsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
@@ -601,6 +705,7 @@ export type TenantUncheckedUpdateWithoutContactsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
@@ -615,6 +720,7 @@ export type TenantCreateWithoutDealsInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
@@ -629,6 +735,7 @@ export type TenantUncheckedCreateWithoutDealsInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
@@ -659,6 +766,7 @@ export type TenantUpdateWithoutDealsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
@@ -673,6 +781,7 @@ export type TenantUncheckedUpdateWithoutDealsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
@@ -687,6 +796,7 @@ export type TenantCreateWithoutActivitiesInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
@@ -701,6 +811,7 @@ export type TenantUncheckedCreateWithoutActivitiesInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
@@ -731,6 +842,7 @@ export type TenantUpdateWithoutActivitiesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
@@ -745,6 +857,7 @@ export type TenantUncheckedUpdateWithoutActivitiesInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
@@ -759,6 +872,7 @@ export type TenantCreateWithoutInvitationsInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealCreateNestedManyWithoutTenantInput
@@ -773,6 +887,7 @@ export type TenantUncheckedCreateWithoutInvitationsInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
@@ -803,6 +918,7 @@ export type TenantUpdateWithoutInvitationsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
@@ -817,6 +933,7 @@ export type TenantUncheckedUpdateWithoutInvitationsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
@@ -831,6 +948,7 @@ export type TenantCreateWithoutKpiTargetsInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealCreateNestedManyWithoutTenantInput
@@ -845,6 +963,7 @@ export type TenantUncheckedCreateWithoutKpiTargetsInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
@@ -875,6 +994,7 @@ export type TenantUpdateWithoutKpiTargetsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
@@ -889,6 +1009,7 @@ export type TenantUncheckedUpdateWithoutKpiTargetsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
@@ -903,6 +1024,7 @@ export type TenantCreateWithoutAuditLogsInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealCreateNestedManyWithoutTenantInput
@@ -917,6 +1039,7 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   slug: string
   plan?: string
   createdAt?: Date | string
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutTenantInput
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutTenantInput
   contacts?: Prisma.ContactUncheckedCreateNestedManyWithoutTenantInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutTenantInput
@@ -947,6 +1070,7 @@ export type TenantUpdateWithoutAuditLogsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUpdateManyWithoutTenantNestedInput
@@ -961,6 +1085,7 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   plan?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutTenantNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutTenantNestedInput
   contacts?: Prisma.ContactUncheckedUpdateManyWithoutTenantNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutTenantNestedInput
@@ -975,6 +1100,7 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
  */
 
 export type TenantCountOutputType = {
+  roles: number
   activities: number
   contacts: number
   deals: number
@@ -985,6 +1111,7 @@ export type TenantCountOutputType = {
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  roles?: boolean | TenantCountOutputTypeCountRolesArgs
   activities?: boolean | TenantCountOutputTypeCountActivitiesArgs
   contacts?: boolean | TenantCountOutputTypeCountContactsArgs
   deals?: boolean | TenantCountOutputTypeCountDealsArgs
@@ -1002,6 +1129,13 @@ export type TenantCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exten
    * Select specific fields to fetch from the TenantCountOutputType
    */
   select?: Prisma.TenantCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RoleWhereInput
 }
 
 /**
@@ -1060,6 +1194,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   slug?: boolean
   plan?: boolean
   createdAt?: boolean
+  roles?: boolean | Prisma.Tenant$rolesArgs<ExtArgs>
   activities?: boolean | Prisma.Tenant$activitiesArgs<ExtArgs>
   contacts?: boolean | Prisma.Tenant$contactsArgs<ExtArgs>
   deals?: boolean | Prisma.Tenant$dealsArgs<ExtArgs>
@@ -1096,6 +1231,7 @@ export type TenantSelectScalar = {
 
 export type TenantOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "plan" | "createdAt", ExtArgs["result"]["tenant"]>
 export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  roles?: boolean | Prisma.Tenant$rolesArgs<ExtArgs>
   activities?: boolean | Prisma.Tenant$activitiesArgs<ExtArgs>
   contacts?: boolean | Prisma.Tenant$contactsArgs<ExtArgs>
   deals?: boolean | Prisma.Tenant$dealsArgs<ExtArgs>
@@ -1111,6 +1247,7 @@ export type TenantIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Tenant"
   objects: {
+    roles: Prisma.$RolePayload<ExtArgs>[]
     activities: Prisma.$ActivityPayload<ExtArgs>[]
     contacts: Prisma.$ContactPayload<ExtArgs>[]
     deals: Prisma.$DealPayload<ExtArgs>[]
@@ -1519,6 +1656,7 @@ readonly fields: TenantFieldRefs;
  */
 export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  roles<T extends Prisma.Tenant$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   activities<T extends Prisma.Tenant$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   contacts<T extends Prisma.Tenant$contactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   deals<T extends Prisma.Tenant$dealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$dealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1950,6 +2088,30 @@ export type TenantDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Limit how many Tenants to delete.
    */
   limit?: number
+}
+
+/**
+ * Tenant.roles
+ */
+export type Tenant$rolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Role
+   */
+  select?: Prisma.RoleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Role
+   */
+  omit?: Prisma.RoleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RoleInclude<ExtArgs> | null
+  where?: Prisma.RoleWhereInput
+  orderBy?: Prisma.RoleOrderByWithRelationInput | Prisma.RoleOrderByWithRelationInput[]
+  cursor?: Prisma.RoleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RoleScalarFieldEnum | Prisma.RoleScalarFieldEnum[]
 }
 
 /**

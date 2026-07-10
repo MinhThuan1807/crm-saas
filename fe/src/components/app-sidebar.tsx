@@ -23,6 +23,8 @@ import {
   Shield,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
+import logoImg from "@/app/icon.png";
 import { cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
 import { useLogout, useMe } from "@/hooks/useAuth";
@@ -41,7 +43,7 @@ function getInitials(name?: string): string {
 const navGroups = [
   {
     label: "Dashboard",
-    path: "/",
+    path: "/dashboard",
     icon: LayoutDashboard,
   },
   {
@@ -85,7 +87,7 @@ export function AppSidebar() {
     logout();
   };
   const isActive = (path: string) => {
-    if (path === "/") return pathName === "/";
+    if (path === "/dashboard") return pathName === "/dashboard";
     return pathName.startsWith(path);
   };
   return (
@@ -99,11 +101,14 @@ export function AppSidebar() {
               className="flex items-center gap-2 mb-1 no-underline"
               style={{ textDecoration: "none" }}
             >
-              <div className="size-6 bg-primary rounded-[6px] flex items-center justify-center shrink-0">
-                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                  <path d="M2 10L6.5 3L11 10H2Z" fill="white" fillOpacity="0.9" />
-                </svg>
-              </div>
+              <Image
+                src={logoImg}
+                alt="salesFlow"
+                width={24}
+                height={24}
+                unoptimized
+                className="rounded-[6px] shrink-0"
+              />
               <span
                 className="text-foreground"
                 style={{
@@ -115,7 +120,7 @@ export function AppSidebar() {
                 SalesFlow
               </span>
             </Link>
-            <div className="flex items-center gap-1.5 pl-8">
+            <div className="flex items-center gap-1.5">
               <span className="text-muted-foreground" style={{ fontSize: 12 }}>
                 Công ty ABC
               </span>

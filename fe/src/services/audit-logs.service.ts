@@ -8,7 +8,7 @@ export interface AuditLogItem {
   targetType: "DEAL" | "CONTACT";
   targetId: string;
   targetName: string | null;
-  changes: any;
+  changes: Record<string, unknown> | null;
   createdAt: string;
   user: {
     id: string;

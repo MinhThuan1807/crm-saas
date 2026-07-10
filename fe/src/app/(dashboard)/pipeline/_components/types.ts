@@ -1,8 +1,8 @@
-// Re-export từ deals.schema để dùng chung trong pipeline components
+// Re-export from deals.schema for shared use in pipeline components
 export { DealStage } from "@/lib/validations/deals.schema";
 import type { DealCard, DealDetail, DealStage } from "@/lib/validations/deals.schema";
 
-// Alias để các component dùng Stage thay vì DealStage (backward compat)
+// Alias so components can use Stage instead of DealStage (backward compat)
 export type Stage = DealStage;
 
 export type Deal = DealCard;

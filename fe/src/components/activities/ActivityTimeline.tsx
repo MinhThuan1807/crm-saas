@@ -3,7 +3,8 @@ import { useState } from "react";
 import { Phone, Mail, Users, FileText, Clock } from "lucide-react";
 import {
   ActivityType,
-  ActivityItem
+  ActivityItem,
+  CreateActivityForContactBodyType
 } from "@/lib/validations/activities.scheme";
 import LogActivityForm from "./LogActivityForm";
 import { relativeTime, formatDate } from "@/lib/helper";
@@ -12,7 +13,7 @@ export type ActivityTab = ActivityType;
 
 interface ActivityTimelineProps {
   activities: ActivityItem[];
-  onSubmitActivity: (data: any, reset: () => void) => void;
+  onSubmitActivity: (data: CreateActivityForContactBodyType, reset: () => void) => void;
   isPendingSubmit?: boolean;
   entityType?: "contact" | "deal";
 }
@@ -59,7 +60,7 @@ export default function ActivityTimeline({
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto bg-[#F8F8F7]">
+    <div className="flex-1 flex flex-col overflow-y-auto bg-[#F8F8F7] dark:bg-background">
       {/* ── Log activity form ── */}
       <LogActivityForm
         onSubmit={onSubmitActivity}

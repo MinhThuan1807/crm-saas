@@ -221,7 +221,7 @@ function ScrollFadeRow({
         setIsIntersecting(entry.isIntersecting);
       },
       {
-        rootMargin: "0px 0px -10% 0px", // Hàng ở 10% dưới cùng màn hình sẽ mờ
+        rootMargin: "0px 0px -10% 0px", // Row in bottom 10% of screen will fade
         threshold: 0.1,
       }
     );

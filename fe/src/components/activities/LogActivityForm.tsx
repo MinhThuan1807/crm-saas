@@ -68,7 +68,7 @@ function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogAct
     });
   };
 
-  const handleSubmit = (data: any) => {
+  const handleSubmit = (data: CreateActivityForContactBodyType) => {
     const reset = () =>
       form.reset({ title: "", note: "", date: new Date(), type: activeTab });
     
@@ -127,7 +127,7 @@ function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogAct
             {...form.register("title")}
             value={form.watch("title") || ""}
             placeholder="Tiêu đề hoạt động (tùy chọn)"
-            className="bg-[#F8F8F7] border-[#E8E7E2] text-sm"
+            className="bg-[#F8F8F7] dark:bg-card border-[#E8E7E2] dark:border-border text-foreground text-sm"
             style={{ fontSize: 13 }}
           />
         </div>
@@ -139,7 +139,7 @@ function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogAct
             value={form.watch("note") || ""}
             placeholder={PLACEHOLDER[activeTab]}
             rows={3}
-            className="bg-[#F8F8F7] border-[#E8E7E2] text-sm resize-none"
+            className="bg-[#F8F8F7] dark:bg-card border-[#E8E7E2] dark:border-border text-foreground text-sm resize-none"
             style={{ fontSize: 13, lineHeight: 1.6 }}
           />
         </div>
@@ -157,7 +157,7 @@ function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogAct
                 <ChevronDown size={10} />
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-3 bg-white flex flex-col gap-2" align="start">
+            <PopoverContent className="w-auto p-3 bg-white dark:bg-card border dark:border-border flex flex-col gap-2" align="start">
               <Calendar
                 mode="single"
                 selected={selectedDate}
@@ -183,11 +183,11 @@ function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogAct
                       newDate.setHours(parseInt(e.target.value, 10));
                       form.setValue("date", newDate);
                     }}
-                    className="text-xs bg-[#F8F8F7] border border-border rounded px-1.5 py-1 outline-none font-mono"
+                    className="text-xs bg-[#F8F8F7] dark:bg-muted border border-border dark:border-border text-foreground rounded px-1.5 py-1 outline-none font-mono"
                   >
                     {Array.from({ length: 24 }).map((_, i) => {
                       const val = i.toString().padStart(2, "0");
-                      return <option key={val} value={val}>{val}</option>;
+                      return <option key={val} value={val} className="bg-white dark:bg-card text-foreground">{val}</option>;
                     })}
                   </select>
                   <span className="text-muted-foreground text-xs">:</span>
@@ -199,11 +199,11 @@ function LogActivityForm({ onSubmit, isPending, entityType = "contact" }: LogAct
                       newDate.setMinutes(parseInt(e.target.value, 10));
                       form.setValue("date", newDate);
                     }}
-                    className="text-xs bg-[#F8F8F7] border border-border rounded px-1.5 py-1 outline-none font-mono"
+                    className="text-xs bg-[#F8F8F7] dark:bg-muted border border-border dark:border-border text-foreground rounded px-1.5 py-1 outline-none font-mono"
                   >
                     {Array.from({ length: 60 }).map((_, i) => {
                       const val = i.toString().padStart(2, "0");
-                      return <option key={val} value={val}>{val}</option>;
+                      return <option key={val} value={val} className="bg-white dark:bg-card text-foreground">{val}</option>;
                     })}
                   </select>
                 </div>

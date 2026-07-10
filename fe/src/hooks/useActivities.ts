@@ -33,7 +33,7 @@ export const activityKeys = {
 };
 
 // ─────────────────────────────────────────
-// GET ALL (paginated) — dùng cho bảng/danh sách có phân trang cụ thể
+// GET ALL (paginated) — used for tables/lists with specific pagination
 // ─────────────────────────────────────────
 export const useActivities = (params?: GetActivitiesParamsType) => {
   return useQuery({
@@ -44,7 +44,7 @@ export const useActivities = (params?: GetActivitiesParamsType) => {
 };
 
 // ─────────────────────────────────────────
-// GET ALL (infinite scroll / "Load more") — dùng cho Activities page
+// GET ALL (infinite scroll / "Load more") — used for Activities page
 // ─────────────────────────────────────────
 export const useActivitiesInfinite = (
   params?: Omit<GetActivitiesParamsType, "page">,
@@ -63,7 +63,7 @@ export const useActivitiesInfinite = (
 };
 
 // ─────────────────────────────────────────
-// GET BY CONTACT — dùng ở Contact Detail Page
+// GET BY CONTACT — used on Contact Detail Page
 // ─────────────────────────────────────────
 export const useContactActivities = (contactId: string) => {
   return useQuery({
@@ -71,12 +71,12 @@ export const useContactActivities = (contactId: string) => {
     queryFn: () => activitiesService.getByContact(contactId),
     enabled: !!contactId,
     staleTime: 30_000,
-    select: (data) => data.data, // trả thẳng ActivityItem[] cho dễ dùng
+    select: (data) => data.data, // return ActivityItem[] directly for ease of use
   });
 };
 
 // ─────────────────────────────────────────
-// GET BY DEAL — dùng ở Deal Detail Page
+// GET BY DEAL — used on Deal Detail Page
 // ─────────────────────────────────────────
 export const useDealActivities = (dealId: string) => {
   return useQuery({
@@ -84,7 +84,7 @@ export const useDealActivities = (dealId: string) => {
     queryFn: () => activitiesService.getByDeal(dealId),
     enabled: !!dealId,
     staleTime: 30_000,
-    select: (data) => data.data, // trả thẳng ActivityItem[] cho dễ dùng
+    select: (data) => data.data, // return ActivityItem[] directly for ease of use
   });
 };
 
@@ -98,7 +98,7 @@ export const useCreateContactActivity = (contactId: string) => {
     mutationFn: (body: CreateActivityForContactBodyType) =>
       activitiesService.createForContact(contactId, body),
     onSuccess: () => {
-      // Invalidate cả list theo contact lẫn global activities
+      // Invalidate both contact list and global activities
       queryClient.invalidateQueries({
         queryKey: activityKeys.byContact(contactId),
       });
@@ -145,7 +145,7 @@ export const useUpdateActivity = () => {
     mutationFn: ({ id, body }: { id: string; body: UpdateActivityBodyType }) =>
       activitiesService.update(id, body),
     onSuccess: () => {
-      // Invalidate toàn bộ activity cache (list, infinite, byContact, byDeal)
+      // Invalidate all activity cache (list, infinite, byContact, byDeal)
       queryClient.invalidateQueries({ queryKey: activityKeys.all });
       toast.success("Cập nhật hoạt động thành công");
     },
@@ -177,7 +177,7 @@ export const useDeleteActivity = () => {
 };
 
 // ─────────────────────────────────────────
-// Re-export ActivityType enum để dùng trong components
-// mà không cần import thêm từ validations
+// Re-export ActivityType enum to use in components
+// without importing again from validations
 // ─────────────────────────────────────────
 export { ActivityType };

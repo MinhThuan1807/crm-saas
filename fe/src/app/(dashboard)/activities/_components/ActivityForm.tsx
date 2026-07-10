@@ -56,9 +56,9 @@ export type ActivityFormContext =
 interface ActivityFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Khi có activity → edit mode; không có → create mode */
+  /** If activity exists -> edit mode; if not -> create mode */
   activity?: ActivityItem;
-  /** Context để xác định endpoint khi tạo mới */
+  /** Context to determine endpoint when creating new */
   context: ActivityFormContext;
 }
 
@@ -76,7 +76,7 @@ const TYPE_OPTIONS: { value: ActivityType; label: string }[] = [
 // Helpers
 // ─────────────────────────────────────────
 
-/** Chuyển Date object sang value của <input type="datetime-local"> */
+/** Convert Date object to value of <input type="datetime-local"> */
 function toDatetimeLocalValue(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return (
@@ -97,8 +97,8 @@ export function ActivityForm({
 }: ActivityFormProps) {
   const isEditMode = !!activity;
 
-  // ── Mutations — instantiate tất cả, dùng theo context ──────────────────
-  // Cần gọi hooks vô điều kiện (rules of hooks)
+  // ── Mutations — instantiate all, use based on context ──────────────────
+  // Need to call hooks unconditionally (rules of hooks)
   const contactId = context.type === "contact" ? context.contactId : "";
   const dealId = context.type === "deal" ? context.dealId : "";
 
@@ -106,7 +106,7 @@ export function ActivityForm({
   const createForDeal = useCreateDealActivity(dealId);
   const updateActivity = useUpdateActivity();
 
-  // isPending của mutation đang hoạt động
+  // isPending of active mutation
   const isPending =
     createForContact.isPending ||
     createForDeal.isPending ||
@@ -123,11 +123,11 @@ export function ActivityForm({
     },
   });
 
-  // ── Pre-populate khi edit mode hoặc khi dialog mở lại ──────────────────
+  // ── Pre-populate when edit mode or when dialog reopens ──────────────────
   useEffect(() => {
     if (open) {
       if (activity) {
-        // Edit mode — pre-fill từ activity
+        // Edit mode — pre-fill from activity
         form.reset({
           type: activity.type,
           title: activity.title ?? "",
@@ -135,7 +135,7 @@ export function ActivityForm({
           date: new Date(activity.date),
         });
       } else {
-        // Create mode — reset về default
+        // Create mode — reset to default
         form.reset({
           type: ActivityType.CALL,
           title: "",
@@ -160,26 +160,26 @@ export function ActivityForm({
         // Edit mode — PATCH /activities/:id
         await updateActivity.mutateAsync({ id: activity.id, body: payload });
       } else {
-        // Create mode — chọn endpoint theo context
+        // Create mode — select endpoint according to context
         if (context.type === "contact") {
           await createForContact.mutateAsync(payload);
         } else if (context.type === "deal") {
           await createForDeal.mutateAsync(payload);
         } else {
-          // global context — không có endpoint cụ thể trong spec;
-          // tạm thời không làm gì (cần contactId hoặc dealId)
-          // Trong tương lai có thể hiện thêm UI để chọn contact/deal
+          // global context — no specific endpoint in spec;
+          // temporarily do nothing (needs contactId or dealId)
+          // In future can show additional UI to select contact/deal
           console.warn(
             "Global context chưa được hỗ trợ tạo activity trực tiếp",
           );
           return;
         }
       }
-      // Thành công → đóng form 
+      // Success -> close form
       onOpenChange(false);
     } catch {
-      // Thất bại → giữ nguyên form, toast đã được xử lý trong hook 
-      // Không gọi onOpenChange(false)
+      // Failure -> keep form, toast has been handled in hook
+      // Do not call onOpenChange(false)
     }
   }
 
@@ -270,7 +270,7 @@ export function ActivityForm({
                       {...field}
                     />
                   </FormControl>
-                  {/* FormMessage tự hiển thị "Nội dung không được để trống" từ Zod */}
+                  {/* FormMessage automatically displays "Content cannot be blank" from Zod */}
                   <FormMessage style={{ fontSize: 11 }} />
                 </FormItem>
               )}

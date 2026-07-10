@@ -27,10 +27,7 @@ export class ReportsController {
     @Query() query: ReportsQueryDto,
     @CurrentUser() user: AccessTokenPayload,
   ) {
-    return this.reportsService.getOverview(user.tenantId, query.startDate, query.endDate, {
-      userId: user.userId,
-      role: user.role,
-    })
+    return this.reportsService.getOverview(query.startDate, query.endDate, user)
   }
 
   @Get('team-performance')
@@ -40,10 +37,7 @@ export class ReportsController {
     @Query() query: ReportsQueryDto,
     @CurrentUser() user: AccessTokenPayload,
   ) {
-    return this.reportsService.getTeamPerformance(user.tenantId, query.startDate, query.endDate, {
-      userId: user.userId,
-      role: user.role,
-    })
+    return this.reportsService.getTeamPerformance(query.startDate, query.endDate, user)
   }
 
   @Post('kpi')
@@ -51,9 +45,7 @@ export class ReportsController {
     @Body() body: UpdateKpiTargetDto,
     @CurrentUser() user: AccessTokenPayload,
   ) {
-    return this.reportsService.updateKpiTarget(user.tenantId, body, {
-      role: user.role,
-    })
+    return this.reportsService.updateKpiTarget(body, user)
   }
 
   @Get('pipeline-analysis')
@@ -62,10 +54,7 @@ export class ReportsController {
   getPipelineAnalysis(
     @CurrentUser() user: AccessTokenPayload,
   ) {
-    return this.reportsService.getPipelineAnalysis(user.tenantId, {
-      userId: user.userId,
-      role: user.role,
-    })
+    return this.reportsService.getPipelineAnalysis(user)
   }
 
   @Get('activities')
@@ -75,9 +64,6 @@ export class ReportsController {
     @Query() query: ReportsQueryDto,
     @CurrentUser() user: AccessTokenPayload,
   ) {
-    return this.reportsService.getActivitiesReport(user.tenantId, query.startDate, query.endDate, {
-      userId: user.userId,
-      role: user.role,
-    })
+    return this.reportsService.getActivitiesReport(query.startDate, query.endDate, user)
   }
 }

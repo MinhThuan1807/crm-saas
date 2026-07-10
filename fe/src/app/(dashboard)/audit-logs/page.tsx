@@ -31,20 +31,20 @@ export default function AuditLogsPage() {
   const getActionBadgeStyle = (act: string) => {
     switch (act) {
       case "CREATE":
-        return "bg-green-50 text-green-700 border-green-200";
+        return "bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800";
       case "UPDATE":
-        return "bg-amber-50 text-amber-700 border-amber-200";
+        return "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800";
       case "DELETE":
-        return "bg-red-50 text-red-700 border-red-200";
+        return "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800";
       default:
-        return "bg-blue-50 text-blue-700 border-blue-200";
+        return "bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800";
     }
   };
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-background">
-      <header className="h-14 shrink-0 border-b flex items-center justify-between px-6">
-        <h1 className="text-[#1A1A18] text-sm font-semibold tracking-tight">Audit Logs</h1>
+      <header className="h-14 shrink-0 border-b flex items-center justify-between px-6 bg-background">
+        <h1 className="text-[#1A1A18] dark:text-foreground text-sm font-semibold tracking-tight">Audit Logs</h1>
         <div className="flex items-center gap-2">
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
@@ -85,7 +85,7 @@ export default function AuditLogsPage() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto bg-[#F8F8F7] p-5">
+      <main className="flex-1 overflow-y-auto bg-[#F8F8F7] dark:bg-background p-5">
         <div className="bg-background rounded-xl border border-border/70 p-4 shadow-sm min-h-full flex flex-col justify-between">
           <div className="overflow-x-auto">
             <Table>
@@ -105,7 +105,7 @@ export default function AuditLogsPage() {
                     <TableCell className="text-xs text-muted-foreground">
                       {formatDate(log.createdAt)} <br />
                     </TableCell>
-                    <TableCell className="text-sm font-medium text-[#1A1A18]">
+                    <TableCell className="text-sm font-medium text-[#1A1A18] dark:text-foreground">
                       {log.user?.name || "Hệ thống"}
                     </TableCell>
                     <TableCell>
@@ -113,8 +113,8 @@ export default function AuditLogsPage() {
                         {log.action}
                       </span>
                     </TableCell>
-                    <TableCell className="text-xs font-semibold text-[#534AB7]">{log.targetType}</TableCell>
-                    <TableCell className="text-sm max-w-[200px] truncate text-[#495057]">{log.targetName || "N/A"}</TableCell>
+                    <TableCell className="text-xs font-semibold text-[#534AB7] dark:text-primary">{log.targetType}</TableCell>
+                    <TableCell className="text-sm max-w-[200px] truncate text-[#495057] dark:text-muted-foreground">{log.targetName || "N/A"}</TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
@@ -166,12 +166,14 @@ export default function AuditLogsPage() {
             <div className="space-y-4 py-2">
               <div className="grid grid-cols-2 gap-2 text-xs border-b pb-3">
                 <div>
-                  <span className="text-[#868E96] block">Người thực hiện</span>
-                  <strong className="text-[#212529]">{selectedLog.user?.name} ({selectedLog.user?.role})</strong>
+                  <span className="text-[#868E96] dark:text-muted-foreground block">Người thực hiện</span>
+                  <strong className="text-[#212529] dark:text-foreground">
+                    {selectedLog.user?.name} ({(selectedLog.user?.role as any)?.name || (typeof selectedLog.user?.role === "string" ? selectedLog.user.role : "N/A")})
+                  </strong>
                 </div>
                 <div>
-                  <span className="text-[#868E96] block">Đối tượng tác động</span>
-                  <strong className="text-[#212529]">{selectedLog.targetType}: {selectedLog.targetName}</strong>
+                  <span className="text-[#868E96] dark:text-muted-foreground block">Đối tượng tác động</span>
+                  <strong className="text-[#212529] dark:text-foreground">{selectedLog.targetType}: {selectedLog.targetName}</strong>
                 </div>
               </div>
 
@@ -185,17 +187,26 @@ export default function AuditLogsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {Object.entries(selectedLog.changes || {}).map(([field, val]: [string, any]) => (
-                      <TableRow key={field}>
-                        <TableCell className="font-medium text-[#534AB7]">{field}</TableCell>
-                        <TableCell className="text-red-600 line-through bg-red-50/50 max-w-[150px] truncate">
-                          {val.old !== null && val.old !== undefined ? String(val.old) : "NULL"}
-                        </TableCell>
-                        <TableCell className="text-green-700 font-semibold bg-green-50/50 max-w-[150px] truncate">
-                          {val.new !== null && val.new !== undefined ? String(val.new) : "NULL"}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {Object.entries(selectedLog.changes || {}).map(([field, val]) => {
+                      const renderVal = (v: unknown) => {
+                        if (v === null || v === undefined) return "NULL";
+                        if (typeof v === "object") return JSON.stringify(v);
+                        return String(v);
+                      };
+                      const change = val as { old?: unknown; new?: unknown };
+
+                      return (
+                        <TableRow key={field}>
+                          <TableCell className="font-medium text-[#534AB7] dark:text-primary">{field}</TableCell>
+                          <TableCell className="text-red-600 dark:text-red-400 line-through bg-red-50/50 dark:bg-red-950/20 max-w-[150px] truncate">
+                            {renderVal(change.old)}
+                          </TableCell>
+                          <TableCell className="text-green-700 dark:text-green-400 font-semibold bg-green-50/50 dark:bg-green-950/20 max-w-[150px] truncate">
+                            {renderVal(change.new)}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>

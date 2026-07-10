@@ -44,8 +44,9 @@ function InviteContent() {
       try {
         const data = await invitationsService.verify(token);
         setInviteData(data);
-      } catch (err: any) {
-        const msg = err.response?.data?.message || "Lời mời không hợp lệ hoặc đã hết hạn.";
+      } catch (err) {
+        const error = err as { response?: { data?: { message?: string } } };
+        const msg = error.response?.data?.message || "Lời mời không hợp lệ hoặc đã hết hạn.";
         setVerifyError(msg);
       } finally {
         setVerifying(false);
@@ -78,7 +79,7 @@ function InviteContent() {
 
     try {
       await invitationsService.accept({
-        token,
+        token: token!,
         name: form.name,
         password: form.password,
         confirmPassword: form.confirmPassword,
@@ -86,8 +87,9 @@ function InviteContent() {
 
       toast.success("Kích hoạt tài khoản thành công! Đang chuyển hướng...");
       router.push("/");
-    } catch (err: any) {
-      const msg = err.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.";
+    } catch (err) {
+      const error = err as { response?: { data?: { message?: string } } };
+      const msg = error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.";
       setFormError(msg);
       setSubmitting(false);
     }

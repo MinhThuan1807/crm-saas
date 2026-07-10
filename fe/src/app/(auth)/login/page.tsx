@@ -67,9 +67,8 @@ const LoginPage = () => {
 
   return (
     <div
-      className="min-h-svh flex flex-col items-center justify-center px-4 py-16"
+      className="min-h-svh flex flex-col items-center justify-center px-4 py-16 bg-[#F8F8F7] dark:bg-background"
       style={{
-        background: "#F8F8F7",
         fontFamily: "Inter, system-ui, sans-serif",
       }}
     >
@@ -97,7 +96,7 @@ const LoginPage = () => {
 
         {/* Form card */}
         <div
-          className="bg-white border border-[#E8E7E2] rounded-xl overflow-hidden"
+          className="bg-card border border-border rounded-xl overflow-hidden"
           style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}
         >
           {ssoStep === "none" && (
@@ -111,7 +110,7 @@ const LoginPage = () => {
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="email"
-                    className="text-[#6B6B67]"
+                    className="text-muted-foreground"
                     style={{ fontSize: 12, fontWeight: 500 }}
                   >
                     Email
@@ -138,7 +137,7 @@ const LoginPage = () => {
                   <div className="flex items-center justify-between">
                     <Label
                       htmlFor="password"
-                      className="text-[#6B6B67]"
+                      className="text-muted-foreground"
                       style={{ fontSize: 12, fontWeight: 500 }}
                     >
                       Mật khẩu
@@ -192,10 +191,10 @@ const LoginPage = () => {
 
               {/* Divider */}
               <div className="relative px-6 pb-1">
-                <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 h-px bg-[#E8E7E2]" />
+                <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 h-px bg-border" />
                 <div className="relative flex justify-center">
                   <span
-                    className="bg-white px-3 text-[#9B9B96]"
+                    className="bg-card px-3 text-muted-foreground"
                     style={{ fontSize: 12 }}
                   >
                     hoặc
@@ -208,7 +207,7 @@ const LoginPage = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-9 flex items-center justify-center gap-2 cursor-pointer border-[#E8E7E2] hover:bg-[#F8F8F7] hover:text-foreground transition-colors"
+                  className="w-full h-9 flex items-center justify-center gap-2 cursor-pointer border-border hover:bg-muted hover:text-foreground transition-colors"
                   onClick={handleGoogleLogin}
                 >
                   <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24">
@@ -235,7 +234,7 @@ const LoginPage = () => {
 
               {/* Sign-up link */}
               <div className="px-6 py-5 text-center">
-                <p className="text-[#6B6B67]" style={{ fontSize: 13 }}>
+                <p className="text-muted-foreground" style={{ fontSize: 13 }}>
                   Chưa có tài khoản?{" "}
                   <Link
                     href="/register"
@@ -254,7 +253,7 @@ const LoginPage = () => {
               <div className="space-y-1.5">
                 <Label
                   htmlFor="sso-email"
-                  className="text-[#6B6B67]"
+                  className="text-muted-foreground"
                   style={{ fontSize: 12, fontWeight: 500 }}
                 >
                   Email công ty
@@ -313,7 +312,7 @@ const LoginPage = () => {
         </div>
 
         {ssoStep === "none" && (
-          <p className="mt-4 text-center text-[#9B9B96]" style={{ fontSize: 12 }}>
+          <p className="mt-4 text-center text-muted-foreground" style={{ fontSize: 12 }}>
             Tổ chức của bạn dùng SSO?{" "}
             <button
               type="button"
@@ -328,8 +327,8 @@ const LoginPage = () => {
       </div>
 
       {/* Footer */}
-      <p className="mt-12 text-[#9B9B96]" style={{ fontSize: 12 }}>
-        © 2025 SalesFlow · All rights reserved.
+      <p className="mt-12 text-muted-foreground" style={{ fontSize: 12 }}>
+        © 2026 SalesFlow · All rights reserved.
       </p>
     </div>
   );

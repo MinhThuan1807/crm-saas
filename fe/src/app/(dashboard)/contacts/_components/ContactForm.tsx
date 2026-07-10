@@ -77,6 +77,7 @@ function ContactForm({ onSubmit, isPending, defaultValues }: ContactFormProps) {
                 </FieldLabel>
                 <Input
                   {...field}
+                  value={field.value ?? ""}
                   id="form-rhf-contact-name"
                   aria-invalid={fieldState.invalid}
                   placeholder="Nhập tên liên hệ"
@@ -98,6 +99,7 @@ function ContactForm({ onSubmit, isPending, defaultValues }: ContactFormProps) {
               <FieldLabel htmlFor="form-rhf-contact-email">Email</FieldLabel>
               <Input
                 {...field}
+                value={field.value ?? ""}
                 id="form-rhf-contact-email"
                 aria-invalid={fieldState.invalid}
                 placeholder="Nhập email"
@@ -119,6 +121,7 @@ function ContactForm({ onSubmit, isPending, defaultValues }: ContactFormProps) {
               </FieldLabel>
               <Input
                 {...field}
+                value={field.value ?? ""}
                 id="form-rhf-contact-phone"
                 aria-invalid={fieldState.invalid}
                 placeholder="Nhập số điện thoại"
@@ -140,6 +143,7 @@ function ContactForm({ onSubmit, isPending, defaultValues }: ContactFormProps) {
               </FieldLabel>
               <Input
                 {...field}
+                value={field.value ?? ""}
                 id="form-rhf-contact-company"
                 aria-invalid={fieldState.invalid}
                 placeholder="Nhập tên công ty"
@@ -161,6 +165,7 @@ function ContactForm({ onSubmit, isPending, defaultValues }: ContactFormProps) {
               </FieldLabel>
               <Input
                 {...field}
+                value={field.value ?? ""}
                 id="form-rhf-contact-position"
                 aria-invalid={fieldState.invalid}
                 placeholder="Nhập vị trí công việc"

@@ -55,7 +55,7 @@ export class AuthService {
     const user = await this.authRepository.findUserByEmail(body.email)
 
     if (!user) {
-      throw new UnauthorizedException('Email không tồn tại!')
+      throw new UnauthorizedException('Email hoặc mật khẩu không đúng')
     }
 
     const isPasswordValid = await this.hashingService.compare(body.password, user.password)
@@ -143,42 +143,62 @@ export class AuthService {
   async getProfile(userId: string) {
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        tenantId: true,
-      },
+      include: { role: true },
     })
-    return user
-  }
-    async validateGoogleUser(profile: { provider: string; providerAccountId: string; email: string; name: string }) {
-    const { provider, providerAccountId, email, name } = profile;
+    if (!user) return null;
 
-    // 1. Check if this Google account is already linked to any User
-    const account = await this.prismaService.account.findUnique({
-      where: {
-        provider_providerAccountId: {
-          provider,
-          providerAccountId,
+    // Fetch permissions list via user's role (Using Redis Cache)
+    const cacheKey = `tenant:${user.tenantId}:role:${user.role.name}:permissions`;
+    let permissions = await this.redisService.get(cacheKey);
+
+    if (!permissions) {
+      const dbRolePermissions = await this.prismaService.rolePermission.findMany({
+        where: {
+          roleId: user.roleId,
         },
-      },
-      include: {
-        user: true,
-      },
-    });
+        include: {
+          permission: true,
+        },
+      });
 
-    if (account) {
-      return account.user;
+      permissions = dbRolePermissions.map((rp) => ({
+        action: rp.permission.action,
+        subject: rp.permission.subject,
+        conditions: rp.conditions,
+      }));
+
+      // Cache in Redis (TTL: 1 hour)
+      await this.redisService.set(cacheKey, permissions, 3600);
     }
 
-    // 2. If no Account exists, check if there is already a User registered with this Email
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role.name, // Map string
+      tenantId: user.tenantId,
+      permissions, // Attach permissions array
+    }
+  }
+
+ async validateGoogleUser(profile: { provider: string; providerAccountId: string; email: string; name: string }) {
+    const { provider, providerAccountId, email, name } = profile;
+    // 1. Check Google linked account
+    const account = await this.prismaService.account.findUnique({
+      where: { provider_providerAccountId: { provider, providerAccountId } },
+      include: { user: { include: { role: true } } },
+    });
+    if (account) {
+      return {
+        ...account.user,
+        role: account.user.role.name as any,
+      };
+    }
+    // 2. Find user by email
     let user = await this.prismaService.user.findUnique({
       where: { email },
+      include: { role: true },
     });
-
-    // 3. If Email matches -> Automatically link this Google account with that User
     if (user) {
       await this.prismaService.account.create({
         data: {
@@ -187,63 +207,85 @@ export class AuthService {
           providerAccountId,
         },
       });
-      return user;
+      return {
+        ...user,
+        role: user.role.name as any,
+      };
     }
-
-    // 4. If no User exists -> Perform new registration
-    // 4a. Check if the Email has any pending Invitation
+    // 3. If it's a completely new account
     const invitation = await this.prismaService.invitation.findFirst({
       where: {
         email,
         status: 'PENDING',
         expiresAt: { gt: new Date() },
       },
+      include: { role: true }
     });
-
     let tenantId: string;
-
+    let roleId: string;
     if (invitation) {
-      // Join the invited Tenant
       tenantId = invitation.tenantId;
-      
-      // Mark the invitation as accepted
+      roleId = invitation.roleId;
       await this.prismaService.invitation.update({
         where: { id: invitation.id },
         data: { status: 'ACCEPTED' },
       });
     } else {
-      // No invitation -> Create a new Tenant
+      // Register new company
       const slug = slugify(name + '-' + Math.floor(Math.random() * 1000));
-      const tenant = await this.prismaService.tenant.create({
-        data: {
-          name: `${name}'s Company`,
-          slug,
-        },
+      return this.prismaService.$transaction(async (tx) => {
+        const tenant = await tx.tenant.create({
+          data: { name: `${name}'s Company`, slug },
+        });
+        // Seed 3 default Roles for new Tenant
+        const adminRole = await tx.role.create({
+          data: { tenantId: tenant.id, name: 'ADMIN', description: 'Quản trị viên' }
+        });
+        const managerRole = await tx.role.create({
+          data: { tenantId: tenant.id, name: 'MANAGER', description: 'Quản lý' }
+        });
+        const salesRepRole = await tx.role.create({
+          data: { tenantId: tenant.id, name: 'SALES_REP', description: 'Nhân viên kinh doanh' }
+        });
+        // Assign permissions for ADMIN
+        const systemManageAll = await tx.permission.findFirst({ where: { action: 'manage', subject: 'all' } });
+        if (systemManageAll) {
+          await tx.rolePermission.create({ data: { roleId: adminRole.id, permissionId: systemManageAll.id } });
+        }
+        // Assign permissions for other roles
+        const allDomainPerms = await tx.permission.findMany({ where: { subject: { in: ['Contact', 'Deal', 'Task', 'Activity'] } } });
+        for (const perm of allDomainPerms) {
+          await tx.rolePermission.create({ data: { roleId: managerRole.id, permissionId: perm.id } });
+          const isSubjectRestricted = ['Contact', 'Deal', 'Activity'].includes(perm.subject)
+          await tx.rolePermission.create({
+            data: {
+              roleId: salesRepRole.id,
+              permissionId: perm.id,
+              conditions: isSubjectRestricted ? (perm.subject === 'Activity' ? { userId: '${user.id}' } : { ownerId: '${user.id}' }) : undefined
+            }
+          });
+        }
+        const newUser = await tx.user.create({
+          data: { email, name, tenantId: tenant.id, password: null, roleId: adminRole.id },
+        });
+        
+        await tx.account.create({
+          data: { userId: newUser.id, provider, providerAccountId },
+        });
+        return { ...newUser, role: 'ADMIN' as any };
       });
-      tenantId = tenant.id;
     }
-
-    // 4b. Create a new User (password = null)
-    user = await this.prismaService.user.create({
-      data: {
-        email,
-        name,
-        tenantId,
-        password: null, // No password because SSO is used
-        role: invitation ? invitation.role : 'ADMIN', // If creating a new tenant, make them ADMIN
-      },
+    // If joining via invitation
+    const newUser = await this.prismaService.user.create({
+      data: { email, name, tenantId, password: null, roleId },
+      include: { role: true },
     });
-
-    // 4c. Create Account link
     await this.prismaService.account.create({
-      data: {
-        userId: user.id,
-        provider,
-        providerAccountId,
-      },
+      data: { userId: newUser.id, provider, providerAccountId },
     });
-
-    return user;
+    return {
+      ...newUser,
+      role: newUser.role.name as any,
+    };
   }
-
 }

@@ -27,13 +27,13 @@ function formatTotal(total: number): string {
 export function KanbanColumn({ stage, deals, onEdit, onDelete }: Props) {
   const config = STAGE_CONFIG[stage];
 
-  // Column là droppable target — id = stage string
+  // Column is droppable target — id = stage string
   const { setNodeRef, isOver } = useDroppable({ id: stage });
 
   const totalValue = deals.reduce((sum, d) => sum + Number(d.value), 0);
   const isEmpty = deals.length === 0;
 
-  // SortableContext cần danh sách id theo thứ tự hiện tại
+  // SortableContext needs id list in current order
   const dealIds = deals.map((d) => d.id);
 
   return (
@@ -80,7 +80,7 @@ export function KanbanColumn({ stage, deals, onEdit, onDelete }: Props) {
           "flex-1 min-h-[300px] rounded-[10px] p-2 flex flex-col gap-2 overflow-y-auto transition-all duration-150",
           isOver
             ? "bg-primary/5 border-[1.5px] border-dashed border-primary"
-            : "bg-[#F8F8F7] border-[1.5px] border-border/70",
+            : "bg-[#F8F8F7] dark:bg-muted/30 border-[1.5px] border-border/70",
         )}
       >
         <SortableContext items={dealIds} strategy={verticalListSortingStrategy}>

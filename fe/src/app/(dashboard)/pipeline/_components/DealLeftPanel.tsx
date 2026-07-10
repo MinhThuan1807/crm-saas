@@ -205,7 +205,7 @@ export function DealLeftPanel({ deal, onEdit }: DealLeftPanelProps) {
         {/* 2 × 2 metric grid */}
         <div className="grid grid-cols-2 gap-2.5 mb-4">
           {/* Value */}
-          <div className="bg-[#F8F8F7] rounded-[10px] border border-border px-3 py-2.5">
+          <div className="bg-[#F8F8F7] dark:bg-card rounded-[10px] border border-border px-3 py-2.5">
             <p className="flex items-center gap-1 text-muted-foreground mb-1" style={{ fontSize: 11 }}>
               <TrendingUp size={10} strokeWidth={1.8} />
               Giá trị deal
@@ -216,7 +216,7 @@ export function DealLeftPanel({ deal, onEdit }: DealLeftPanelProps) {
           </div>
 
           {/* Close date */}
-          <div className="bg-[#F8F8F7] rounded-[10px] border border-border px-3 py-2.5">
+          <div className="bg-[#F8F8F7] dark:bg-card rounded-[10px] border border-border px-3 py-2.5">
             <p className="flex items-center gap-1 text-muted-foreground mb-1" style={{ fontSize: 11 }}>
               <Calendar size={10} strokeWidth={1.8} />
               Ngày chốt dự kiến
@@ -249,7 +249,7 @@ export function DealLeftPanel({ deal, onEdit }: DealLeftPanelProps) {
           </div> */}
 
           {/* Owner */}
-          <div className="bg-[#F8F8F7] rounded-[10px] border border-border px-3 py-2.5">
+          <div className="bg-[#F8F8F7] dark:bg-card rounded-[10px] border border-border px-3 py-2.5">
             <p className="flex items-center gap-1 text-muted-foreground mb-1.5" style={{ fontSize: 11 }}>
               <User size={10} strokeWidth={1.8} />
               Phụ trách
@@ -258,12 +258,6 @@ export function DealLeftPanel({ deal, onEdit }: DealLeftPanelProps) {
               <Avatar className="size-5 shrink-0">
                 <AvatarFallback
                   className="border-0"
-                  // style={{
-                  //   background: deal.owner.bg,
-                  //   color: deal.owner.color,
-                  //   fontSize: 9,
-                  //   fontWeight: 600,
-                  // }}
                 >
                   {getInitials(deal.owner.name)}
                 </AvatarFallback>
@@ -274,7 +268,6 @@ export function DealLeftPanel({ deal, onEdit }: DealLeftPanelProps) {
                 </p>
                 <p className="text-muted-foreground truncate" style={{ fontSize: 10, marginTop: 2 }}>
                   {deal.owner.name}
-                  {/* {deal.owner.role} */}
                 </p>
               </div>
             </div>
@@ -293,10 +286,10 @@ export function DealLeftPanel({ deal, onEdit }: DealLeftPanelProps) {
                   className="h-1 flex-1 rounded-full transition-all"
                   style={{
                     background: isPast
-                      ? "#534AB7"
+                      ? "var(--primary)"
                       : isActive
                       ? "#9B94E3"
-                      : "#E8E7E2",
+                      : "var(--border)",
                   }}
                 />
               );
@@ -471,7 +464,7 @@ export function DealLeftPanel({ deal, onEdit }: DealLeftPanelProps) {
                           {editingDueDate ? format(new Date(editingDueDate), "dd/MM/yyyy") : "Chọn hạn chót"}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-white" align="start">
+                      <PopoverContent className="w-auto p-0 bg-white dark:bg-card" align="start">
                         <ShadcnCalendar
                           mode="single"
                           selected={editingDueDate ? new Date(editingDueDate) : undefined}
@@ -511,7 +504,7 @@ export function DealLeftPanel({ deal, onEdit }: DealLeftPanelProps) {
                 className={cn(
                   "flex items-start gap-2.5 px-3 py-2.5 rounded-lg border cursor-pointer transition-all select-none group",
                   task.done
-                    ? "border-green-100 bg-green-50/60"
+                    ? "border-green-100 dark:border-green-950/60 bg-green-50/60 dark:bg-green-950/20"
                     : "border-border bg-background hover:bg-muted/20"
                 )}
               >
@@ -593,7 +586,7 @@ export function DealLeftPanel({ deal, onEdit }: DealLeftPanelProps) {
                       {newDueDate ? format(new Date(newDueDate), "dd/MM/yyyy") : "Chọn hạn chót"}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-white" align="start">
+                  <PopoverContent className="w-auto p-0 bg-white dark:bg-card" align="start">
                     <ShadcnCalendar
                       mode="single"
                       selected={newDueDate ? new Date(newDueDate) : undefined}

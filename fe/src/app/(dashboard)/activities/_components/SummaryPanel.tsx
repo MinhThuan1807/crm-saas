@@ -14,7 +14,7 @@ import type { ActivityItem, ActivityType } from "./types";
 // ─────────────────────────────────────────
 
 interface SummaryPanelProps {
-  /** Toàn bộ unfiltered activities — không thay đổi khi type filter thay đổi */
+  /** All unfiltered activities — does not change when type filter changes */
   activities: ActivityItem[];
   isLoading: boolean;
 }
@@ -60,7 +60,7 @@ const TYPE_ROWS: {
   },
 ];
 
-// Màu avatar deterministic theo userId
+// Deterministic avatar color by userId
 const AVATAR_COLORS = [
   "#D4E8F5",
   "#E8D4F5",
@@ -123,7 +123,7 @@ function UserSkeletonRows() {
 // ─────────────────────────────────────────
 
 export function SummaryPanel({ activities, isLoading }: SummaryPanelProps) {
-  // ── Count theo type — useMemo để tránh tính lại mỗi render (req 10.1) ──
+  // ── Count by type — useMemo to avoid recalculation on each render (req 10.1) ──
   const counts = useMemo(() => {
     return activities.reduce<Record<string, number>>((acc, a) => {
       acc[a.type] = (acc[a.type] ?? 0) + 1;
@@ -151,11 +151,8 @@ export function SummaryPanel({ activities, isLoading }: SummaryPanelProps) {
   // ── Render ──────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col gap-3">
-      {/* ── Tổng quan theo type ── */}
-      <div
-        className="bg-white rounded-xl border p-4"
-        style={{ borderColor: "#E8E7E2", borderWidth: "0.5px" }}
-      >
+      {/* ── Overview by type ── */}
+      <div className="bg-white dark:bg-card rounded-xl border border-border/70 dark:border-border p-4 shadow-sm">
         <p
           className="text-foreground mb-3"
           style={{ fontSize: 13, fontWeight: 600 }}
@@ -195,19 +192,16 @@ export function SummaryPanel({ activities, isLoading }: SummaryPanelProps) {
         {/* Total row */}
         {!isLoading && (
           <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
-            <span style={{ fontSize: 11, color: "#6B6B67" }}>Tổng</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#1A1A18" }}>
+            <span style={{ fontSize: 11, color: "var(--muted-foreground)" }}>Tổng</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--foreground)" }}>
               {total}
             </span>
           </div>
         )}
       </div>
 
-      {/* ── Top nhân viên ── */}
-      <div
-        className="bg-white rounded-xl border p-4"
-        style={{ borderColor: "#E8E7E2", borderWidth: "0.5px" }}
-      >
+      {/* ── Top staff ── */}
+      <div className="bg-white dark:bg-card rounded-xl border border-border/70 dark:border-border p-4 shadow-sm">
         <p
           className="text-foreground mb-3"
           style={{ fontSize: 13, fontWeight: 600 }}
@@ -219,16 +213,13 @@ export function SummaryPanel({ activities, isLoading }: SummaryPanelProps) {
           {isLoading ? (
             <UserSkeletonRows />
           ) : topUsers.length === 0 ? (
-            // Placeholder khi không có data
+            // Placeholder when there is no data
             [1, 2, 3].map((rank) => (
               <div key={rank} className="flex items-center gap-2.5">
                 <span
-                  className="size-5 flex items-center justify-center shrink-0 rounded-full"
+                  className="size-5 flex items-center justify-center shrink-0 rounded-full bg-[#FAEEDA] dark:bg-amber-950/20 text-[#B45309] dark:text-amber-400 font-bold"
                   style={{
                     fontSize: 10,
-                    fontWeight: 700,
-                    background: rank === 1 ? "#FAEEDA" : "#F1EFE8",
-                    color: rank === 1 ? "#B45309" : "#6B6B67",
                   }}
                 >
                   {rank}
@@ -249,12 +240,9 @@ export function SummaryPanel({ activities, isLoading }: SummaryPanelProps) {
               return (
                 <div key={user.id} className="flex items-center gap-2.5">
                   <span
-                    className="size-5 flex items-center justify-center shrink-0 rounded-full"
+                    className="size-5 flex items-center justify-center shrink-0 rounded-full bg-[#FAEEDA] dark:bg-amber-950/20 text-[#B45309] dark:text-amber-400 font-bold"
                     style={{
                       fontSize: 10,
-                      fontWeight: 700,
-                      background: rank === 1 ? "#FAEEDA" : "#F1EFE8",
-                      color: rank === 1 ? "#B45309" : "#6B6B67",
                     }}
                   >
                     {rank}

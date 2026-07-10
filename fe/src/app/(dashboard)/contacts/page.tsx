@@ -3,13 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { useDebounceValue } from "usehooks-ts";
-import { ChevronDown, Filter, Plus, Search } from "lucide-react";
+import { ChevronDown, Filter, Plus, Search, FileSpreadsheet } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useGetContacts } from "@/hooks/useContacts";
 import ContactTable from "@/app/(dashboard)/contacts/_components/ContactTable";
 import { Contact, ContactTagConst } from "@/lib/validations/contacts.scheme";
 import ContactDialog from "@/app/(dashboard)/contacts/_components/ContactDialog";
+import ImportExcelDialog from "@/app/(dashboard)/contacts/_components/ImportExcelDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +27,7 @@ const ContactsPage = () => {
     isOpen: boolean;
     contact?: Contact;
   }>({ isOpen: false });
+  const [isImportOpen, setIsImportOpen] = useState(false);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useGetContacts({ limit: 10, search: debouncedSearch, tag: selectedTag });
@@ -99,8 +101,18 @@ const ContactsPage = () => {
               </DropdownMenu>
 
               <Button
+                variant="outline"
                 size="sm"
-                className="h-8 gap-1.5 text-xs"
+                className="h-8 gap-1.5 border-border text-muted-foreground hover:text-foreground text-xs cursor-pointer"
+                onClick={() => setIsImportOpen(true)}
+              >
+                <FileSpreadsheet size={13} className="text-green-600" />
+                Import Excel
+              </Button>
+
+              <Button
+                size="sm"
+                className="h-8 gap-1.5 text-xs cursor-pointer"
                 onClick={() => setDialog({ isOpen: true })}
               >
                 <Plus size={13} />
@@ -109,7 +121,7 @@ const ContactsPage = () => {
             </div>
           </header>
           {/* ── Main content ─────────────────────────────────────────────────── */}
-          <main className="flex-1 overflow-y-auto bg-[#F8F8F7] p-5">
+          <main className="flex-1 overflow-y-auto bg-[#F8F8F7] dark:bg-background p-5">
             <div className="min-h-full bg-background rounded-xl border border-border/70 overflow-hidden shadow-none">
               <ContactTable
                 contacts={contacts}
@@ -128,6 +140,10 @@ const ContactsPage = () => {
       <ContactDialog
         {...dialog}
         onOpenChange={(open) => setDialog((s) => ({ ...s, isOpen: open }))}
+      />
+      <ImportExcelDialog
+        isOpen={isImportOpen}
+        onOpenChange={setIsImportOpen}
       />
     </>
   );

@@ -43,7 +43,7 @@ export function DealCard({ deal, onEdit, onDelete }: Props) {
     isDragging,
   } = useSortable({
     id: deal.id,
-    // data được truyền vào active.data.current trong onDragEnd
+    // data passed into active.data.current in onDragEnd
     data: { stage: deal.stage },
   });
 

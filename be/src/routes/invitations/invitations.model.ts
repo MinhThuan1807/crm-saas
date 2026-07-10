@@ -3,7 +3,7 @@ import z from 'zod';
 
 export const CreateInvitationSchema = z.object({
   email: z.string().email('Email không hợp lệ'),
-  role: z.enum([ROLE.ADMIN, ROLE.MANAGER, ROLE.SALES_REP]),
+  role: z.string(),
 }).strict();
 
 export type CreateInvitationType = z.infer<typeof CreateInvitationSchema>;
@@ -27,7 +27,7 @@ export type AcceptInvitationType = z.infer<typeof AcceptInvitationSchema>;
 
 export const UpdateInvitationSchema = z.object({
   email: z.string().email('Email không hợp lệ').optional(),
-  role: z.enum([ROLE.ADMIN, ROLE.MANAGER, ROLE.SALES_REP]).optional(),
+  role: z.string().optional(),
 }).strict();
 
 export type UpdateInvitationType = z.infer<typeof UpdateInvitationSchema>;

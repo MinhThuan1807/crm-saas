@@ -10,6 +10,9 @@
  */
 export type * from './models/Tenant'
 export type * from './models/User'
+export type * from './models/Role'
+export type * from './models/Permission'
+export type * from './models/RolePermission'
 export type * from './models/Account'
 export type * from './models/Contact'
 export type * from './models/Deal'

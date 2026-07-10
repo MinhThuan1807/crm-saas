@@ -27,8 +27,9 @@ export const useUpdateUser = () => {
       toast.success("Cập nhật thông tin thành viên thành công!");
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || "Không thể cập nhật thành viên.";
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { message?: string } } };
+      const msg = err.response?.data?.message || "Không thể cập nhật thành viên.";
       toast.error(msg);
     },
   });
@@ -43,8 +44,9 @@ export const useDeleteUser = () => {
       toast.success("Đã xóa thành viên khỏi workspace thành công!");
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || "Không thể xóa thành viên.";
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: { message?: string } } };
+      const msg = err.response?.data?.message || "Không thể xóa thành viên.";
       toast.error(msg);
     },
   });

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const protectedRoutes = ['/', '/contacts', '/deals', '/activities', '/users'];
+const protectedRoutes = ['/dashboard', '/pipeline', '/contacts', '/deals', '/activities', '/users', '/roles', '/audit-logs', '/settings'];
 const authRoutes = ['/login', '/register'];
 
 export function proxy(request: NextRequest) {
@@ -10,15 +10,11 @@ export function proxy(request: NextRequest) {
 
   // If user already logged in and try access auth page
   if (authRoutes.includes(pathname) && accessToken) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   // Check protected route
   const isProtectedRoute = protectedRoutes.some(route => {
-    if (route === '/') {
-      return pathname === '/';
-    }
-
     return pathname === route || pathname.startsWith(route + '/');
   });
 
