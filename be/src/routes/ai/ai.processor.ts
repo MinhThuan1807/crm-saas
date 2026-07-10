@@ -3,10 +3,10 @@ import { createRedis } from '../../common/providers/redis.provider'
 import { AI_QUEUE_NAME } from './ai.queue'
 import { PrismaService } from '../../common/services/prisma.service'
 import { saveAiResultAtomic } from './ai.service'
-import OpenAI from 'openai'
 import { publishAiEvent } from './ai.sse'
 import envConfig from '../../common/config'
 import { z } from 'zod'
+import { openai, AI_MODEL } from './ai.client'
 
 const connection = createRedis()
 const prisma = new PrismaService()
@@ -32,22 +32,7 @@ function withTimeout<T>(promise: Promise<T>, ms = OPENAI_TIMEOUT_MS) {
   return Promise.race([promise, new Promise<T>((_, rej) => setTimeout(() => rej(new Error('OpenAI timeout')), ms))])
 }
 
-const isGroq = envConfig.AI_PROVIDER === 'groq';
-
-const openai = new OpenAI(
-  isGroq
-    ? {
-        apiKey: envConfig.GROQ_API_KEY,
-        baseURL: 'https://api.groq.com/openai/v1',
-      }
-    : {
-        apiKey: envConfig.OPENAI_API_KEY,
-      }
-);
-
-const MODEL = isGroq
-  ? (envConfig.GROQ_MODEL || 'llama-3.3-70b-versatile')
-  : (envConfig.OPENAI_MODEL || 'gpt-4o-mini');
+const MODEL = AI_MODEL;
 
 async function callOpenAiAndParse(meetingNote: string, jobId: string, dealId: string): Promise<AiResponseType> {
   const prompt = `You are an assistant that extracts actionable items from a meeting note.\nReturn ONLY a single valid JSON object (no explanation) with keys:\n{\n  "tasks": [{ "title": "<string>", "dueDate": "<ISO-8601 or null>" }],\n  "emailDraft": "<string>",\n  "summary": "<string>"\n}\nNote: You MUST write a detailed follow-up email draft in Vietnamese under "emailDraft", and a brief summary in Vietnamese under "summary". Do not set them to null.\nMeeting Note:\n"""${meetingNote}"""\n`

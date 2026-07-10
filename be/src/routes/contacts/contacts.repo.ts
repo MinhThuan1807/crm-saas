@@ -90,4 +90,26 @@ export class ContactsRepository {
       data: { deletedAt: null },
     })
   }
+
+  // Tìm kiếm User theo email để gán làm Owner
+  findUserByEmail(email: string) {
+    return this.prismaService.user.findFirst({
+      where: { email },
+    });
+  }
+
+  // Tìm kiếm Contact đã tồn tại dựa theo email hoặc số điện thoại
+  findByEmailOrPhone(email?: string | null, phone?: string | null) {
+    if (!email && !phone) return null;
+    return this.prismaService.contact.findFirst({
+      where: {
+        deletedAt: null,
+        OR: [
+          ...(email ? [{ email }] : []),
+          ...(phone ? [{ phone }] : []),
+        ],
+      },
+    });
+  }
 }
+

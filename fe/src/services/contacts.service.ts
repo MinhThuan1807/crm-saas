@@ -37,4 +37,15 @@ export const contactsService = {
   delete: async (id: string): Promise<void> => {
     await axiosInstance.delete(`contacts/${id}`);
   },
+
+  bulkImport: async (contacts: any[]): Promise<{ success: boolean; count: number }> => {
+    const response = await axiosInstance.post("contacts/bulk", { contacts });
+    return response.data;
+  },
+
+  aiMapColumns: async (headers: string[]): Promise<{ mappings: Record<string, string | null> }> => {
+    const response = await axiosInstance.post("contacts/import/map-columns", { headers });
+    return response.data;
+  },
 };
+

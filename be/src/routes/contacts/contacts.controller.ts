@@ -4,7 +4,7 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ContactsService } from './contacts.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AccessTokenPayload } from 'src/common/types/jwt.type';
-import { CreateContactBodyDto, CreateContactResDto, GetContactResDto, GetContactsQueryDto, GetContactsResDto, UpdateContactBodyDto } from './contacts.dto';
+import { CreateContactBodyDto, CreateContactResDto, GetContactResDto, GetContactsQueryDto, GetContactsResDto, UpdateContactBodyDto, BulkImportContactsBodyDto } from './contacts.dto';
 import { ZodSerializerDto } from 'nestjs-zod';
 import { SkipThrottle } from '@nestjs/throttler';
 
@@ -20,6 +20,19 @@ export class ContactsController {
   @ZodSerializerDto(GetContactsResDto)
   getContacts(@CurrentUser() user: AccessTokenPayload, @Query() query: GetContactsQueryDto) {
     return this.contactService.getAllContacts(user.tenantId, query, user);
+  }
+
+  @Post('bulk')
+  bulkImport(
+    @CurrentUser() user: AccessTokenPayload,
+    @Body() body: BulkImportContactsBodyDto,
+  ) {
+    return this.contactService.bulkImport(user.tenantId, user.userId, body);
+  }
+
+  @Post('import/map-columns')
+  mapColumns(@Body() body: { headers: string[] }) {
+    return this.contactService.aiMapColumns(body.headers);
   }
 
   @Get(':id')
@@ -64,4 +77,5 @@ export class ContactsController {
     return this.contactService.restore(contactId, user.tenantId, user)
   }
 }
+
 
