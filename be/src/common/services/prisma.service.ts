@@ -6,6 +6,8 @@ import { PrismaClient } from '../../../generated/prisma-client/client'
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
+  // Forced to use any because return type of Prisma Client Extensions is extremely complex and dynamic,
+  // cannot be statically mapped to work smoothly with Proxy while maintaining compatibility.
   private readonly extendedClient: any
 
   constructor(private readonly cls?: ClsService) {
@@ -43,9 +45,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 
               // Only inject filter when tenantId is available and bypass is not set
               if (tenantId && !bypass) {
-                const queryArgs = args as any
+                // Cast to Record<string, any> to dynamically operate on arguments of Prisma query
+                const queryArgs = args as Record<string, any>
 
-                // Với các thao tác Đọc, Cập nhật, Xóa (cần lọc theo where)
+                // For Read, Update, Delete operations (filtering needed on 'where')
                 if (
                   [
                     'findFirst',
@@ -68,7 +71,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
                 if (['create', 'createMany'].includes(operation)) {
                   if (queryArgs.data) {
                     if (Array.isArray(queryArgs.data)) {
-                      queryArgs.data.forEach((item: any) => {
+                      queryArgs.data.forEach((item: Record<string, any>) => {
                         item.tenantId = tenantId
                       })
                     } else {

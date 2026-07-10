@@ -17,7 +17,7 @@ const sharedProviders = [
   SharedUserRepository,
   RedisService,
   MailService,
-  CaslAbilityFactory, // Đăng ký CaslAbilityFactory tại đây
+  CaslAbilityFactory, // Register CaslAbilityFactory here
 ];
 @Global()
 @Module({

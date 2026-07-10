@@ -27,7 +27,7 @@ export class SharedUserRepository {
     })
   }
 
-  // Tự động tạo Tenant cùng 3 Role mặc định + Phân quyền
+  // Automatically create Tenant with 3 default Roles + Permissions
   async createTenantIncludeUser(payload: {
     companyName: string
     slug: string
@@ -37,7 +37,7 @@ export class SharedUserRepository {
     role: RoleType
   }): Promise<UserType & { role: { name: string } }> {
     return this.prismaService.$transaction(async (tx) => {
-      // 1. Tạo Tenant mới
+      // 1. Create new Tenant
       const tenant = await tx.tenant.create({
         data: {
           name: payload.companyName,
@@ -45,7 +45,7 @@ export class SharedUserRepository {
         },
       })
 
-      // 2. Tạo 3 Role mặc định
+      // 2. Create 3 default Roles
       const adminRole = await tx.role.create({
         data: { tenantId: tenant.id, name: 'ADMIN', description: 'Quản trị viên doanh nghiệp' }
       })
@@ -56,7 +56,7 @@ export class SharedUserRepository {
         data: { tenantId: tenant.id, name: 'SALES_REP', description: 'Nhân viên kinh doanh' }
       })
 
-      // 3. Gán quyền manage:all cho ADMIN
+      // 3. Assign manage:all permission to ADMIN
       const systemManageAll = await tx.permission.findFirst({
         where: { action: 'manage', subject: 'all' }
       })
@@ -66,7 +66,7 @@ export class SharedUserRepository {
         })
       }
 
-      // 4. Gán quyền cho MANAGER & SALES_REP
+      // 4. Assign permissions for MANAGER & SALES_REP
       const allDomainPerms = await tx.permission.findMany({
         where: { subject: { in: ['Contact', 'Deal', 'Task', 'Activity'] } }
       })
@@ -88,7 +88,7 @@ export class SharedUserRepository {
         })
       }
 
-      // 5. Tạo người dùng ADMIN đầu tiên
+      // 5. Create first ADMIN user
       const user = await tx.user.create({
         data: {
           email: payload.email,
@@ -102,7 +102,7 @@ export class SharedUserRepository {
 
       return {
         ...user,
-        role: user.role.name as any, // Trả về dạng chuỗi tương thích ngược
+        role: user.role.name as any, // Return as backward-compatible string string type
       }
     })
   }
@@ -134,7 +134,7 @@ export class SharedUserRepository {
 
       return {
         ...user,
-        role: user.role.name, // Map sang tên vai trò dạng chuỗi
+        role: user.role.name, // Map to role name string
       }
     })
   }

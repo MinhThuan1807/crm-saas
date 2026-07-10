@@ -1,12 +1,18 @@
-import { AbilityBuilder, Ability, subject } from '@casl/ability';
+import { AbilityBuilder, createMongoAbility, subject, MongoAbility } from '@casl/ability';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../services/prisma.service';
 import { RedisService } from '../services/redis.service';
 
 export type Action = 'manage' | 'create' | 'read' | 'update' | 'delete';
 
-// Hàm helper để parse nội suy chuỗi placeholder ${user.id} -> userId thực tế
-function interpolateConditions(conditions: any, user: { userId: string }) {
+export interface PermissionRule {
+  action: string;
+  subject: string;
+  conditions?: Record<string, unknown> | null;
+}
+
+// Helper function to parse/interpolate placeholder string ${user.id} -> actual userId
+function interpolateConditions(conditions: Record<string, unknown> | null | undefined, user: { userId: string }): Record<string, unknown> | undefined {
   if (!conditions) return undefined;
   const serialized = JSON.stringify(conditions);
   const interpolated = serialized.replace(/\${user\.id}/g, user.userId);
@@ -21,14 +27,14 @@ export class CaslAbilityFactory {
   ) {}
 
   async createForUser(user: { userId: string; role: string; tenantId: string }) {
-    const { can, build } = new AbilityBuilder<Ability>(Ability as any);
+    const { can, build } = new AbilityBuilder<MongoAbility>(createMongoAbility);
 
-    // 1. Tạo khóa cache theo tenant và vai trò
+    // 1. Create cache key by tenant and role
     const cacheKey = `tenant:${user.tenantId}:role:${user.role}:permissions`;
-    let rawRules = await this.redis.get(cacheKey);
+    let rawRules = (await this.redis.get(cacheKey)) as PermissionRule[] | null;
 
     if (!rawRules) {
-      // 2. Cache miss -> Lấy quyền từ database
+      // 2. Cache miss -> Fetch permissions from database
       const dbRolePermissions = await this.prisma.rolePermission.findMany({
         where: {
           role: {
@@ -44,28 +50,31 @@ export class CaslAbilityFactory {
       rawRules = dbRolePermissions.map((rp) => ({
         action: rp.permission.action,
         subject: rp.permission.subject,
-        conditions: rp.conditions,
+        conditions: rp.conditions as Record<string, unknown> | null,
       }));
 
-      // 3. Cache hit -> Set vào Redis (TTL: 1 giờ)
+      // 3. Cache hit -> Save to Redis (TTL: 1 hour)
       await this.redis.set(cacheKey, rawRules, 3600);
     }
 
-    // 4. Định nghĩa các quy tắc (rules)
-    rawRules.forEach((rule: any) => {
+    // 4. Define the rules
+    rawRules.forEach((rule) => {
       const parsedConditions = interpolateConditions(rule.conditions, user);
       can(rule.action, rule.subject, parsedConditions);
     });
 
     return build({
       detectSubjectType: (item) => {
-        // Tự động nhận diện Subject Type từ helper subject('SubjectName', data)
-        return (item as any)?.__type;
+        // Automatically detect Subject Type from helper subject('SubjectName', data)
+        return (
+          ((item as Record<string, unknown>)?.__caslSubjectType__ as string | undefined) ||
+          ((item as Record<string, unknown>)?.__type as string | undefined)
+        );
       }
     });
   }
 
-  // Xóa cache khi Admin thay đổi quyền hạn của một Role
+  // Invalidate cache when Admin changes permissions of a Role
   async invalidateRoleCache(tenantId: string, roleName: string) {
     const cacheKey = `tenant:${tenantId}:role:${roleName}:permissions`;
     await this.redis.delete(cacheKey);
