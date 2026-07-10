@@ -91,10 +91,7 @@ export function ActivityCard({
   });
 
   return (
-    <div
-      className="bg-white rounded-xl border p-3 hover:shadow-sm transition-shadow"
-      style={{ borderColor: "#E8E7E2", borderWidth: "0.5px" }}
-    >
+    <div className="bg-white dark:bg-card rounded-xl border border-border/70 dark:border-border p-3 hover:shadow-sm transition-shadow">
       <div className="flex gap-3">
         {/* Type icon */}
         <div
@@ -200,8 +197,8 @@ export function ActivityCard({
           {activity.deal && (
             <div className="mb-2">
               <span
-                className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 border border-border text-muted-foreground"
-                style={{ fontSize: 11, background: "#F8F8F7" }}
+                className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 border border-border text-muted-foreground bg-[#F8F8F7] dark:bg-muted"
+                style={{ fontSize: 11 }}
               >
                 Deal: {activity.deal.title}
               </span>
@@ -227,17 +224,14 @@ export function ActivityCard({
 
           {/* AI badge — hiển thị khi activity có dealId (req 13.4) */}
           {activity.dealId && (
-            <div
-              className="rounded-lg px-3 py-2 mb-2 flex items-start justify-between gap-2"
-              style={{ background: "#EEEDFE" }}
-            >
+            <div className="rounded-lg px-3 py-2 mb-2 flex items-start justify-between gap-2 bg-[#EEEDFE] dark:bg-secondary">
               <div className="flex items-start gap-1.5 min-w-0">
                 <Sparkles
                   size={12}
-                  style={{ color: "#534AB7", marginTop: 2 }}
+                  style={{ color: "var(--primary)", marginTop: 2 }}
                   className="shrink-0"
                 />
-                <p style={{ fontSize: 11, color: "#534AB7", lineHeight: 1.5 }}>
+                <p style={{ fontSize: 11, color: "var(--primary)", lineHeight: 1.5 }}>
                   <span style={{ fontWeight: 500 }}>AI Suggestions</span>
                   {" · "}
                   Có gợi ý AI cho deal này

@@ -20,7 +20,7 @@ export function DealRightPanel({ dealId, activities }: DealRightPanelProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto bg-[#F8F8F7]">
+    <div className="flex-1 flex flex-col overflow-y-auto bg-[#F8F8F7] dark:bg-background">
       {/* AI Analyzer */}
       <DealAiAnalyzer dealId={dealId} />
 

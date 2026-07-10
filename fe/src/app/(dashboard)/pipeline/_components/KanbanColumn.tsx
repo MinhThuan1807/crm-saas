@@ -80,7 +80,7 @@ export function KanbanColumn({ stage, deals, onEdit, onDelete }: Props) {
           "flex-1 min-h-[300px] rounded-[10px] p-2 flex flex-col gap-2 overflow-y-auto transition-all duration-150",
           isOver
             ? "bg-primary/5 border-[1.5px] border-dashed border-primary"
-            : "bg-[#F8F8F7] border-[1.5px] border-border/70",
+            : "bg-[#F8F8F7] dark:bg-muted/30 border-[1.5px] border-border/70",
         )}
       >
         <SortableContext items={dealIds} strategy={verticalListSortingStrategy}>

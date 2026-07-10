@@ -8,13 +8,13 @@ import { formatVndShort } from "@/lib/helper";
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-[#E8E7E2] rounded-lg shadow-md px-3 py-2.5 text-xs">
-      <p className="text-[#1A1A18] mb-1.5" style={{ fontWeight: 600 }}>{label}</p>
+    <div className="bg-white dark:bg-card border border-[#E8E7E2] dark:border-border rounded-lg shadow-md px-3 py-2.5 text-xs">
+      <p className="text-[#1A1A18] dark:text-foreground mb-1.5" style={{ fontWeight: 600 }}>{label}</p>
       {payload.map((p: any) => (
         <div key={p.dataKey} className="flex items-center gap-2 mb-0.5">
           <span className="size-2 rounded-full shrink-0" style={{ background: p.color ?? p.stroke }} />
-          <span className="text-[#6B6B67]">{p.name}:</span>
-          <span className="text-[#1A1A18]" style={{ fontWeight: 500 }}>{formatVndShort(p.value)}</span>
+          <span className="text-[#6B6B67] dark:text-muted-foreground">{p.name}:</span>
+          <span className="text-[#1A1A18] dark:text-foreground" style={{ fontWeight: 500 }}>{formatVndShort(p.value)}</span>
         </div>
       ))}
     </div>
@@ -86,9 +86,9 @@ export function ForecastAreaChart({ data = [] }: ForecastAreaChartProps) {
               <stop offset="95%" stopColor="#60A5FA" stopOpacity={0.01} />
             </linearGradient>
           </defs>
-          <CartesianGrid key="fva-grid"  strokeDasharray="3 3" stroke="#E8E7E2" vertical={false} />
-          <XAxis         key="fva-xaxis" dataKey="month" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} />
-          <YAxis         key="fva-yaxis" tick={{ fontSize: 11, fill: "#6B6B67" }} axisLine={false} tickLine={false} tickFormatter={formatVndShort} width={48} domain={[0, yDomainMax]} />
+          <CartesianGrid key="fva-grid"  strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+          <XAxis         key="fva-xaxis" dataKey="month" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} />
+          <YAxis         key="fva-yaxis" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} axisLine={false} tickLine={false} tickFormatter={formatVndShort} width={48} domain={[0, yDomainMax]} />
           <Tooltip       key="fva-tt"    content={<CustomTooltip />} />
           <Area
             key="fva-forecast"

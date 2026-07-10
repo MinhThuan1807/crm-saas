@@ -181,7 +181,7 @@ export default function Activities() {
         onToggleEmpty={() => setShowEmpty((v) => !v)}
       />
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-[#F8F8F7] dark:bg-background">
         <div
           className="flex gap-6 p-6 items-start mx-auto"
           style={{ maxWidth: 1400 }}
