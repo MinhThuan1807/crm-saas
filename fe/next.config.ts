@@ -29,15 +29,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  async redirects() {
-    return [
-      {
-        source: "/:path*",
-        destination: "https://salesflow.codelaicuocdoi.io.vn/:path*",
-        permanent: true,
-      },
-    ];
-  },
 };
 
 export default nextConfig;
