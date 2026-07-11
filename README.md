@@ -18,8 +18,7 @@
 
 A production-grade, multi-tenant Customer Relationship Management (CRM) SaaS platform designed for Small and Medium Enterprises (SMEs). This system features a visual drag-and-drop Sales Pipeline (Kanban), activity tracking, a granular RBAC/ABAC security system, audit trails, and deep Generative AI integrations (via OpenAI and Groq APIs) to automate meeting note summarization, follow-up emails, and unstructured database imports.
 
-**Demo Video:** [https://youtu.be/JAUMLhuh9cM](https://youtu.be/JAUMLhuh9cM)  
-**Live Demo:** [https://codelaicuocdoi.io.vn](https://codelaicuocdoi.io.vn)  
+**Live Demo:** [https://salesflow.codelaicuocdoi.io.vn](https://salesflow.codelaicuocdoi.io.vn)  
 👥 **Test Accounts:**
 *   **Tenant 1 (Admin):** `admin@abc.com` / Password: `Password123!`
 *   **Tenant 1 (Sales Rep):** `sales@abc.com` / Password: `Password123!`
