@@ -1694,21 +1694,57 @@ export default function LandingPage() {
         </div>
 
         {/* Footer */}
-        <div className="max-w-7xl mx-auto px-6 pt-20 pb-8 mt-10 border-t border-border/40 text-center space-y-4">
-          <div className="flex justify-center items-center gap-2 text-primary font-bold">
-            <Image
-              src={logoImg}
-              alt="salesFlow"
-              width={16}
-              height={16}
-              unoptimized
-              className="rounded shrink-0"
-            />
-            <span>SalesFlow CRM</span>
+        <div className="max-w-7xl mx-auto px-6 pt-16 pb-8 mt-16 border-t border-border/40">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-12 text-left">
+            {/* Column 1: Brand Info */}
+            <div className="md:col-span-5 space-y-3">
+              <div className="flex items-center gap-2 text-primary font-bold">
+                <Image
+                  src={logoImg}
+                  alt="salesFlow"
+                  width={20}
+                  height={20}
+                  unoptimized
+                  className="rounded shrink-0"
+                />
+                <span className="text-foreground font-extrabold tracking-tight">SalesFlow CRM</span>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-sm">
+                Giải pháp Quản lý Khách hàng thông minh thế hệ mới, tối ưu hóa quy trình bán hàng cho doanh nghiệp vừa và nhỏ tại Việt Nam.
+              </p>
+            </div>
+
+            {/* Column 2: Navigation Links */}
+            <div className="md:col-span-3 space-y-3">
+              <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">Khám phá</h4>
+              <div className="flex flex-col gap-2">
+                <a href="#features" className="cursor-target text-xs text-muted-foreground hover:text-foreground transition-colors w-fit">Tính năng</a>
+                <a href="#ai-demo" className="cursor-target text-xs text-muted-foreground hover:text-foreground transition-colors w-fit">Trải nghiệm AI</a>
+                <a href="#roles-matrix" className="cursor-target text-xs text-muted-foreground hover:text-foreground transition-colors w-fit">Phân quyền</a>
+                <a href="#audit-logs" className="cursor-target text-xs text-muted-foreground hover:text-foreground transition-colors w-fit">Nhật ký hoạt động</a>
+              </div>
+            </div>
+
+            {/* Column 3: Contact & Custom Build */}
+            <div className="md:col-span-4 space-y-3">
+              <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">Hợp tác & Phát triển</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Doanh nghiệp cần xây dựng tính năng riêng, tùy biến quy trình hoặc thiết kế nền tảng độc bản?
+              </p>
+              <div className="pt-1">
+                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block">Email liên hệ</span>
+                <a href="mailto:nguyenthuan05.work@gmail.com" className="cursor-target text-xs font-bold text-primary hover:underline mt-0.5 block break-all">
+                  nguyenthuan05.work@gmail.com
+                </a>
+              </div>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} SalesFlow. Phát triển dành cho SMEs Việt Nam. Bảo lưu mọi quyền.
-          </p>
+
+          <div className="pt-8 border-t border-border/20 text-center">
+            <p className="text-[11px] text-muted-foreground">
+              &copy; {new Date().getFullYear()} SalesFlow. Phát triển dành cho SMEs Việt Nam. Bảo lưu mọi quyền.
+            </p>
+          </div>
         </div>
       </section>
 
