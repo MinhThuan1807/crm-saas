@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import logoImg from "@/app/icon.png";
+import logoImg from "@/app/favicon.ico";
 
 export function SalesFlowLogo() {
   return (

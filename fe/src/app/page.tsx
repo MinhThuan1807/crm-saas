@@ -5,15 +5,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import logoImg from "@/app/icon.png";
+import logoImg from "@/app/favicon.ico";
 import { useMe, useLogin } from "@/hooks/useAuth";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { gsap } from "gsap";
 import {
-  LayoutDashboard,
   GitBranch,
   Users,
-  TrendingUp,
   Bot,
   Sparkles,
   ShieldCheck,
@@ -21,10 +19,6 @@ import {
   ArrowRight,
   Sun,
   Moon,
-  Workflow,
-  Cpu,
-  Database,
-  Network,
   Menu,
   X,
   CheckCircle2,
@@ -32,10 +26,7 @@ import {
   Play,
   RotateCcw,
   FileSpreadsheet,
-  Settings,
   Lock,
-  ArrowDown,
-  ShieldAlert,
   FolderSync,
   History,
   Eye

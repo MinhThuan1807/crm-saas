@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import logoImg from "@/app/icon.png";
+import logoImg from "@/app/favicon.ico";
 import { cn } from "@/lib/utils";
 import { Badge } from "./ui/badge";
 import { useLogout, useMe } from "@/hooks/useAuth";
