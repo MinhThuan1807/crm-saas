@@ -1,4 +1,4 @@
-# CRM SaaS - Intelligent Customer Management Platform for SMEs
+# SalesFlow - Intelligent Customer Management Platform for SMEs
 
 <div align="center">
 
@@ -30,18 +30,23 @@ A production-grade, multi-tenant Customer Relationship Management (CRM) SaaS pla
 
 | **Analytics Dashboard** | **Reports & Statistics** |
 | --- | --- |
-| ![Dashboard](assets/dashboard.jpg) | ![Reports](assets/reports.jpg) |
+| ![Dashboard](assets/analytics-dashboard.jpg) | ![Reports](assets/reports-statistics.jpg) |
 | *Visual analytics tracking deals value, win rates, and team performance.* | *Conversion funnel tracking and sales activity distribution.* |
 
 | **Kanban Board for Deal Pipeline** | **AI Meeting Brief & Action Items** |
 | --- | --- |
-| ![Kanban Board](assets/pipeline.jpg) | ![AI Integration](assets/AI-intergation.jpg) |
+| ![Kanban Board](assets/sales-pipeline.jpg) | ![AI Integration](assets/ai-meeting-analysis.jpg) |
 | *Smooth drag-and-drop interface for updating deal stages.* | *Asynchronous AI parsing of raw meeting notes to extract deliverables.* |
 
-| **Permissions & Multi-Tenant Configuration** |
+| **Permissions & Multi-Tenant Configuration** | **AI Column Mapping for Import** |
+| --- | --- |
+| ![Tenant Settings](assets/roles-matrix.jpg) | ![AI Column Mapping](assets/ai-column-mapping.jpg) |
+| *Matrix-based dynamic permission management with system and custom roles.* | *AI-powered mapping of raw Excel headers to CRM database fields.* |
+
+| **Structured Audit Logs** |
 | --- |
-| ![Tenant Settings](assets/tenant%20isolation.jpg) |
-| *Matrix-based dynamic permission management with system and custom roles.* |
+| ![Audit Logs](assets/audit-logs.jpg) |
+| *Detailed change tracking with JSON differences showing old vs new values.* |
 
 ---
 
